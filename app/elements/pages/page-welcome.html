@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-welcome">
+  <template>
+    <style include="shared-styles"></style>
+    <paper-toolbar>
+      <span class="flex"></span>
+      <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
+    </paper-toolbar>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-welcome',
+
+        properties: {
+
+        },
+        goToSearch: function(){
+          page.show('/search');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

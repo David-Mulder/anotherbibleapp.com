@@ -1,0 +1,225 @@
+<script src="jszip.custom.js"></script>
+<a id="link" href="#">Generating</a>
+<script>
+  var reBlank = /^\s*$/;
+  var walk = function(node) {
+    var child, next;
+    switch (node.nodeType) {
+      case 3: // Text node
+        break;
+        if (reBlank.test(node.nodeValue)) {
+          node.parentNode.removeChild(node);
+        }
+        break;
+      case 1: // Element node
+      case 9: // Document node
+        if(node.childNodes.length == 0){
+          node.parentNode.removeChild(node);
+        }else{
+          child = node.firstChild;
+          while (child) {
+            next = child.nextSibling;
+            walk(child);
+            child = next;
+          }
+        }
+        break;
+    }
+  }
+  var zip = new JSZip();
+  var httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = function() {
+    if (httpRequest.readyState === 4) {
+      if (httpRequest.status === 200) {
+        var parser = new DOMParser();
+        var text = httpRequest.responseText;
+        text = text.replace(/\s+/g, " ");
+        text = text.replace(/\n/g, " ");
+        //replace <li1>'s and <li2>'s with proper html <li>'s
+        text = text.replace(new RegExp("\<li(\\d+)\>","g"),"<li class='level-$1'>");
+        text = text.replace(new RegExp("\<\/li\\d+\>","g"),"</li>");
+        //make idioms proper tags
+        text = text.replace(new RegExp("\<idiom\-start /\>([a-zA-Z0-9'\". ]+)<idiom\-end /\>","g"),"<idiom>$1</idiom>");
+        text = text.replace(new RegExp("\<note(.*?)>(.*?)</note>","g"),"<note$1><info>$2</info></note>");
+        var doc = parser.parseFromString(text, "application/xml");
+
+        //remove empty nodes??
+        walk(doc);
+
+        //put uls in p's???
+        var uls = doc.querySelectorAll("ul");
+        for(var i=0;i<uls.length;i++){
+          var el = uls[i];
+          if(el.previousElementSibling && el.previousElementSibling.tagName == "p"){
+            var newel = el.cloneNode(true);
+            console.log(newel.outerHTML);
+            newel.removeAttribute("xmlns");
+            el.previousElementSibling.appendChild(newel);
+          }else{
+            var wrapper = document.createElementNS('','p');
+            wrapper.innerHTML = el.outerHTML;
+            el.parentElement.insertBefore(wrapper,el);
+          }
+          el.parentElement.removeChild(el);
+        }
+        /*
+         var uls = doc.querySelectorAll("p:empty + ul + p:empty");
+
+         for(var i=0;i<uls.length;i++){
+         var ul = uls[i].previousSibling;
+         console.log(parser.parseFromString(uls[i].parentElement.outerHTML,"application/xml"));
+         console.dir(uls[i]);
+         throw err;
+         var p = uls[i].previousSibling.previousSibling;
+         p.parentElement.removeChild(p);
+         p = uls[i];
+         p.parentElement.removeChild(p);
+         var parent = ul.parentNode;
+         var wrapper = document.createElementNS('','p');
+         var position = 0;
+         for(var iii = 0; iii < parent.childNodes.length; iii++) {
+         if(parent.childNodes[iii] == ul) {
+         position = iii;
+         break;
+         };
+         };
+         wrapper.appendChild(ul);
+         parent.insertBefore(wrapper, parent.childNodes[position]);
+         //ul.outerHTML = "<p>"+ul.outerHTML+"</p>";
+         //console.log(wrapper.parentElement,ul.parentElement);
+         //throw err;
+         }
+         throw err;
+         */
+        /*
+         var toArray = Array.prototype.slice.call.bind(Array.prototype.slice);
+         var troubleverses = toArray(doc.querySelectorAll("book p > *:first-child:not(verse-number)"));
+         for(var i=0;i<troubleverses.length;i++){
+         firstChildOfChild = troubleverses[i].childNodes[0];
+         while(firstChildOfChild){
+         if(firstChildOfChild.tagName == "verse-number"){
+         delete troubleverses[i];
+         firstChildOfChild = null;
+         }else{
+         firstChildOfChild = firstChildOfChild.childNodes[0];
+         }
+         }
+         if(troubleverses[i])
+         troubleverses[i] = troubleverses[i].parentElement;
+         };
+         var allps = Array.prototype.slice.call(doc.querySelectorAll("book p"));
+         allps.forEach(function(p){
+         if(p.childNodes.length == 1 && p.childNodes[0].nodeType == 3){
+         troubleverses.push(p);
+         }
+         });
+         for(var i=0;i<troubleverses.length;i++){
+         if(troubleverses[i]){
+         var prev = troubleverses[i].previousSibling;
+         if(prev === null){
+         prev = troubleverses[i].parentElement.previousSibling;
+         }
+         //while(prev && ((prev.tagName !=="p" && prev.tagName !=="ul") || prev.textContent == "")){
+         while(prev && !("querySelector" in prev && prev.querySelector("verse-number"))){
+         oldref = prev;
+         prev = prev.previousSibling;
+         if(prev == null){
+         //if(troubleverses[i].parentElement.previousSibling == oldref){
+         //	console.log(troubleverses[i].parentElement,troubleverses[i],oldref);
+         //	prev = troubleverses[i].parentElement.previousSibling.previousSibling;
+         //}else{
+         prev = troubleverses[i].parentElement.previousSibling;
+         //}
+         }
+         }
+         if(!prev){
+         console.log(prev);
+         }
+         var verseNumbersInPrev = prev.querySelectorAll("verse-number");
+         var verseTag = verseNumbersInPrev[verseNumbersInPrev.length-1].cloneNode(true);
+         verseTag.setAttribute("tag","PARAGRAPH_ONLY");
+         troubleverses[i].insertBefore(verseTag,troubleverses[i].childNodes[0]);
+         }
+         //console.log("prev",prev,verseTag)
+
+         }
+         */
+        //make sure we have got verse numbers in every paragraph in cases where the verse splits over various paragraphs??
+        var toArray = Array.prototype.slice.call.bind(Array.prototype.slice);
+        var allps = Array.prototype.slice.call(doc.querySelectorAll("book p"));
+        allps.forEach(function(p){
+          if(!p.querySelector("verse-number")){
+            //we got a paragraph without a verse number
+            previousSibling = p.previousSibling;
+            while(previousSibling && (previousSibling.nodeType == 3 || previousSibling.querySelectorAll("verse-number").length == 0)){
+              if(previousSibling.previousSibling){
+                previousSibling = previousSibling.previousSibling;
+              }else if(previousSibling.parentElement.previousSibling){
+                previousSibling = previousSibling.parentElement.previousSibling;
+              }
+            };
+            if(!previousSibling){
+              console.log(p,p.nextSibling.nextSibling);
+              console.log("nooo");
+            }
+            var verseNumbersInPrev = previousSibling.querySelectorAll("verse-number");
+            var verseTag = verseNumbersInPrev[verseNumbersInPrev.length-1].cloneNode(true);
+            verseTag.setAttribute("tag","PARAGRAPH_ONLY");
+            p.insertBefore(verseTag,p.childNodes[0]);
+          }
+        });
+        var books = doc.querySelectorAll("book");
+
+        toArray(doc.querySelectorAll("book")).forEach(function(book){
+          if(!(book.querySelector("chapter"))){
+            var wrapper = document.createElementNS('','chapter');
+            wrapper.setAttribute("id",book.getAttribute("id")+" 1");
+
+            toArray(book.childNodes).forEach(function(node){
+              wrapper.appendChild(node);
+            });
+            book.insertBefore(wrapper, book.childNodes[0]);
+          }
+        });
+        toArray(doc.querySelectorAll("verse-number")).forEach(function(vs){
+          if(vs.getAttribute("id").indexOf(":")==-1){
+            if(vs.nextSibling.tagName == "verse-number"){
+              vs.parentElement.removeChild(vs);
+            }else{
+              //change attribute to be clearer
+              var ref = vs.getAttribute("id");
+              var space = ref.lastIndexOf(" ");
+              var bookName = ref.substr(0,space);
+              var verseNumber = ref.substr(space+1,ref.length);
+              vs.setAttribute("id",bookName + " 1:" + verseNumber);
+              console.log("single chapter?",vs);
+            }
+
+          }
+        });
+        //throw err;
+        //console.log(doc);
+        //throw err;
+        //throw err;
+        for(var i=0;i<books.length;i++){
+          var book = books[i];
+          var string = book.outerHTML;
+          if(string.indexOf("xmlns") > -1){
+            string = string.replace(new RegExp(" xmlns=\".*?\"","g"),"");
+          }
+          zip.file(book.getAttribute("id")+".xml", string);
+          //console.log(doc.querySelector("chapter").innerHTML)
+        }
+        var blob = zip.generate({
+          type : "blob",
+          compression:"DEFLATE"
+        });
+        document.getElementById("link").href = window.URL.createObjectURL(blob);
+        document.getElementById("link").download = "bible.zip";
+        document.getElementById("link").textContent = "Download";
+      }
+    }
+  }
+  httpRequest.open('GET', "./LEB.xml");
+  httpRequest.send();
+</script>

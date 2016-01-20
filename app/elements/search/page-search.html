@@ -1,0 +1,85 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./bible-search.html">
+<link rel="import" href="./topical-search.html">
+
+<dom-module id="page-search">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+
+        background: var(--primary-color-100);
+
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        display: flex;
+        flex-direction: column;
+      }
+      .search-box {
+        background-color: #fff;
+        border: 1px solid #eee;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        height: 40px;
+      }
+
+      .search-box iron-icon {
+        color: var(--google-grey-700);
+        fill: var(--google-grey-700);
+        margin: 0 8px;
+      }
+
+      .search-box input {
+        font-size: 20px;
+        outline: 0;
+        border: none;
+      }
+
+      .content {
+        padding: 8px;
+      }
+
+      .search-box {
+        @apply(--layout-flex);
+        @apply(--layout-center);
+        @apply(--layout-horizontal);
+      }
+
+      .search-box input {
+        @apply(--layout-flex);
+      }
+    </style>
+    <paper-toolbar class="medium-tall">
+      <span class="flex"></span>
+      <div class="search-box bottom">
+        <iron-icon icon="search"></iron-icon>
+        <input value="{{searchQuery::input}}" x-webkit-speech>
+        <iron-icon icon="av:mic"></iron-icon>
+      </div>
+    </paper-toolbar>
+    <div style="overflow:auto;padding: 0px 10px;">
+      <topical-search search-query="{{searchQuery}}"></topical-search>
+      <bible-search search-query="{{searchQuery}}"></bible-search>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-search',
+
+        properties: {
+          searchQuery: {
+            type: String,
+            notify: true
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

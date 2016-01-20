@@ -1,0 +1,161 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="./bind-html.html">
+
+<dom-module id="bible-text">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        top: 0px;
+        display: flex;
+      }
+      iron-list{
+        flex: 1;
+
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+    <style>
+      :host{
+      }
+      paper-card{
+      }
+      chapter{
+        display: block;
+        box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;
+      }
+      p{
+        text-align: justify;
+      }
+      ul{
+        list-style: none;
+        padding-left: 20px;
+      }
+      ul li{
+        font-style: italic;
+      }
+    </style>
+    <style>
+      .read{
+
+      }
+    </style>
+    <style>
+      :host([mode='study']) chapter{
+        background: var(--card-dialog-color);
+        margin: 10px 10px 0px 10px;
+        padding: 20px;
+      }
+      :host([mode='study']) pericope{
+        display: inline-block;
+        text-indent:0px;
+        padding-left:10px;
+        padding-right:10px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: .9em;
+        font-weight: 400;
+        text-align: left;
+        text-decoration: underline;
+      }
+      :host([mode='study']) n io{
+        display: none;
+      }
+      :host([mode='study']) n:after{
+        content: 'NOTE';
+        position: relative; top: -1em;
+        font-size: 7px;
+        color: rgba(0, 0, 0, 0.6);
+        font-family: Verdana;
+      }
+      /*
+      :host([mode='study']) verse-number{
+        display: inline-block;
+        text-align: center;
+        font-size: 9px;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        min-width: 12px;
+        min-height: 12px;
+        transform: scale(0.9) translateY(-20%);
+      }
+      */
+      :host([mode='study']) sd{
+        font-variant: small-caps;
+      }
+      :host([mode='study']) im{
+        font-style: italic;
+      }
+    </style>
+    <iron-list id="text" items="{{chapters}}" as="book" on-tap="selectVerse">
+      <template>
+        <bind-html html="{{book}}"></bind-html>
+      </template>
+    </iron-list>
+  </template>
+
+  <script>
+    (function () {
+      'use strict';
+
+      Polymer({
+        is: 'bible-text',
+        properties: {
+          bookName: {
+            type: String,
+            observer: 'loadBook'
+          },
+          chapters: {
+            type: Array,
+            value: []
+          },
+          mode: {
+            type: String,
+            value: 'study',
+            reflectToAttribute: true
+          },
+          selectedVerse: {
+            type: String,
+            notify: true
+          }
+        },
+        ready: function() {
+          //this.scopeSubtree(this.$.text, true);
+        },
+        loadBook: function(){
+          var url = this.resolveUrl('text/'+this.bookName+'.xml');
+
+          var httpRequest = new XMLHttpRequest();
+          httpRequest.onreadystatechange = function(){
+            this.set('chapters', []);
+            if(httpRequest.readyState === XMLHttpRequest.DONE) {
+              if(httpRequest.status === 200) {
+                var chapters = httpRequest.responseXML.querySelectorAll('chapter');
+                for(var i=0; i<chapters.length;i++){
+                  this.push('chapters', chapters[i].outerHTML);
+                }
+                //this.$.text.innerHTML = httpRequest.responseText;
+              }
+            }
+          }.bind(this);
+          httpRequest.responseType = 'document';
+          httpRequest.open('GET', url);
+          httpRequest.send();
+        },
+        selectVerse: function(ev){
+          var verseNumberElement = ev.path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
+          this.set('selectedVerse', verseNumberElement ? verseNumberElement.id : undefined)
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

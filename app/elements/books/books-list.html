@@ -1,0 +1,58 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="books-list">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+
+      paper-card{
+        width: 100%;
+        margin-bottom: 10px;
+        --paper-card-header-text: {
+          font-size: 16px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        };
+      }
+      paper-button{
+        text-transform: none;
+        width: 100%;
+        text-align: left;
+        font-size: 14px;
+      }
+    </style>
+    <utils-books grouped-books="{{books}}" sort-category="tradition"></utils-books>
+    <template is="dom-repeat" items="{{books}}" as="group">
+      <paper-card heading="{{group.label}}">
+        <template is="dom-repeat" items="{{group.books}}" as="book">
+          <div class="card-actions">
+            <paper-button on-tap="goToBook">{{book.title}}</paper-button>
+          </div>
+        </template>
+      </paper-card>
+    </template>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'books-list',
+
+        properties: {
+          books: Array
+        },
+        goToBook: function(ev){
+          page('/book/'+ev.model.book.name);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

@@ -1,0 +1,132 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../text/bible-snippet.html">
+
+<dom-module id="topical-search">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-card{
+        min-height:150px;
+        position:relative;
+      }
+      paper-spinner{
+        position: absolute;
+        height: 40px;
+        width: 40px;
+        top: 45%;
+        left: 50%;
+        margin-left:-20px;
+        /*
+        display:block;
+        margin:auto;
+        padding: 30px 0px 50px;
+        */
+      }
+      .card-actions{
+        padding:8px 16px !important;
+      }
+      #noResults{
+        color: var(--secondary-text-on-card-dialog-color);
+        position:absolute;
+        left:0px;
+        right:0px;
+        text-align:center;
+        top: 50%;
+      }
+    </style>
+
+    <utils-books id="utils"></utils-books>
+
+
+    <template is="dom-repeat" items="{{topics}}">
+      <paper-card heading="{{item.title}}" class="full-page">
+
+        <template is="dom-repeat" items="{{item.verses}}" as="snippet">
+          <div class="card-actions">
+            <bible-snippet start="{{snippet.start}}" end="{{snippet.end}}" highlight="{{searchQuery}}"></bible-snippet>
+          </div>
+        </template>
+
+      </paper-card>
+    </template>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'topical-search',
+
+        properties: {
+          searchQuery: {
+            type: String,
+            observer: 'triggerSearch'
+          }
+        },
+        ready: function(){
+        },
+        _toTitleCase: function(str){
+          return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        },
+        triggerSearch: function(query){
+          if(query.length == 0){
+            return false;
+          }
+          this.set('topics', []);
+          this.debounce('search bible', function(){
+            this.set('topics', []);
+            this._search(query).then(function(topics){
+              console.log('topic result', topics);
+              topics = topics.filter((topic) => topic.score > 0.7);
+              topics.forEach(function(topic){
+                var verses = topic.texts.map(function(text){
+                  var parts = text.split(' ');
+                  return {
+                    start: parts[0],
+                    end: parts[1].length > 0 ? parts[1] : parts[0],
+                    votes: parts[2]
+                  };
+                }.bind(this));
+                this.push('topics', {
+                  title: this._toTitleCase(topic.title),
+                  verses: verses
+                });
+              }.bind(this));
+
+            }.bind(this)).catch(function(){
+              console.error('some error occured...')
+            });
+          }, 100);
+        },
+        _search: function(searchString){
+          this.loading = true;
+          this.noResults = false;
+          return new Promise(function(resolve, reject){
+            if(this.worker){
+              //this might I guess lead to unresolved promises laying around...
+              this.worker.terminate();
+            }
+            this.worker = new Worker(this.resolveUrl('topical-search-worker.js'));
+            this.worker.postMessage(searchString);
+            this.worker.addEventListener('message', function(ev){
+              this.loading = false;
+              this.noResults = ev.data.length === 0;
+              resolve(ev.data);
+            }.bind(this));
+            this.worker.addEventListener('error', function(ev){
+              //console.error('ERROR YES', ev);
+              reject(ev);
+            });
+          }.bind(this));
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

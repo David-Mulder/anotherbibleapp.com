@@ -1,0 +1,4 @@
+Just a list of things I could theoretically optimize if need be:
+ - load snippets only if in view
+ - Reference <utils-books> in parent in snippets
+ - do not retrieve full book text for every snippet (!!!)

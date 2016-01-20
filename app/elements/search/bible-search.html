@@ -1,0 +1,110 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../text/bible-snippet.html">
+
+<dom-module id="bible-search">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-card{
+        min-height:150px;
+        position:relative;
+      }
+      paper-spinner{
+        position: absolute;
+        height: 40px;
+        width: 40px;
+        top: 45%;
+        left: 50%;
+        margin-left:-20px;
+        /*
+        display:block;
+        margin:auto;
+        padding: 30px 0px 50px;
+        */
+      }
+      .card-actions{
+        padding:8px 16px !important;
+      }
+      #noResults{
+        color: var(--secondary-text-on-card-dialog-color);
+        position:absolute;
+        left:0px;
+        right:0px;
+        text-align:center;
+        top: 50%;
+      }
+    </style>
+
+    <utils-books id="utils"></utils-books>
+
+    <paper-card heading="Literal Search" class="full-page">
+      <paper-spinner active="{{loading}}"></paper-spinner>
+      <div id="noResults" hidden$="{{!noResults}}">No verses found for your search query.</div>
+      <template is="dom-repeat" items="{{results}}">
+        <div class="card-actions">
+          <bible-snippet start="{{item.firstVerse}}" end="{{item.lastVerse}}" highlight="{{searchQuery}}"></bible-snippet>
+        </div>
+      </template>
+    </paper-card>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'bible-search',
+
+        properties: {
+          searchQuery: {
+            type: String,
+            observer: 'triggerSearch'
+          }
+        },
+        ready: function(){
+        },
+        triggerSearch: function(query){
+          this.set('results', []);
+          this.debounce('search bible', function(){
+            this._search(query, 300).then(function(result){
+              console.log('result', result);
+              result.results.forEach(function(result){
+                this.push('results', {
+                  verses: result.verses,
+                  score: result.score,
+                  firstVerse: result.verses[0],
+                  lastVerse: result.verses[result.verses.length - 1]
+                });
+              }.bind(this));
+            }.bind(this));
+          }, 100);
+        },
+        _search: function(searchString, length){
+          this.loading = true;
+          this.noResults = false;
+          return new Promise(function(resolve, reject){
+            if(this.worker){
+              //this might I guess lead to unresolved promises laying around...
+              this.worker.terminate();
+            }
+            this.worker = new Worker(this.resolveUrl('bible-search-worker.js'));
+            this.worker.postMessage(searchString);
+            this.worker.addEventListener('message', function(ev){
+              this.loading = false;
+              this.noResults = ev.data.results.length === 0;
+              resolve(ev.data);
+            }.bind(this));
+            this.worker.addEventListener('error', function(ev){
+              console.log('ERROR YES', ev);
+            });
+          }.bind(this));
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

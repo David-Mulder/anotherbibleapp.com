@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+
+<dom-module id="qa-drawer">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        background: var(--primary-color-100);
+        color: var(--text-on-primary-color-100);
+        display: flex;
+        flex-direction: column;
+      }
+      #content{
+        flex: 1;
+        position: relative;
+        padding: 10px;
+      }
+      paper-fab{
+        position:absolute;
+        bottom: 20px;
+        right: 20px;
+      }
+      #noSelection{
+        opacity: 1;
+        position: absolute;
+        left: 0px;
+        top: 30px;
+        right: 0px;
+        height: 30px;
+        text-align: center;
+        color: var(--secondary-text-on-primary-color-100);
+      }
+    </style>
+    <paper-toolbar>
+      <span class="title" style="margin-left: 0px;">Q&A</span>
+    </paper-toolbar>
+    <div id="content">
+      <div id="noSelection">Tap a verse to see related Q&A's</div>
+      {{verse}}
+      <paper-fab icon="add"></paper-fab>
+
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'qa-drawer',
+
+        properties: {
+          verse: {
+            type: String
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

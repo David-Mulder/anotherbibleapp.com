@@ -1,0 +1,64 @@
+<script>
+  fetch('topic-votes.txt').then((response) => response.text()).then(function(text){
+    var lines = text.split('\n');
+    var result = {};
+    var topics = [];
+    lines.forEach(function(line,i){
+      if(i % 100 == 0){
+        console.log(i+'/'+lines.length, Object.keys(result).length);
+      }
+      var parts = line.split('\t');
+      text = parts[1] + ' ' + parts[2] + ' ' + parts[3];
+      if(typeof result[parts[0]] === 'undefined'){
+        result[parts[0]] = [];
+      };
+      topics.push(parts[0]);
+      result[parts[0]].push(text);
+    });
+    /*
+    var result = {};
+    lines.forEach(function(line,i){
+      if(i % 100 == 0){
+        console.log(i+'/'+lines.length, Object.keys(result).length);
+      }
+      var parts = line.split('\t');
+      text = parts[1] + ' ' + parts[2] + ' ' + parts[3];
+      if(typeof result[parts[0]] === 'undefined'){
+        result[parts[0]] = [];
+      };
+      result[parts[0]].push(text);
+    });
+    */
+    /*
+    var lines = text.split('\n');
+    var result = [];
+    var lastTopic = '';
+    var voteMinimum = 10;
+n = 0;
+    lines.forEach(function(line,i){
+      if(i % 100 == 0){
+        console.log(i+'/'+lines.length, result.length);
+      }
+      var parts = line.split('\t');
+      if(parts[0] !== lastTopic){
+        result.push({
+          v:[],
+          t:parts[0]
+        });
+        lastTopic = parts[0];
+      }
+      text = parts[1] + ' ' + parts[2] + ' ' + parts[3];
+      if(parts[3] >= voteMinimum){
+        result[result.length-1].v.push(text);
+      }
+    });
+    result.filter(function(topic){
+      if(topic.v.length < 3 || topic.v.length > 50){
+        console.log(topic.t, topic.v.length);
+      }
+    });
+    */
+    document.write('<pre>var topics = '+JSON.stringify(result));
+    console.log(JSON.stringify(result).length);
+  });
+</script>

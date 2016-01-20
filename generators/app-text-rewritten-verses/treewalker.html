@@ -1,0 +1,107 @@
+<script>
+  var xml = `
+    <dom><p>
+      <verse-number id="1"></verse-number>
+      Lorem ipsum dolar <idiom>also known as dollar</idiom> sit <verse-number id="2"></verse-number>amet.
+      <ul>
+        <li>
+          consectetur <note>in</note> adipiscing <verse-number id="3"></verse-number>elit.
+        </li>
+        <li>
+          Nunc finibus, neque aliquam <verse-number id="4"></verse-number>ultrices ornare,
+        </li>
+      </ul>
+    </p>
+    <p>
+      orci quam elementum.
+    </p>
+    Antro periscope.
+    <verse-number id="5"></verse-number>
+    <p>
+      Tontro derilium.
+    </p>
+  </dom>
+  `;
+
+  var domParser = new DOMParser();
+  var dom = domParser.parseFromString(xml, 'text/xml');
+
+  var prevId;
+
+  var versify = function(dom) {
+    var treeWalker = document.createTreeWalker(dom);
+    while (treeWalker.nextNode()) {
+      var cn = treeWalker.currentNode;
+      if (cn.nodeName === 'verse-number') {
+        prevId = cn.id;
+        //console.log(cn);
+        //cn.parentNode.removeChild(cn);
+        //console.log(prevId);
+        cn.classList.add('remove');
+      }
+
+      var prevSiblingVerseNumber = false;
+      var containsVerseNumber = false;
+      if (cn.previousSibling) {
+        //console.log('nodename', cn.previousSibling.nodeName);
+        if (cn.previousSibling.nodeName == 'verse-number' && !cn.previousSibling.classList.contains('remove')) {
+          if(cn.previousSibling.id == prevId){
+            prevSiblingVerseNumber = true;
+          }
+        }
+      }
+      if (cn.nodeType === 1 && cn.querySelector('verse-number')) {
+        containsVerseNumber = true;
+      }
+      //console.log(cn.nodeName, prevSiblingVerseNumber, containsVerseNumber);
+      if (prevSiblingVerseNumber && !containsVerseNumber) {
+        console.log('append', cn, 'into', cn.previousSibling);
+        cn.previousSibling.appendChild(cn);
+      }
+
+      if (cn.nodeType === 3) {
+        if (cn.textContent.trim().length > 0) {
+          //console.group(cn);
+          var inMarker = false;
+          var inPericope = false;
+          var inNote = false;
+
+          var current = cn.parentElement;
+          while (current) {
+            if (current.nodeName == 'verse-number') {
+              inMarker = true;
+            }
+            if(current.nodeName == 'pericope'){
+              inPericope = true;
+            }
+            if(current.nodeName == 'note'){
+              inNote = true;
+            }
+            //console.log(current.nodeName);
+            current = current.parentElement;
+          }
+
+          //console.log(cn.textContent, inMarker, inPericope, inNote);
+          if (!inMarker && !inPericope && !inNote ) {
+            var marker = document.createElement('verse-number');
+            marker.setAttribute('id', prevId);
+            if (cn.nextSibling) {
+              cn.parentNode.insertBefore(marker, cn.nextSibling);
+            } else {
+              cn.parentNode.appendChild(marker);
+            }
+            marker.appendChild(cn);
+          }
+          //console.dir(cn);
+          //console.groupEnd();
+        }
+      }
+    }
+    var remove = dom.querySelectorAll('.remove');
+    for (var i = 0; i < remove.length; i++) {
+      remove[i].parentNode.removeChild(remove[i]);
+    }
+  };
+  versify(dom);
+  console.log(dom);
+</script>
