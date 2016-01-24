@@ -31,6 +31,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
     // imports are loaded and elements have been registered
+    document.getElementById('loading').style.opacity = 0;
+
+    var func;
+    document.getElementById('mainDrawer').addEventListener('narrow-changed', func = function(){
+      document.body.dispatchEvent(new CustomEvent("narrow-changed", {
+        detail: {
+          narrow: document.getElementById('mainDrawer').narrow
+        }
+      }));
+    });
+    func();
+
   });
 
   // Main area's paper-scroll-header-panel custom condensing transformation of
@@ -71,6 +83,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Scroll page to top and expand header
   app.scrollPageToTop = function() {
     document.getElementById('mainContainer').scrollTop = 0;
+  };
+
+  app.goToHome = function(){
+    page('/');
   };
 
 })(document);

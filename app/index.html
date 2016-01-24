@@ -10,7 +10,7 @@
   <!-- Place favicon.ico in the `app/` directory -->
 
   <!-- Chrome for Android theme color -->
-  <meta name="theme-color" content="#2E3AA1">
+  <meta name="theme-color" content="#795548">
 
   <!-- Web Application Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -21,23 +21,23 @@
   <!-- Add to homescreen for Chrome on Android -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="application-name" content="PSK">
-  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+  <link rel="icon" sizes="192x192" href="/images/touch/chrome-touch-icon-192x192.png">
 
   <!-- Add to homescreen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Polymer Starter Kit">
-  <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/images/touch/apple-touch-icon.png">
 
   <!-- Tile icon for Win8 (144x144) -->
-  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+  <meta name="msapplication-TileImage" content="/images/touch/ms-touch-icon-144x144-precomposed.png">
 
   <!-- build:css styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="/styles/main.css">
   <!-- endbuild-->
 
   <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   <!-- endbuild -->
 
   <script>
@@ -46,7 +46,7 @@
   </script>
 
   <!-- will be replaced with elements/elements.vulcanized.html -->
-  <link rel="import" href="elements/elements.html">
+  <link rel="import" href="/elements/elements.html">
   <!-- endreplace-->
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
@@ -56,70 +56,80 @@
 
 </head>
 
-<body unresolved class="fullbleed layout vertical">
-  <span id="browser-sync-binding"></span>
-  <template is="dom-bind" id="app">
+<body class="fullbleed layout vertical">
+  <div id="loading">
+    <div class="toolbar">
+      Another Bible App
+    </div>
+  </div>
+  <div>
+    <span id="browser-sync-binding"></span>
+    <template is="dom-bind" id="app">
 
-    <paper-drawer-panel id="paperDrawerPanel" responsive-width="1000px">
-      <!-- Drawer Scroll Header Panel -->
-      <paper-scroll-header-panel drawer fixed>
+      <paper-drawer-panel id="mainDrawer" responsive-width="1300px">
+        <!-- Drawer Scroll Header Panel -->
+        <paper-scroll-header-panel drawer fixed>
 
-        <!-- Drawer Toolbar -->
-        <paper-toolbar id="drawerToolbar">
-          <span class="paper-font-title">Another Bible App</span>
-        </paper-toolbar>
-        <div style="position:absolute;left:0px;top:0px;bottom:0px;right:0px;overflow: auto;">
-          <books-list></books-list>
-        </div>
+          <!-- Drawer Toolbar -->
+          <paper-toolbar id="drawerToolbar" on-tap="goToHome">
+            <span class="title" style="margin-left:0px;">Another Bible App</span>
+          </paper-toolbar>
+          <div style="position:absolute;left:0px;top:0px;bottom:0px;right:0px;overflow: auto;">
+            <books-list></books-list>
+          </div>
 
 
-      </paper-scroll-header-panel>
+        </paper-scroll-header-panel>
 
-      <!-- Main Area -->
-      <paper-scroll-header-panel main condenses keep-condensed-header>
+        <!-- Main Area -->
+        <paper-scroll-header-panel main condenses keep-condensed-header>
 
-        <!-- Main Content -->
-        <div class="content">
-          <iron-pages attr-for-selected="data-route" selected="{{route}}">
+          <!-- Main Content -->
+          <div class="content">
+            <iron-pages attr-for-selected="data-route" selected="{{route}}">
 
-            <page-welcome data-route="home">
-            </page-welcome>
-            <page-book data-route="book" book="{{params.bookName}}">
-            </page-book>
-            <page-search data-route="search" search-query="{{params.searchQuery}}"></page-search>
-            <!--<section data-route="home">
+              <page-welcome data-route="home"></page-welcome>
+              <page-book data-route="book" book="{{params.bookName}}"></page-book>
+              <page-search data-route="search" search-query="{{params.searchQuery}}"></page-search>
+              <page-login data-route="login"></page-login>
+              <page-new-question data-route="new-question" verses-string="{{params.newQuestionVerses}}"></page-new-question>
+              <page-question data-route="question" id="{{params.questionId}}"></page-question>
+              <page-rules-questions data-route="rules-questions"></page-rules-questions>
+              <!--<section data-route="home">
 
-              <paper-material elevation="1" class="paper-font-body2">
-                <bible-text book-name="Da"></bible-text>
-              </paper-material>
+				<paper-material elevation="1" class="paper-font-body2">
+				  <bible-text book-name="Da"></bible-text>
+				</paper-material>
 
-            </section>-->
-          </iron-pages>
-        </div>
-      </paper-scroll-header-panel>
-    </paper-drawer-panel>
+			  </section>-->
+            </iron-pages>
+          </div>
+        </paper-scroll-header-panel>
+      </paper-drawer-panel>
 
-    <!-- Uncomment next block to enable Service Worker support (1/2) -->
-    <!--
-    <paper-toast id="caching-complete"
-                 duration="6000"
-                 text="Caching complete! This app will work offline.">
-    </paper-toast>
+      <!-- Uncomment next block to enable Service Worker support (1/2) -->
+      <!--
+	  <paper-toast id="caching-complete"
+				   duration="6000"
+				   text="Caching complete! This app will work offline.">
+	  </paper-toast>
 
-    <platinum-sw-register auto-register
-                          clients-claim
-                          skip-waiting
-                          on-service-worker-installed="displayInstalledToast">
-      <platinum-sw-cache default-cache-strategy="fastest"
-                         cache-config-file="cache-config.json">
-      </platinum-sw-cache>
-    </platinum-sw-register>
-    -->
+	  <platinum-sw-register auto-register
+							clients-claim
+							skip-waiting
+							on-service-worker-installed="displayInstalledToast">
+		<platinum-sw-cache default-cache-strategy="fastest"
+						   cache-config-file="cache-config.json">
+		</platinum-sw-cache>
+	  </platinum-sw-register>
+	  -->
 
-  </template>
+    </template>
+
+  </div>
 
   <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
+  <script src="/scripts/app.js"></script>
   <!-- endbuild-->
 </body>
 

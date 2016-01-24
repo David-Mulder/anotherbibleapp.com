@@ -1,0 +1,75 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-welcome">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <paper-toolbar>
+      <span class="flex"></span>
+      <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
+    </paper-toolbar>
+    <div class="page-content">
+      <auth-api logged-in="{{loggedIn}}"></auth-api>
+      <div hidden="{{!loggedIn}}">
+        <paper-card heading="Welcome back">
+          <div class="card-content">
+            Over here you will later see a list of featured questions and answers.
+          </div>
+          <div class="card-actions">
+            <paper-button>Log Out</paper-button>
+          </div>
+        </paper-card>
+      </div>
+      <div hidden="{{loggedIn}}">
+        <paper-card heading="Welcome to Another Bible App">
+          <div class="card-content">
+            There are a lot of Bible Apps out there, so thanks for using this one. To use the Q&A parts of the app fully
+            you need to register and log in. If you want to just read go right ahead and pick the book from the left drawer.
+            Use search in the top right even offline to find bible verses.
+          </div>
+          <div class="card-actions">
+            <paper-button on-tap="goToLogin">Log In</paper-button>
+            <paper-button>Register</paper-button>
+          </div>
+        </paper-card>
+        <paper-card heading="Q&A">
+          <div class="card-content">
+            An integral part of this bible app is the ability to ask and answer questions about bible texts.
+          </div>
+        </paper-card>
+        <paper-card heading="Focused reading">
+          <div class="card-content">
+            The Bible is 'just' a collection of books and letters and stuff like verses, notes, pericopes (the headers in
+            between paragraphs) and all those things were later added. All of these are incredibly useful when reading,
+            but only distract from the real text. By default this app will hide all these things, although they are just
+            a click away if you need them.
+          </div>
+        </paper-card>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-welcome',
+
+        properties: {
+
+        },
+        ready: function(){
+          this.set('loggedIn', false);
+        },
+        goToSearch: function(){
+          page.show('/search');
+        },
+        goToLogin: function(){
+          page.show('/login');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

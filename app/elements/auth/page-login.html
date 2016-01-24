@@ -1,0 +1,83 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="page-login">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+        background: var(--primary-color-50);
+      }
+      paper-card{
+        display: block;
+        width: 400px;
+        margin: 10px auto;
+        padding: 20px;
+        background: var(--card-dialog-color);
+      }
+      paper-card#login .card-content{
+        padding-top: 0px;
+      }
+      paper-card#login paper-input{
+        --paper-input-container: {
+          padding-top: 0px;
+        };
+      }
+      .card-content .actions{
+        padding-top: 30px;
+      }
+      paper-button.blue{
+        background: var(--primary-color);
+        color: var(--text-on-primary-color);
+      }
+    </style>
+    <paper-toolbar>
+      <span class="flex"></span>
+    </paper-toolbar>
+    <div>
+      <auth-api id="api" param-username="{{username}}" param-password="{{password}}" logged-in="{{loggedIn}}"></auth-api>
+      <form is="iron-form" id="form" method="post" action="/form/handler" on-submit="test" hidden="{{loggedIn}}">
+        <paper-card id="login" heading="Log in">
+          <div class="card-content">
+            <paper-input label="E-mail" value="{{username}}" autofocus></paper-input>
+            <paper-input type="password" value="{{password}}" label="Password"></paper-input>
+            <div class="actions">
+              <paper-button class="blue" on-tap="login">Log In</paper-button>
+              <paper-button class="blue">Forgot your password</paper-button>
+            </div>
+          </div>
+        </paper-card>
+      </form>
+      <paper-card id="login" heading="Log in" hidden="{{!loggedIn}}">
+        <div class="card-content">
+          You are already logged in. Please Log Out first.
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-login',
+
+        properties: {
+
+        },
+        ready: function(){
+        },
+        login: function(){
+          this.$.api.login().then(function(){
+            console.log('yay', this.loggedIn);
+            if(this.loggedIn){
+              page('/');
+            }
+          }.bind(this));
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

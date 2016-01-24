@@ -19,9 +19,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //app.scrollPageToTop();
     });
 
+    page('/login', function (data) {
+      app.route = 'login';
+      //app.scrollPageToTop();
+    });
+
     page('/book/:name', function (data) {
       app.route = 'book';
       app.set('params.bookName', data.params.name);
+      //app.scrollPageToTop();
+    });
+
+    page('/questions/ask/:verses', function (data) {
+      app.route = 'new-question';
+      app.set('params.newQuestionVerses', data.params.verses);
       //app.scrollPageToTop();
     });
 
@@ -31,15 +42,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //app.scrollPageToTop();
     });
 
+    page('/question/:id', function(data) {
+      app.route = 'question';
+      app.set('params.questionId', data.params.id);
+      //app.scrollPageToTop();
+    });
+
     page('/search/:query', function (data) {
       app.route = 'search';
       app.set('params.searchQuery', data.params.query);
       //app.scrollPageToTop();
     });
 
+    page('/help/how-to-ask', function (data) {
+      app.route = 'rules-questions';
+      //app.scrollPageToTop();
+    });
+
     // add #! before urls
     page({
-      hashbang: true
+      hashbang: false
     });
 
   });

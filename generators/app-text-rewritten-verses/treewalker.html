@@ -23,6 +23,8 @@
   </dom>
   `;
 
+  xml = `<p><verse-number id="Dt 7:7">7</verse-number>“Yahweh loved you and chose you not <idiom-start />because of your great number<idiom-end /><note>Literally “from your multitude/abundance”</note> exceeding all <supplied>other</supplied> peoples, for you <supplied>are</supplied> fewer than all of the peoples, <verse-number id="Dt 7:8">8</verse-number>but<note>Or “for”</note> <idiom-start />because of<idiom-end /><note>Literally “from”</note> the love of Yahweh <supplied>for</supplied> you and because of his keeping <supplied>of</supplied> the sworn oath that he swore to your ancestors,<note>Or “fathers”</note> Yahweh brought you <supplied>out</supplied> with a strong hand and redeemed you from the house of slavery, from the hand of Pharaoh, the king of Egypt. <verse-number id="Dt 7:9">9</verse-number><supplied>So</supplied> know that Yahweh your God, he <supplied>is</supplied> God, the trustworthy God, maintaining his<note>Hebrew “the”</note> covenant and his<note>Hebrew “the”</note> loyal love with those who love him and with those who keep his commandments to a thousand generations,<note>Hebrew “generation”</note> <verse-number id="Dt 7:10">10</verse-number>but repaying those<note>Hebrew “the one”</note> who hate him <idiom-start />in their own person<idiom-end /><note>Literally “to their faces”</note> to destroy them;<note>Hebrew “him”; “them” in sense</note> he is not slow with those who hate him <idiom-start />in their own person<idiom-end />;<note>Literally “to their faces”</note> he repays them.<note>Hebrew “him”</note> <verse-number id="Dt 7:11">11</verse-number>And <supplied>so</supplied> you shall keep the commandment and the rules and the regulations that I <supplied>am</supplied> commanding you <idiom-start />today<idiom-end /><note>Literally “the day”</note> to observe them. </p>`;
+
   var domParser = new DOMParser();
   var dom = domParser.parseFromString(xml, 'text/xml');
 
@@ -55,7 +57,7 @@
       }
       //console.log(cn.nodeName, prevSiblingVerseNumber, containsVerseNumber);
       if (prevSiblingVerseNumber && !containsVerseNumber) {
-        console.log('append', cn, 'into', cn.previousSibling);
+        //console.log('append', cn, 'into', cn.previousSibling);
         cn.previousSibling.appendChild(cn);
       }
 

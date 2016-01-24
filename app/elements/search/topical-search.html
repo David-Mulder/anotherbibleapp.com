@@ -81,9 +81,13 @@
           this.set('topics', []);
           this.debounce('search bible', function(){
             this.set('topics', []);
+
             this._search(query).then(function(topics){
               console.log('topic result', topics);
               topics = topics.filter((topic) => topic.score > 0.7);
+              if(topics.length == 0){
+                this.fire('no-results');
+              }
               topics.forEach(function(topic){
                 var verses = topic.texts.map(function(text){
                   var parts = text.split(' ');

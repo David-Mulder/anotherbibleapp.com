@@ -8,7 +8,7 @@
     <style>
       :host{
 
-        background: var(--primary-color-100);
+        background: var(--primary-color-50);
 
         position: absolute;
         top: 0px;
@@ -55,13 +55,14 @@
       <span class="flex"></span>
       <div class="search-box bottom">
         <iron-icon icon="search"></iron-icon>
-        <input value="{{searchQuery::input}}" x-webkit-speech>
+        <input is="iron-input" value="{{searchQuery}}" on-keyup="_setValueIfEnter" x-webkit-speech autofocus></input>
         <iron-icon icon="av:mic"></iron-icon>
       </div>
     </paper-toolbar>
     <div style="overflow:auto;padding: 0px 10px;">
-      <topical-search search-query="{{searchQuery}}"></topical-search>
-      <bible-search search-query="{{searchQuery}}"></bible-search>
+      <topical-search search-query="{{searchQuery}}" on-no-results="triggerBibleSearch"></topical-search>
+
+      <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>
     </div>
   </template>
 
@@ -77,6 +78,17 @@
             type: String,
             notify: true
           }
+        },
+
+        _setValueIfEnter: function(ev){
+          if(ev.keyCode == 13){
+            ev.target.blur();
+            this.searchQuery = ev.target.value;
+          }
+        },
+
+        triggerBibleSearch: function(){
+          this.$.bibleSearch.search();
         }
       });
     })();

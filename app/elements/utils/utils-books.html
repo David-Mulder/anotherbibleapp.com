@@ -1131,7 +1131,7 @@
         }
       ];
 
-      var bibleReferenceParserRegex = new RegExp("^([a-zA-Z0-9 ]+?)( ([0-9]*?)(([: ])(([0-9]*?)([\-\u2013]([0-9]*?))?)?)?)?$");
+      var bibleReferenceParserRegex = new RegExp('^([a-zA-Z0-9 ]+?)( ([0-9]*?)(([: ])(([0-9]*?)([\-\u2013]([0-9]*?))?)?)?)?$');
 
       var BibleReference = function(bookObject, chapter, verseStart, verseEnd){
         this.book = bookObject;
@@ -1141,10 +1141,13 @@
         this.verseEnd = verseEnd;
       };
       BibleReference.prototype.toString = function(){
-        return this.book.name + " " + this.chapter + ":" + this.verse;
+        return this.book.name + ' ' + this.chapter + ':' + this.verse;
       };
       BibleReference.prototype.toLongString = function(){
-        return this.book.title + " " + this.chapter + ":" + this.verse;
+        return this.book.title + ' ' + this.chapter + ':' + this.verse;
+      };
+      BibleReference.prototype.toNumeric = function(){
+        return (('00' + (bibleBooks.indexOf(this.book)+1)).slice(-2) + ('000' + this.chapter).slice(-3) + ('000' + this.verseStart).slice(-3)) * 1;
       };
 
       Polymer({
@@ -1216,12 +1219,12 @@
         },
 
         parseReference: function(vs){
+          //todo: can be shorter than 8 if leading 0
           if(/^[0-9]{8}$/.test(vs)){
             //numeric reference
             var book = parseInt(vs.toString().substring(0,2));
             var chapter = parseInt(vs.toString().substring(2,5));
             var verse = parseInt(vs.toString().substring(5,8));
-            console.log(book, bibleBooks[book-1]);
             return new BibleReference(bibleBooks[book-1], chapter, verse, verse);
           }else{
             //normal reference
@@ -1234,7 +1237,7 @@
               var matchQuality = book ? book.matchQuality : 0;
               matchQuality += matches[3] ? 30 : 0;
               matchQuality += matches[6] ? 50 : 0;
-              matchQuality -= matches[5] == ' ' ? 50 : 0;
+              matchQuality -= matches[5] === ' ' ? 50 : 0;
               return new BibleReference(book, parseInt(matches[3]), parseInt(matches[7]), parseInt(matches[9]));
             }else{
               return new BibleReference();
@@ -1245,7 +1248,7 @@
           var book;
           var quality = 0;
           bibleBooks.every(function(booki){
-            if(booki.title.toLowerCase() == bookname.toLowerCase()){
+            if(booki.title.toLowerCase() === bookname.toLowerCase()){
               book = booki;
               quality = 100;
               return false;
@@ -1254,7 +1257,7 @@
           });
           if(!book){
             bibleBooks.every(function(booki){
-              if(booki.name.toLowerCase() == bookname.toLowerCase()){
+              if(booki.name.toLowerCase() === bookname.toLowerCase()){
                 book = booki;
                 quality = 90;
                 return false;
@@ -1269,9 +1272,9 @@
             };
             bibleBooks.forEach(function(book,bookIndex){
               for(var i=1;i<7;i++){
-                if(book.title.toLowerCase().substr(0,i) == bookname.toLowerCase().substr(0,i)){
+                if(book.title.toLowerCase().substr(0,i) === bookname.toLowerCase().substr(0,i)){
                   var quality = 30;
-                  if(bookname.length == i) quality += 50;
+                  if(bookname.length === i){ quality += 50 }
                   if(quality > bestBook.quality){
                     bestBook.quality = quality;
                     bestBook.book = book;
@@ -1284,7 +1287,7 @@
               quality = bestBook.quality;
             }
           }
-          if(book) book.matchQuality = quality;
+          if(book){ book.matchQuality = quality }
           return book;
         }
       });

@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="intelligent-title">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: flex;
+        flex: 1;
+        align-items: center;
+      }
+      .title{
+        margin-left: 0px;
+        font-size: 20px;
+      }
+      :host(:not([narrow])) paper-icon-button{
+        display: none;
+      }
+      :host([no-title-if-wide]:not([narrow])){
+        display: none;
+      }
+      :host([narrow]) .title{
+        margin-left: 15px;
+      }
+    </style>
+    <paper-icon-button icon="menu" on-tap="openDrawer"></paper-icon-button>
+    <span class="title">{{title}}</span>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'intelligent-title',
+
+        properties: {
+          title: {
+            type: String,
+            value: 'Another Bible App'
+          },
+          narrow: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          noTitleIfWide: {
+            reflectToAttribute: true
+          }
+        },
+        ready: function(){
+          document.body.addEventListener('narrow-changed', function(ev){
+            this.set('narrow', ev.detail.narrow);
+          }.bind(this))
+        },
+        openDrawer: function(){
+          document.getElementById('mainDrawer').openDrawer();
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="./bind-html.html">
+<link rel="import" href="./chapter-html.html">
 
 <dom-module id="bible-text">
   <template>
@@ -42,6 +42,11 @@
       ul li{
         font-style: italic;
       }
+      vn.selected{
+
+        background: var(--accent-color-200);
+        color: var(--text-on-accent-color-200);
+      }
     </style>
     <style>
       .read{
@@ -53,6 +58,14 @@
         background: var(--card-dialog-color);
         margin: 10px 10px 0px 10px;
         padding: 20px;
+      }
+      :host([mode='study']) chapter::before{
+        content: attr(n);
+        display: inline-block;
+        float: left;
+        font-size: 48px;
+        padding-right: 10px;
+        padding-bottom: 10px;
       }
       :host([mode='study']) pericope{
         display: inline-block;
@@ -76,8 +89,8 @@
         color: rgba(0, 0, 0, 0.6);
         font-family: Verdana;
       }
-      /*
-      :host([mode='study']) verse-number{
+      :host([mode='study']) vn[first]::before{
+        content: attr(n);
         display: inline-block;
         text-align: center;
         font-size: 9px;
@@ -87,7 +100,6 @@
         min-height: 12px;
         transform: scale(0.9) translateY(-20%);
       }
-      */
       :host([mode='study']) sd{
         font-variant: small-caps;
       }
@@ -97,7 +109,7 @@
     </style>
     <iron-list id="text" items="{{chapters}}" as="book" on-tap="selectVerse">
       <template>
-        <bind-html html="{{book}}"></bind-html>
+        <chapter-html html="{{book}}" selected-verses="{{selectedVerses}}"></chapter-html>
       </template>
     </iron-list>
   </template>
@@ -122,13 +134,18 @@
             value: 'study',
             reflectToAttribute: true
           },
-          selectedVerse: {
-            type: String,
+          selectedVerses: {
+            type: Array,
             notify: true
+          },
+          selectionMode: {
+            type: String,
+            value: 'single'
           }
         },
         ready: function() {
           //this.scopeSubtree(this.$.text, true);
+          this.selectedVerses = [];
         },
         loadBook: function(){
           var url = this.resolveUrl('text/'+this.bookName+'.xml');
@@ -152,7 +169,26 @@
         },
         selectVerse: function(ev){
           var verseNumberElement = ev.path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
-          this.set('selectedVerse', verseNumberElement ? verseNumberElement.id : undefined)
+          if(this.selectionMode === 'multiple'){
+            if(verseNumberElement) {
+              var isSelected = this.selectedVerses.includes(verseNumberElement.id);
+              if (isSelected) {
+                //unselect
+                this.splice('selectedVerses', this.selectedVerses.indexOf(verseNumberElement.id), 1);
+              } else {
+                //select
+                this.push('selectedVerses', verseNumberElement.id);
+              }
+              console.log(this.selectedVerses);
+            }
+          }else{
+            if(!verseNumberElement || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)){
+              this.set('selectedVerses', []);
+            }else{
+              this.set('selectedVerses', verseNumberElement ? [verseNumberElement.id] : []);
+            }
+          }
+          this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
         }
       });
     })();

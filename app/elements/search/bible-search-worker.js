@@ -5,6 +5,7 @@ importScripts('lib/stringDistance.js');
 importScripts('data/stopWords.js');
 
 onmessage = function(ev){
+  console.info('search for', ev.data);
   search(ev.data, 300).then(function(result){
     postMessage(result);
     close();

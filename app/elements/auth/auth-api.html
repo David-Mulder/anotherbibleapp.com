@@ -1,0 +1,181 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/whenever.js/whenever.js">
+
+<!-- athenticated api -->
+<dom-module id="auth-api">
+  <script>
+    (function() {
+      'use strict';
+
+      var apiElements = [];
+
+      var registerToken = function(token){
+        apiElements.forEach(function(el){
+          el.set('token', token);
+        });
+      };
+
+      Polymer({
+        is: 'auth-api',
+
+        properties: {
+          action: String,
+          method: {
+            type: String,
+            value: 'GET'
+          },
+          unauthorized: Boolean,
+          token: String,
+          apiUrl: {
+            type: String,
+            value: 'http://localhost:3000'
+          },
+          loggedIn: {
+            type: Boolean,
+            notify: true,
+            computed: 'isLoggedIn(token)'
+          },
+          _requiredParams: {
+            type: Array,
+            computed: '_getRequiredParams(action)'
+          },
+          response: {
+            type: Object,
+            notify: true
+          }
+        },
+
+        ready: function(){
+          apiElements.push(this);
+          if('token' in localStorage){
+            registerToken(localStorage.token);
+          }
+        },
+
+        isLoggedIn: function(){
+          return this.token.length > 0;
+        },
+
+        execute: function(cb){
+
+          return new Promise(function(resolve, reject){
+            if(this.token || this.unauthorized) {
+              var paramsSet = this._requiredParams.every((param) => {
+                var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
+                return typeof this.get(propertyName) !== 'undefined' && this.get(propertyName);
+              });
+
+              if(paramsSet){
+                var url = this._buildURL(this.action);
+
+                var fetchConfig = {
+                  method: this.method,
+                  headers: new Headers()
+                };
+                fetchConfig.headers.set('Accept', 'application/json');
+
+                if(this.loggedIn){
+                  //fetchConfig.headers.set('auth-token', this.token);
+                  url += '?token='+this.token;
+                }
+
+                var formDataParams = this._getUnusedParams();
+                if(formDataParams.length > 0){
+                  /*var formData = new FormData();
+                  formDataParams.forEach(function(param){
+                    var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
+                    formData.append(param, this.get(propertyName));
+                  }.bind(this));
+                  fetchConfig.body = formData;
+                  fetchConfig.headers.set('Content-Type','application/x-www-form-urlencoded');*/
+                  var data = {};
+                  formDataParams.forEach(function(param){
+                    var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
+                    data[param] = this.get(propertyName);
+                  }.bind(this));
+                  fetchConfig.body = JSON.stringify(data);
+                  fetchConfig.headers.set('Content-Type','application/json');
+                }
+
+                fetch(url, fetchConfig).then(function(response){
+                  this.status = response.status;
+                  return response.text();
+                }.bind(this)).then(function(text){
+                  var response = JSON.parse(text);
+                  if(this.status === 401 && response === 'Invalid token'){
+                    var pt = document.createElement('paper-toast');
+                    pt.opened = true;
+                    pt.duration = 10000;
+                    pt.text = 'It seems your login credentials are out of date. Please log out and log in again.';
+                    document.body.appendChild(pt);
+                    reject(response);
+                  }else if(this.status === 429){
+                    var pt = document.createElement('paper-toast');
+                    pt.opened = true;
+                    pt.duration = 10000;
+                    pt.text = 'Sorry, you are doing too many request within a minute. As a security measure this is not allowed.';
+                    document.body.appendChild(pt);
+                    reject(response);
+                  }else if(this.status === 200){
+                    resolve(response);
+                    this.response = response;
+                  }else{
+                    reject(response);
+                  }
+                }.bind(this));
+              }else{
+                reject('Not all parameters are set');
+              }
+            }
+          }.bind(this));
+
+        },
+
+        login: function(){
+          return new Promise(function(resolve, reject){
+            this.set('action', 'authenticate/:username/:password');
+            this.set('unauthorized', true);
+            this.execute().then(function(){
+              if(this.status === 401){
+                reject(this.response);
+              }else{
+                localStorage.token = this.response;
+                registerToken(localStorage.token);
+                resolve();
+              }
+            }.bind(this)).catch(function(err){
+              reject('Please enter both a username and password');
+            }.bind(this));
+          }.bind(this));
+        },
+
+        _getRequiredParams: function(url){
+          return url.split('/').filter(urlPart => urlPart.substr(0,1) === ':').map(urlPart => urlPart.split(':')[1]);
+        },
+
+        _getUnusedParams: function(){
+          var allParams = Object.keys(this).filter(function(propName){
+            return propName.substring(0,5) == 'param'
+          }).map(function(propName){
+            return propName.substring(5, 6).toLowerCase() + propName.substring(6, propName.length);
+          });
+          return allParams.filter(function(param){
+            return !this._requiredParams.includes(param);
+          }.bind(this));
+        },
+
+        _buildURL: function(url){
+          return this.apiUrl + '/' + url.split('/').map((urlPart) => {
+            if(urlPart.substr(0,1) === ':'){
+              var propertyName = 'param' + urlPart.substring(1, 2).toUpperCase() + urlPart.slice(2);
+              return this.get(propertyName);
+            }else{
+              return urlPart
+            }
+          }).join('/')
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

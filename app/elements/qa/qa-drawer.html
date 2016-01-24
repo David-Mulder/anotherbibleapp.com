@@ -7,8 +7,8 @@
     <style>
       :host {
         display: block;
-        background: var(--primary-color-100);
-        color: var(--text-on-primary-color-100);
+        background: var(--primary-color-50);
+        color: var(--text-on-primary-color-50);
         display: flex;
         flex-direction: column;
       }
@@ -22,24 +22,34 @@
         bottom: 20px;
         right: 20px;
       }
-      #noSelection{
+      #noSelection, #noResult{
         opacity: 1;
         position: absolute;
-        left: 0px;
+        left: 10px;
         top: 30px;
-        right: 0px;
+        right: 15px;
         height: 30px;
         text-align: center;
-        color: var(--secondary-text-on-primary-color-100);
+        color: var(--secondary-text-on-primary-color-50);
       }
     </style>
+    <utils-books id="utils"></utils-books>
+    <auth-api id="api" action="questions/list/:verse" param-verse="{{verseId}}" response="{{questions}}"></auth-api>
     <paper-toolbar>
       <span class="title" style="margin-left: 0px;">Q&A</span>
     </paper-toolbar>
     <div id="content">
-      <div id="noSelection">Tap a verse to see related Q&A's</div>
-      {{verse}}
-      <paper-fab icon="add"></paper-fab>
+      <div id="noSelection" hidden$="{{selection}}">Tap a verse to see related Q&A's</div>
+      <div id="noResult" hidden$="{{!noResults}}">No questions have been asked about {{verse}}. Got a question? Click the + below to ask yours.</div>
+
+      <paper-card heading="Related Questions" hidden$="{{!relatedQuestions}}">
+        <template is="dom-repeat" items="{{questions}}" as="question">
+          <div class="card-actions">
+            {{question.title}}
+          </div>
+        </template>
+      </paper-card>
+      <paper-fab icon="add" on-tap="newQuestion"></paper-fab>
 
     </div>
   </template>
@@ -52,8 +62,42 @@
         is: 'qa-drawer',
 
         properties: {
-          verse: {
-            type: String
+          verses: {
+            type: Array
+          },
+          relatedQuestions: {
+            type: Boolean,
+            value: false
+          },
+          noResults: {
+            type: Boolean,
+            value: false
+          }
+        },
+        observers: [
+          'verseChanged(verses.splices)'
+        ],
+        newQuestion: function(){
+          this.fire('new-question');
+        },
+        newQuestionSelectionFinished: function(){
+          page('/questions/ask/'+this.verses.toString());
+        },
+        verseChanged: function(){
+          if(this.verses.length > 0){
+            this.selection = true;
+            this.verse = this.$.utils.parseReference(this.verses[0]);
+            this.verseId = this.verse.toNumeric();
+            this.$.api.execute().then(function(questions){
+              this.set('relatedQuestions', questions.length > 0)
+              this.set('noResults', questions.length === 0)
+            }.bind(this));
+          }else{
+            this.verse = null;
+            this.verseId = null;
+            this.selection = false;
+            this.noResults = false;
+            this.relatedQuestions = false;
           }
         }
       });

@@ -1,0 +1,81 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="chapter-html">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'chapter-html',
+
+        properties: {
+          html: {
+            type: String,
+            observer: 'setHTML'
+          }
+        },
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+        observers: [
+          'setSelectionClassesFromSplices(selectedVerses.splices)'
+        ],
+        setHTML: function(){
+          var div = document.createElement('div');
+          div.innerHTML = this.html;
+          this.setSelectionClasses(div);
+          this.setVerseNumberAttributes(div);
+          this.setChapterAttributes(div);
+          this.innerHTML = '';
+          this.appendChild(div);
+          //this.scopeSubtree(this.$.html, false);
+          //console.log(this.classList.contains("bible-text"));
+          //Polymer.dom(this).parentNode.parentNode.scopeSubtree(this);
+          //this.notifyResize();
+        },
+        setSelectionClassesFromSplices: function(){
+          this.setSelectionClasses(this);
+        },
+        setSelectionClasses: function(element){
+          var verses = element.querySelectorAll('vn.selected');
+          for(var i=0;i<verses.length;i++){
+            verses[i].classList.remove('selected');
+          }
+          this.selectedVerses.forEach(function(verse){
+            var verseEls = element.querySelectorAll('vn[id="'+verse+'"]');
+            if(verseEls.length > 0){
+              for(var i=0;i<verseEls.length;i++){
+                verseEls[i].classList.add('selected');
+              }
+            }
+          }.bind(this));
+        },
+        setVerseNumberAttributes: function(element){
+          var verses = element.querySelectorAll('vn');
+          var cVerse = "";
+          for(var i=0;i<verses.length;i++) {
+            var split = verses[i].id.split(':');
+            if(split.length > 1){
+              verses[i].setAttribute('n', split[1]);
+            }else{
+              verses[i].setAttribute('n', verses[i].id.split(' ')[1]);
+            }
+
+            if(cVerse !== verses[i].id){
+              verses[i].setAttribute('first', '');
+            }
+            cVerse = verses[i].id;
+          }
+        },
+        setChapterAttributes: function(element){
+          var chapter = element.querySelector('chapter');
+          chapter.setAttribute('n', chapter.id.split(' ')[1]);
+        },
+        attached: function(){
+          console.log('ATTACHED');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

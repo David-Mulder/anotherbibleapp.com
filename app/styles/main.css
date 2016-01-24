@@ -12,5 +12,23 @@ body {
   font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #333;
 }
-
-
+#loading{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: rgb(239,235,233);
+  z-index: 1;
+  opacity: 1;
+  transition: .2s opacity linear;
+  pointer-events: none;
+}
+#loading .toolbar{
+  height: 64px;
+  background: rgb(121,85,72);
+  color: white;
+  font-size: 20px;
+  line-height: 64px;
+  padding-left: 16px;
+}

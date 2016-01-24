@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-rules-questions">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      li{
+        margin-bottom: 20px;
+      }
+    </style>
+    <paper-toolbar>
+      <span>How to Write and Ask a Good Question</span>
+    </paper-toolbar>
+    <div class="page-content">
+      <paper-card heading="Writing a Question">
+        <div class="card-content">
+          If you ask a question you should write it in such a way that it's not only useful for you if it gets an answer,
+          but also for everybody else who might ever wonder about this issue. For this reason this site works a bit
+          differently from most forums across the internet and has a couple of rules to keep in mind:
+          <ul>
+            <li>
+              <strong>Do not include salutations</strong> ('Hi', 'Greetings', etc.), <strong>thanks</strong>
+              ('Thanks!', 'Thanks in advance', etc.) <strong>or your signature</strong> in the question body. Your name is already right
+              next to the question and this keeps the question to the point.
+            </li>
+            <li>
+              Every question should be worded in such a way that there could be <strong>one definite answer</strong>.
+              Try to write them in such a way that they do not incite discussion, although it's fine that different answers will disagree.
+            </li>
+            <li>
+              Every question should <strong>only contain one actual question</strong>. Do not combine multiple question in to one
+              except if the overlap is huge. In most cases splitting them up is better.
+            </li>
+            <li>
+              Others may edit your posts to improve them.
+            </li>
+          </ul>
+        </div>
+      </paper-card>
+      <paper-card heading="Question categories">
+        <div class="card-content">
+          To keep questions focused they are split in to three categories:
+          <ul>
+            <li>
+              Questions regarding the events described in the text. This applies primarily to texts that describe
+              historical events and questions will often be about the temporal context.
+            </li>
+            <li>
+              Questions regarding the author, his intentions and his public. Why was the text written as it was written?
+              How was it understood by it's audience? Why did the author decide to write the text in the first place?
+            </li>
+            <li>
+              Questions regarding the modern application the text has for the modern reader. These questions will often
+              incite most discussion, so please read the rules carefully above and write these questions well. In the
+              future once this site has ran for awhile good questions will hopefully show up and I will improve
+              the description here.
+            </li>
+          </ul>
+        </div>
+      </paper-card>
+      <paper-card heading="Formatting">
+        <div class="card-content">
+          This site uses Markdown to handle it's formatting with a couple additions, here are the most important things to know:
+          <ul>
+            <li>
+              To start a new paragraph just leave an empty line in between.
+            <code><!--
+              -->First paragraph.
+
+<!--              -->Second paragraph.<!--
+            --></code>
+            </li>
+            <li>
+              To quote someone put it on an a standalone line with a &gt; in front.
+<code>Augustine claimed that:
+
+> And here you place your quote
+> even if it spans multiple lines.
+
+and you continue like normal again.</code>
+            </li>
+            <li>
+              (NOT IMPLEMENTED YET) To link a Bible verse use `[Mt 3:3]` for example, to quote a bible passage use the quotation syntax from above
+              with just
+              <code>> Mt 3:3-4</code>
+            </li>
+          </ul>
+          For full instructions (making text bold, italic, underline, a header, etc.) just Google for 'markdown'.
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-rules-questions',
+
+        properties: {
+
+        },
+        ready: function(){
+          this.set('loggedIn', false);
+        },
+        goToSearch: function(){
+          page.show('/search');
+        },
+        goToLogin: function(){
+          page.show('/login');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
