@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./verse-information-drawer.html">
 
 <dom-module id="page-book">
   <template>
@@ -37,7 +38,7 @@
         display: flex;
         flex-direction: column;
       }
-      qa-drawer{
+      verse-information-drawer{
         flex: 1;
       }
       #qaNewQuestionSelected{
@@ -60,9 +61,15 @@
         </paper-toast>
       </div>
       <div drawer>
+        <verse-information-drawer verses="{{selectedVerses}}" on-new-question="qaNewQuestionMode"></verse-information-drawer>
+        <!--
+        <paper-toolbar>
+          <span class="title" style="margin-left: 0px;">Information</span>
+        </paper-toolbar>
         <qa-drawer id="qa" verses="{{selectedVerses}}" on-new-question="qaNewQuestionMode">
 
         </qa-drawer>
+        -->
       </div>
 
   </template>

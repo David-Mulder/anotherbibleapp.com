@@ -1,55 +1,62 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 
-<dom-module id="qa-drawer">
+<dom-module id="qa-related-questions-card">
   <template>
     <style include="shared-styles"></style>
     <style>
       :host {
-        display: block;
-        background: var(--primary-color-50);
-        color: var(--text-on-primary-color-50);
         display: flex;
         flex-direction: column;
       }
       #content{
         flex: 1;
         position: relative;
-        padding: 10px;
       }
       paper-fab{
         position:absolute;
         bottom: 20px;
         right: 20px;
       }
-      #noSelection, #noResult{
-        opacity: 1;
-        position: absolute;
-        left: 10px;
-        top: 30px;
-        right: 15px;
-        height: 30px;
+      #noResult{
+        margin-top: 20px;
+        margin-bottom: 20px;
         text-align: center;
         color: var(--secondary-text-on-primary-color-50);
       }
+      paper-card{
+        margin: 0px;
+      }
+      paper-button{
+        color: var(--primary-color);
+        font-weight: bold;
+        margin: 0px;
+      }
+      #content .question-link{
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+      #content .question-link:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
     </style>
-    <utils-books id="utils"></utils-books>
     <auth-api id="api" action="questions/list/:verse" param-verse="{{verseId}}" response="{{questions}}"></auth-api>
-    <paper-toolbar>
-      <span class="title" style="margin-left: 0px;">Q&A</span>
-    </paper-toolbar>
+
     <div id="content">
-      <div id="noSelection" hidden$="{{selection}}">Tap a verse to see related Q&A's</div>
-      <div id="noResult" hidden$="{{!noResults}}">No questions have been asked about {{verse}}. Got a question? Click the + below to ask yours.</div>
+      <div id="noResult" hidden$="{{!noResults}}">
+        No questions have been asked about {{verse}}. Got a question? <a href="#" on-tap="newQuestion">Tap here to ask yours</a>.
+      </div>
 
       <paper-card heading="Related Questions" hidden$="{{!relatedQuestions}}">
         <template is="dom-repeat" items="{{questions}}" as="question">
-          <div class="card-actions">
+          <div class="card-actions question-link" on-tap="gotoQuestionPage">
             {{question.title}}
           </div>
         </template>
+        <div class="card-actions">
+          <paper-button on-tap="newQuestion">Ask a question</paper-button>
+        </div>
       </paper-card>
-      <paper-fab icon="add" on-tap="newQuestion"></paper-fab>
 
     </div>
   </template>
@@ -59,11 +66,11 @@
       'use strict';
 
       Polymer({
-        is: 'qa-drawer',
+        is: 'qa-related-questions-card',
 
         properties: {
-          verses: {
-            type: Array
+          verse: {
+            type: Object
           },
           relatedQuestions: {
             type: Boolean,
@@ -75,7 +82,7 @@
           }
         },
         observers: [
-          'verseChanged(verses.splices)'
+          'verseChanged(verse)'
         ],
         newQuestion: function(){
           this.fire('new-question');
@@ -84,21 +91,19 @@
           page('/questions/ask/'+this.verses.toString());
         },
         verseChanged: function(){
-          if(this.verses.length > 0){
-            this.selection = true;
-            this.verse = this.$.utils.parseReference(this.verses[0]);
+          if(this.verse){
             this.verseId = this.verse.toNumeric();
             this.$.api.execute().then(function(questions){
               this.set('relatedQuestions', questions.length > 0)
               this.set('noResults', questions.length === 0)
             }.bind(this));
           }else{
-            this.verse = null;
-            this.verseId = null;
-            this.selection = false;
             this.noResults = false;
             this.relatedQuestions = false;
           }
+        },
+        gotoQuestionPage: function(ev){
+          page('/question/'+ev.model.question._id)
         }
       });
     })();

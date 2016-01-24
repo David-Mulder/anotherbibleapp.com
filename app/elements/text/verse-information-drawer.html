@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./related-topics-card.html">
+
+<dom-module id="verse-information-drawer">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: flex;
+        flex-direction: column;
+      }
+      #content {
+        position: relative;
+        flex: 1;
+        overflow: auto;
+        background: var(--primary-color-50);
+      }
+      #noSelection{
+        opacity: 1;
+        position: absolute;
+        left: 10px;
+        top: 30px;
+        right: 15px;
+        height: 30px;
+        text-align: center;
+        color: var(--secondary-text-on-primary-color-50);
+      }
+      qa-related-questions-card{
+        margin: 10px;
+      }
+      related-topics-card{
+        margin: 10px;
+      }
+    </style>
+    <paper-toolbar>
+      <span class="title" style="margin-left: 0px;">Information</span>
+    </paper-toolbar>
+    <div id="content">
+      <utils-books id="utils"></utils-books>
+
+      <div id="noSelection" hidden$="{{selection}}">Tap a verse to see related Q&A's</div>
+
+      <qa-related-questions-card verse="{{verse}}">
+      </qa-related-questions-card>
+      <related-topics-card verse="{{verse}}"></related-topics-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'verse-information-drawer',
+
+        properties: {
+          verses: {
+            type: Array,
+            notity: true
+          }
+        },
+        observers: [
+          'verseChanged(verses.splices)'
+        ],
+        verseChanged: function(){
+          if(this.verses.length > 0){
+            this.selection = true;
+            this.verse = this.$.utils.parseReference(this.verses[0]);
+          }else{
+            this.verse = null;
+            this.selection = false;
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

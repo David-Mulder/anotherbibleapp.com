@@ -69,7 +69,8 @@
         },
         setChapterAttributes: function(element){
           var chapter = element.querySelector('chapter');
-          chapter.setAttribute('n', chapter.id.split(' ')[1]);
+          var s = chapter.id.split(':')[0].split(' ');
+          chapter.setAttribute('n', s[s.length - 1]);
         },
         attached: function(){
           console.log('ATTACHED');

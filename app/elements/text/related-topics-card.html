@@ -1,0 +1,77 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="related-topics-card">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-card{
+        display: block;
+      }
+      .note{
+        color: var(--secondary-text-on-card-dialog-color);
+        font-size: small;
+      }
+      .topic:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
+    </style>
+    <paper-card heading="Related Topics" hidden$="{{noTopics}}">
+      <template is="dom-repeat" items="{{topics}}" as="topic">
+        <div class="card-actions topic" on-tap="openTopicPage">{{_smartCaps(topic.title)}}</div>
+      </template>
+      <div class="card-actions note">
+        If you come across a dubious topic, please do contact me.
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'related-topics-card',
+
+        properties: {
+          verse: {
+            type: Object
+          }
+        },
+        observers: [
+          'verseChanged(verse)'
+        ],
+        ready: function(){
+          this.worker = new Worker(this.resolveUrl('../search/verse-topic-finder.js'));
+          this.worker.addEventListener('message', function(ev){
+            this.noTopics = ev.data.length === 0;
+            this.set('topics', ev.data);
+            console.log('new topics', ev.data);
+          }.bind(this));
+        },
+        verseChanged: function(){
+          console.log('test');
+          console.log(this.verse);
+          if(this.verse){
+            this.worker.postMessage({
+              verseAsNumber: this.verse.toNumeric()
+            });
+          }else{
+            this.noTopics = true;
+          }
+        },
+        openTopicPage: function(ev){
+          console.log(ev.model.topic);
+        },
+        _smartCaps: function(s){
+          var boringWords = ['and', 'from', 'with', 'against', 'the', 'to', 'your', 'in', 'of', 'or'];
+          return s.split(' ').map(w => boringWords.indexOf(w) === -1 ? w.substring(0, 1).toUpperCase() + w.substring(1, w.length) : w).join(' ');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

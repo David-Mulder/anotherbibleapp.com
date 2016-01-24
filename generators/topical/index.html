@@ -1,20 +1,38 @@
 <script>
+  var blacklist = ['about having a mohawk', 'about marriages', 'about your brother', 'anime', 'ankh', 'atlantis', 'astroprojection', 'astral projection', 'theology', 'video games', 'muhammad', 'human cloning'];
+
   fetch('topic-votes.txt').then((response) => response.text()).then(function(text){
     var lines = text.split('\n');
     var result = {};
-    var topics = [];
     lines.forEach(function(line,i){
       if(i % 100 == 0){
-        console.log(i+'/'+lines.length, Object.keys(result).length);
+        //console.log(i+'/'+lines.length, Object.keys(result).length);
       }
-      var parts = line.split('\t');
-      text = parts[1] + ' ' + parts[2] + ' ' + parts[3];
-      if(typeof result[parts[0]] === 'undefined'){
-        result[parts[0]] = [];
-      };
-      topics.push(parts[0]);
-      result[parts[0]].push(text);
+      var [topicName, verseStart, verseEnd, votes] = line.split('\t');
+      if(verseEnd - verseStart < 50 && blacklist.indexOf(topicName) == -1){
+        //text = verseStart + ' ' + verseEnd + ' ' + votes;
+        if(typeof result[topicName] === 'undefined'){
+          result[topicName] = [];
+        };
+        result[topicName].push({
+          verseStart: verseStart,
+          verseEnd: verseEnd,
+          votes: votes
+        });
+      }
     });
+
+    Object.keys(result).forEach(function(topicName){
+      var topic = result[topicName];
+      var maxScore = Math.max.apply(Math, topic.map(function(textReference){
+        return parseInt(textReference.votes);
+      }));
+
+      result[topicName] = topic.map(v => v.verseStart + ' ' + v.verseEnd + ' ' + Math.round(v.votes / maxScore * (100 + Math.log2(maxScore)*5)));
+    });
+
+
+
     /*
     var result = {};
     lines.forEach(function(line,i){
