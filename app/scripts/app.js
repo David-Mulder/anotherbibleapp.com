@@ -22,6 +22,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   };
 
+  app.setTitle = function(title){
+    console.log('set title to',title);
+    if(title.length > 0){
+      document.title = title + ' - Another Bible App';
+    }else{
+      document.title = 'Another Bible App'
+    }
+  };
+
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
   app.addEventListener('dom-change', function() {

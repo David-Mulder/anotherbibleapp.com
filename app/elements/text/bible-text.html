@@ -119,7 +119,9 @@
       'use strict';
 
       Polymer({
+
         is: 'bible-text',
+
         properties: {
           bookName: {
             type: String,
@@ -143,10 +145,12 @@
             value: 'single'
           }
         },
+
         ready: function() {
           //this.scopeSubtree(this.$.text, true);
           this.selectedVerses = [];
         },
+
         loadBook: function(){
           var url = this.resolveUrl('text/'+this.bookName+'.xml');
 
@@ -167,6 +171,7 @@
           httpRequest.open('GET', url);
           httpRequest.send();
         },
+
         selectVerse: function(ev){
           var verseNumberElement = ev.path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
           if(this.selectionMode === 'multiple'){
@@ -179,7 +184,6 @@
                 //select
                 this.push('selectedVerses', verseNumberElement.id);
               }
-              console.log(this.selectedVerses);
             }
           }else{
             if(!verseNumberElement || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)){
@@ -190,6 +194,7 @@
           }
           this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
         }
+
       });
     })();
   </script>

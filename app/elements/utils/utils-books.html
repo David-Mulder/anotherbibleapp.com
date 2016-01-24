@@ -1131,6 +1131,11 @@
         }
       ];
 
+      bibleBooks.forEach(function(bibleBook){
+        bibleBook.long_title = 'Book of ' + bibleBook.title;
+        bibleBook.plainLongTitle = bibleBook.long_title.replace(/\*/g, '');
+      });
+
       var bibleReferenceParserRegex = new RegExp('^([a-zA-Z0-9 ]+?)( ([0-9]*?)(([: ])(([0-9]*?)([\-\u2013]([0-9]*?))?)?)?)?$');
 
       var BibleReference = function(bookObject, chapter, verseStart, verseEnd){
@@ -1244,6 +1249,7 @@
             }
           }
         },
+
         bookNameToBook: function(bookname){
           var book;
           var quality = 0;
@@ -1290,6 +1296,7 @@
           if(book){ book.matchQuality = quality }
           return book;
         }
+
       });
     })();
   </script>

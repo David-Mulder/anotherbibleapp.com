@@ -15,46 +15,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     app.set('params', {});
 
     page('/', function () {
+      app.setTitle('');
       app.route = 'home';
       //app.scrollPageToTop();
     });
 
     page('/login', function (data) {
+      app.setTitle('Log in');
       app.route = 'login';
       //app.scrollPageToTop();
     });
 
     page('/book/:name', function (data) {
+      app.setTitle('Reading');
       app.route = 'book';
       app.set('params.bookName', data.params.name);
       //app.scrollPageToTop();
     });
 
     page('/questions/ask/:verses', function (data) {
+      app.setTitle('Ask a Question');
       app.route = 'new-question';
       app.set('params.newQuestionVerses', data.params.verses);
       //app.scrollPageToTop();
     });
 
     page('/search', function() {
+      app.setTitle('Search');
       app.route = 'search';
       app.set('params.searchQuery', '');
       //app.scrollPageToTop();
     });
 
     page('/question/:id', function(data) {
+      app.setTitle('Question');
       app.route = 'question';
       app.set('params.questionId', data.params.id);
       //app.scrollPageToTop();
     });
 
     page('/search/:query', function (data) {
+      app.setTitle('Search');
       app.route = 'search';
       app.set('params.searchQuery', data.params.query);
       //app.scrollPageToTop();
     });
 
     page('/help/how-to-ask', function (data) {
+      app.setTitle('How to ask a Question');
       app.route = 'rules-questions';
       //app.scrollPageToTop();
     });

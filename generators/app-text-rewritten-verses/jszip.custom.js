@@ -288,7 +288,7 @@ function JSZip(data, options) {
     //   "folder/" : {...},
     //   "folder/data.txt" : {...}
     // }
-    
+
     this.files = {};
 
     // Where we are in the hierarchy
@@ -782,7 +782,7 @@ var generateZipParts = function(name, file, compressedObject, offset) {
     "\x00\x00" +
     // disk number start
     "\x00\x00" +
-    // internal file attributes TODO
+    // internal file attributes
     "\x00\x00" +
     // external file attributes
     (file.options.dir === true ? "\x10\x00\x00\x00" : "\x00\x00\x00\x00") +
@@ -1089,7 +1089,7 @@ var out = {
             default : // case "string" :
                return zip;
          }
-      
+
     },
 
     /**
@@ -2027,7 +2027,7 @@ ZipEntry.prototype = {
 
             var compressedFileData = utils.transformTo(compression.uncompressInputType, this.getCompressedContent());
             var uncompressedFileData = compression.uncompress(compressedFileData);
-			
+
             if (uncompressedFileData.length !== uncompressedSize) {
             	console.log(new Error("Bug : uncompressed data size mismatch"));
                 //throw new Error("Bug : uncompressed data size mismatch");
@@ -2267,7 +2267,6 @@ process.binding = function (name) {
     throw new Error('process.binding is not supported');
 }
 
-// TODO(shtylman)
 process.cwd = function () { return '/' };
 process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
@@ -2296,7 +2295,7 @@ function Ha(e,d,c){var f,a,b=0,k,m,g,p,v=e.length;m=0;p=c.length;a:for(;m<p;m++)
 function oa(e,d){var c=e.length,f=new ja(572),a=new (C?Uint8Array:Array)(c),b,k,m,g,p;if(!C)for(g=0;g<c;g++)a[g]=0;for(g=0;g<c;++g)0<e[g]&&f.push(g,e[g]);b=Array(f.length/2);k=new (C?Uint32Array:Array)(f.length/2);if(1===b.length)return a[f.pop().index]=1,a;g=0;for(p=f.length/2;g<p;++g)b[g]=f.pop(),k[g]=b[g].value;m=Ja(k,k.length,d);g=0;for(p=b.length;g<p;++g)a[b[g].index]=m[g];return a}
 function Ja(e,d,c){function f(a){var b=g[a][p[a]];b===d?(f(a+1),f(a+1)):--k[b];++p[a]}var a=new (C?Uint16Array:Array)(c),b=new (C?Uint8Array:Array)(c),k=new (C?Uint8Array:Array)(d),m=Array(c),g=Array(c),p=Array(c),v=(1<<c)-d,x=1<<c-1,l,h,q,t,w;a[c-1]=d;for(h=0;h<c;++h)v<x?b[h]=0:(b[h]=1,v-=x),v<<=1,a[c-2-h]=(a[c-1-h]/2|0)+d;a[0]=b[0];m[0]=Array(a[0]);g[0]=Array(a[0]);for(h=1;h<c;++h)a[h]>2*a[h-1]+b[h]&&(a[h]=2*a[h-1]+b[h]),m[h]=Array(a[h]),g[h]=Array(a[h]);for(l=0;l<d;++l)k[l]=c;for(q=0;q<a[c-1];++q)m[c-
 1][q]=e[q],g[c-1][q]=q;for(l=0;l<c;++l)p[l]=0;1===b[c-1]&&(--k[0],++p[c-1]);for(h=c-2;0<=h;--h){t=l=0;w=p[h+1];for(q=0;q<a[h];q++)t=m[h+1][w]+m[h+1][w+1],t>e[l]?(m[h][q]=t,g[h][q]=d,w+=2):(m[h][q]=e[l],g[h][q]=l,++l);p[h]=0;1===b[h]&&f(h)}return k}
-function pa(e){var d=new (C?Uint16Array:Array)(e.length),c=[],f=[],a=0,b,k,m,g;b=0;for(k=e.length;b<k;b++)c[e[b]]=(c[e[b]]|0)+1;b=1;for(k=16;b<=k;b++)f[b]=a,a+=c[b]|0,a<<=1;b=0;for(k=e.length;b<k;b++){a=f[e[b]];f[e[b]]+=1;m=d[b]=0;for(g=e[b];m<g;m++)d[b]=d[b]<<1|a&1,a>>>=1}return d};ba("Zlib.RawDeflate",ka);ba("Zlib.RawDeflate.prototype.compress",ka.prototype.h);var Ka={NONE:0,FIXED:1,DYNAMIC:ma},V,La,$,Ma;if(Object.keys)V=Object.keys(Ka);else for(La in V=[],$=0,Ka)V[$++]=La;$=0;for(Ma=V.length;$<Ma;++$)La=V[$],ba("Zlib.RawDeflate.CompressionType."+La,Ka[La]);}).call(this); 
+function pa(e){var d=new (C?Uint16Array:Array)(e.length),c=[],f=[],a=0,b,k,m,g;b=0;for(k=e.length;b<k;b++)c[e[b]]=(c[e[b]]|0)+1;b=1;for(k=16;b<=k;b++)f[b]=a,a+=c[b]|0,a<<=1;b=0;for(k=e.length;b<k;b++){a=f[e[b]];f[e[b]]+=1;m=d[b]=0;for(g=e[b];m<g;m++)d[b]=d[b]<<1|a&1,a>>>=1}return d};ba("Zlib.RawDeflate",ka);ba("Zlib.RawDeflate.prototype.compress",ka.prototype.h);var Ka={NONE:0,FIXED:1,DYNAMIC:ma},V,La,$,Ma;if(Object.keys)V=Object.keys(Ka);else for(La in V=[],$=0,Ka)V[$++]=La;$=0;for(Ma=V.length;$<Ma;++$)La=V[$],ba("Zlib.RawDeflate.CompressionType."+La,Ka[La]);}).call(this);
 
 },{}],20:[function(require,module,exports){
 /** @license zlib.js 2012 - imaya [ https://github.com/imaya/zlib.js ] The MIT License */(function() {'use strict';var l=this;function p(c,e){var a=c.split("."),b=l;!(a[0]in b)&&b.execScript&&b.execScript("var "+a[0]);for(var d;a.length&&(d=a.shift());)!a.length&&void 0!==e?b[d]=e:b=b[d]?b[d]:b[d]={}};var q="undefined"!==typeof Uint8Array&&"undefined"!==typeof Uint16Array&&"undefined"!==typeof Uint32Array&&"undefined"!==typeof DataView;function t(c){var e=c.length,a=0,b=Number.POSITIVE_INFINITY,d,f,g,h,k,m,r,n,s;for(n=0;n<e;++n)c[n]>a&&(a=c[n]),c[n]<b&&(b=c[n]);d=1<<a;f=new (q?Uint32Array:Array)(d);g=1;h=0;for(k=2;g<=a;){for(n=0;n<e;++n)if(c[n]===g){m=0;r=h;for(s=0;s<g;++s)m=m<<1|r&1,r>>=1;for(s=m;s<d;s+=k)f[s]=g<<16|n;++h}++g;h<<=1;k<<=1}return[f,a,b]};function u(c,e){this.g=[];this.h=32768;this.c=this.f=this.d=this.k=0;this.input=q?new Uint8Array(c):c;this.l=!1;this.i=v;this.p=!1;if(e||!(e={}))e.index&&(this.d=e.index),e.bufferSize&&(this.h=e.bufferSize),e.bufferType&&(this.i=e.bufferType),e.resize&&(this.p=e.resize);switch(this.i){case w:this.a=32768;this.b=new (q?Uint8Array:Array)(32768+this.h+258);break;case v:this.a=0;this.b=new (q?Uint8Array:Array)(this.h);this.e=this.u;this.m=this.r;this.j=this.s;break;default:throw Error("invalid inflate mode");
@@ -2312,7 +2311,7 @@ u.prototype.s=function(c,e){var a=this.b,b=this.a;this.n=c;for(var d=a.length,f,
 u.prototype.e=function(){var c=new (q?Uint8Array:Array)(this.a-32768),e=this.a-32768,a,b,d=this.b;if(q)c.set(d.subarray(32768,c.length));else{a=0;for(b=c.length;a<b;++a)c[a]=d[a+32768]}this.g.push(c);this.k+=c.length;if(q)d.set(d.subarray(e,e+32768));else for(a=0;32768>a;++a)d[a]=d[e+a];this.a=32768;return d};
 u.prototype.u=function(c){var e,a=this.input.length/this.d+1|0,b,d,f,g=this.input,h=this.b;c&&("number"===typeof c.o&&(a=c.o),"number"===typeof c.q&&(a+=c.q));2>a?(b=(g.length-this.d)/this.n[2],f=258*(b/2)|0,d=f<h.length?h.length+f:h.length<<1):d=h.length*a;q?(e=new Uint8Array(d),e.set(h)):e=h;return this.b=e};
 u.prototype.m=function(){var c=0,e=this.b,a=this.g,b,d=new (q?Uint8Array:Array)(this.k+(this.a-32768)),f,g,h,k;if(0===a.length)return q?this.b.subarray(32768,this.a):this.b.slice(32768,this.a);f=0;for(g=a.length;f<g;++f){b=a[f];h=0;for(k=b.length;h<k;++h)d[c++]=b[h]}f=32768;for(g=this.a;f<g;++f)d[c++]=e[f];this.g=[];return this.buffer=d};
-u.prototype.r=function(){var c,e=this.a;q?this.p?(c=new Uint8Array(e),c.set(this.b.subarray(0,e))):c=this.b.subarray(0,e):(this.b.length>e&&(this.b.length=e),c=this.b);return this.buffer=c};p("Zlib.RawInflate",u);p("Zlib.RawInflate.prototype.decompress",u.prototype.t);var S={ADAPTIVE:v,BLOCK:w},T,U,V,W;if(Object.keys)T=Object.keys(S);else for(U in T=[],V=0,S)T[V++]=U;V=0;for(W=T.length;V<W;++V)U=T[V],p("Zlib.RawInflate.BufferType."+U,S[U]);}).call(this); 
+u.prototype.r=function(){var c,e=this.a;q?this.p?(c=new Uint8Array(e),c.set(this.b.subarray(0,e))):c=this.b.subarray(0,e):(this.b.length>e&&(this.b.length=e),c=this.b);return this.buffer=c};p("Zlib.RawInflate",u);p("Zlib.RawInflate.prototype.decompress",u.prototype.t);var S={ADAPTIVE:v,BLOCK:w},T,U,V,W;if(Object.keys)T=Object.keys(S);else for(U in T=[],V=0,S)T[V++]=U;V=0;for(W=T.length;V<W;++V)U=T[V],p("Zlib.RawInflate.BufferType."+U,S[U]);}).call(this);
 
 },{}]},{},[7])
 (7)

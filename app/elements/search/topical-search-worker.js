@@ -1,7 +1,7 @@
 //importScripts('../../bower_components/whenever.js/whenever.js');
 importScripts('lib/lancaster.js');
 importScripts('lib/smartStemmer.js');
-importScripts('./data/topical.js');
+importScripts('../topics/data/topical.js');
 importScripts('lib/stringDistance.js');
 
 onmessage = function(ev){

@@ -108,6 +108,7 @@
         },
         observers: [
           'retrieveFromApi(id)',
+          'setTitle(qas.question.title)',
           'setAnyAnswers(qas.answers.splices)'
         ],
         ready: function(){
@@ -117,6 +118,9 @@
         },
         submitAnswer: function(){
           this.$.newAnswerApi.execute();
+        },
+        setTitle: function(title){
+          app.setTitle(title);
         },
         setAnyAnswers: function(){
           this.set('anyAnswers', this.qas.answers.length > 0);

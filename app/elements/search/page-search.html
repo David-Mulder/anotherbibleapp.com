@@ -52,14 +52,14 @@
       }
     </style>
     <paper-toolbar class="medium-tall">
-      <span class="flex"></span>
+      <intelligent-title no-title-if-wide></intelligent-title>
       <div class="search-box bottom">
         <iron-icon icon="search"></iron-icon>
         <input is="iron-input" value="{{searchQuery}}" on-keyup="_setValueIfEnter" x-webkit-speech autofocus></input>
         <iron-icon icon="av:mic"></iron-icon>
       </div>
     </paper-toolbar>
-    <div style="overflow:auto;padding: 0px 10px;">
+    <div style="overflow:auto;padding: 0px 10px;flex:1;">
       <topical-search search-query="{{searchQuery}}" on-no-results="triggerBibleSearch"></topical-search>
 
       <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>

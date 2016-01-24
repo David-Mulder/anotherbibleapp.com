@@ -47,10 +47,15 @@
             reflectToAttribute: true
           }
         },
+        observers: [
+        ],
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
         ready: function(){
           document.body.addEventListener('narrow-changed', function(ev){
             this.set('narrow', ev.detail.narrow);
-          }.bind(this))
+          }.bind(this));
         },
         openDrawer: function(){
           document.getElementById('mainDrawer').openDrawer();

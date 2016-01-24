@@ -207,6 +207,7 @@ var search = function(searchString, length){
 
       results.forEach(function(result) {
         var line = text.substring(getStartOfLine(text, result.allIndexes[0]), getEndOfWord(text, result.allIndexes[result.allIndexes.length-1]));
+        //todo: remove duplicate verse ranges from results
         result.verses = line.split('\n').map(function(line){
           return line.split('| ')[0];
         });
