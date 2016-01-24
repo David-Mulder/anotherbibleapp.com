@@ -4,6 +4,7 @@ var rateLimit = require('express-rate-limit');
 var cors = require('cors');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var authenticator = require('./objects/users/authenticator');
 
 mongoose.connect('mongodb://localhost/test');
 
@@ -30,5 +31,7 @@ app.use(limiter);
 
 // form data parser:
 app.use(bodyParser.json());
+
+app.use(authenticator.handleAuthentication);
 
 routes.register(app);

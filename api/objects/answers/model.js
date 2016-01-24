@@ -23,10 +23,16 @@ var schema = new Schema({
   }
 });
 
-schema.methods.makePublic = function(){
+schema.methods.makePublic = function(userId){
+  console.log('make answer public', userId);
   var obj = this.toObject();
+
+  obj.upvoted = obj.upvotes.some(uID => uID.equals(userId));
+  obj.downvoted = obj.downvotes.some(uID => uID.equals(userId));
   obj.upvotes = obj.upvotes.length;
   obj.downvotes = obj.downvotes.length;
+  obj.score = obj.upvotes - obj.downvotes;
+
   delete obj.user.password; //unnecessary, but just in case
   return obj;
 };

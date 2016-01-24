@@ -34,28 +34,39 @@ module.exports = {
       }
     });
   },
-  isAuthenticated: function (req, res, next){
+  handleAuthentication: function(req, res, next){
     var token = req.headers['auth-token'] || req.query.token;
-    LoginToken.findOne({
-      token: token
-    }, function(err, token){
-      //todo: expire logic
-      if(token){
-        User.findOne({
-          _id: token.userId
-        }, function(err, user){
-          req.user = user;
+    if(token){
+      LoginToken.findOne({
+        token: token
+      }, function(err, token){
+        //todo: expire logic
+        if(token){
+          User.findOne({
+            _id: token.userId
+          }, function(err, user){
+            req.user = user;
+            next();
+          });
+        }else{
+          req.user = 'Invalid token';
           next();
-        });
+          //res.status(401).json('Invalid token');
+        }
+      });
+    }else{
+      next();
+    }
+  },
+  isAuthenticated: function (req, res, next){
+    if(req.user === 'Invalid token'){
+      res.status(401).json('Invalid token');
+    }else{
+      if(typeof req.user !== 'undefined'){
+        next();
       }else{
         res.status(401).json('Invalid token');
       }
-    });
-    return;
-    if(false && validated){
-      next();
-    }else{
-      res.send('login');
     }
   }
 };

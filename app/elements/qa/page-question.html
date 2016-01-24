@@ -52,16 +52,22 @@
           <intelligent-title title="Another Bible App" no-title-if-wide></intelligent-title>
         </paper-toolbar>
         <div class="page-content">
-          <qa-post is-question post="{{qas.question}}"></qa-post>
+
+          <qa-post type="question" post="{{qas.question}}"></qa-post>
+
           <hr class="divider">
+
           <template is="dom-repeat" items="{{qas.answers}}" as="answer">
             <qa-post type="answer" post="{{answer}}"></qa-post>
           </template>
-          <div is-answer hidden$="{{anyAnswers}}">
+
+          <div id="noAnswers" hidden$="{{anyAnswers}}">
             <span>Nobody has answered this question yet. Know somebody who can? Share this link with them!</span>
             <hr class="divider">
           </div>
+
           <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{id}}" param-text="{{answerText}}"></auth-api>
+
           <paper-card heading="Your Answer" id="newAnswer">
             <div class="card-content">
               <bible-markdown-editor value="{{answerText}}"></bible-markdown-editor>
@@ -70,6 +76,7 @@
               <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>
             </div>
           </paper-card>
+
         </div>
       </div>
       <div drawer>

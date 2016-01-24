@@ -3,24 +3,30 @@ var Answer = require('../answers/model');
 
 module.exports = {
   get: function(req, res){
-    console.log(req.params.id);
-    Question.findOne({_id: req.params.id}).populate('user', 'displayName _id').exec(function(err, question){
-      if(err){
-        res.status(500).json(err);
-      }else{
-        Answer.find({
-          question: req.params.id
-        }).populate('user', 'displayName _id').exec(function(err, answers){
-          if(err){
-            res.status(500).json(err);
-          }else{
-            res.json({
-              question: question.makePublic(),
-              answers: answers.map(a => a.makePublic())
-            });
-          }
-        });
-      }
+    var userId;
+    if(req.user){
+      userId = req.user._id;
+    }
+    Question
+      .findOne({_id: req.params.id})
+      .populate('user', 'displayName _id')
+      .exec(function(err, question){
+        if(err){
+          res.status(500).json(err);
+        }else{
+          Answer.find({
+            question: req.params.id
+          }).populate('user', 'displayName _id').exec(function(err, answers){
+            if(err){
+              res.status(500).json(err);
+            }else{
+              res.json({
+                question: question.makePublic(userId),
+                answers: answers.map(a => a.makePublic(userId))
+              });
+            }
+          });
+        }
     });
   },
   create: function(req, res){

@@ -72,6 +72,7 @@
                   method: this.method,
                   headers: new Headers()
                 };
+
                 fetchConfig.headers.set('Accept', 'application/json');
 
                 if(this.loggedIn){
@@ -81,13 +82,6 @@
 
                 var formDataParams = this._getUnusedParams();
                 if(formDataParams.length > 0){
-                  /*var formData = new FormData();
-                  formDataParams.forEach(function(param){
-                    var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
-                    formData.append(param, this.get(propertyName));
-                  }.bind(this));
-                  fetchConfig.body = formData;
-                  fetchConfig.headers.set('Content-Type','application/x-www-form-urlencoded');*/
                   var data = {};
                   formDataParams.forEach(function(param){
                     var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
@@ -98,30 +92,43 @@
                 }
 
                 fetch(url, fetchConfig).then(function(response){
+
                   this.status = response.status;
                   return response.text();
+
                 }.bind(this)).then(function(text){
+
                   var response = JSON.parse(text);
+
                   if(this.status === 401 && response === 'Invalid token'){
+
                     var pt = document.createElement('paper-toast');
                     pt.opened = true;
                     pt.duration = 10000;
                     pt.text = 'It seems your login credentials are out of date. Please log out and log in again.';
                     document.body.appendChild(pt);
                     reject(response);
+
                   }else if(this.status === 429){
+
                     var pt = document.createElement('paper-toast');
                     pt.opened = true;
                     pt.duration = 10000;
                     pt.text = 'Sorry, you are doing too many request within a minute. As a security measure this is not allowed.';
                     document.body.appendChild(pt);
                     reject(response);
+
                   }else if(this.status === 200){
+
                     resolve(response);
                     this.response = response;
+
                   }else{
+
                     reject(response);
+
                   }
+
                 }.bind(this));
               }else{
                 reject('Not all parameters are set');
