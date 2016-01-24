@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="topic-card">
+  <template>
+    <style>
+      :host{
+        display: block;
+      }
+    </style>
+    <paper-card heading="{{topic.title}}" class="full-page">
+
+      <template is="dom-repeat" items="{{topic.verses}}" as="snippet">
+        <div class="card-actions">
+          <bible-snippet start="{{snippet.start}}" end="{{snippet.end}}" highlight="{{searchQuery}}"></bible-snippet>
+        </div>
+      </template>
+
+    </paper-card>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'topic-card',
+
+        properties: {
+          topic: Object
+        },
+        ready: function(){
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

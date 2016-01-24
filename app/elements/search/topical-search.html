@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../text/bible-snippet.html">
+<link rel="import" href="../topics/topic-card.html">
 
 <dom-module id="topical-search">
   <template>
@@ -9,9 +10,13 @@
       :host {
         display: block;
       }
-      paper-card{
+      paper-card, topic-card{
         min-height:150px;
         position:relative;
+      }
+      topic-card{
+        margin: 10px auto;
+        max-width: 800px;
       }
       paper-spinner{
         position: absolute;
@@ -41,17 +46,8 @@
 
     <utils-books id="utils"></utils-books>
 
-
-    <template is="dom-repeat" items="{{topics}}">
-      <paper-card heading="{{item.title}}" class="full-page">
-
-        <template is="dom-repeat" items="{{item.verses}}" as="snippet">
-          <div class="card-actions">
-            <bible-snippet start="{{snippet.start}}" end="{{snippet.end}}" highlight="{{searchQuery}}"></bible-snippet>
-          </div>
-        </template>
-
-      </paper-card>
+    <template is="dom-repeat" items="{{topics}}" as="topic">
+      <topic-card topic="{{topic}}" class="card"></topic-card>
     </template>
 
   </template>

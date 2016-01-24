@@ -1,0 +1,70 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./topic-card.html">
+
+<dom-module id="page-topic">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+
+    </style>
+    <paper-toolbar>
+      <intelligent-title no-title-if-wide></intelligent-title>
+      <span class="flex"></span>
+      <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
+    </paper-toolbar>
+    <div class="page-content">
+      <topic-card topic="{{topic}}" class="card"></topic-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-topic',
+
+        properties: {
+          topicName: {
+            type: String
+          }
+        },
+        observers: [
+          'topicChanged(topicName)'
+        ],
+        ready: function(){
+
+        },
+        topicChanged: function(topicName){
+          var beautifulTitle = this._smartCaps(topicName);
+          app.setTitle(beautifulTitle);
+          fetch(this.resolveUrl('./data/topical.js')).then(function(response){
+            return response.text();
+          }).then(function(text){
+            text = text.replace('var topics = ', '');
+            text = text.replace(';', '');
+            var topicTexts = JSON.parse(text)[topicName];
+            var verses = topicTexts.map(function(text){
+              var parts = text.split(' ');
+              return {
+                start: parts[0],
+                end: parts[1].length > 0 ? parts[1] : parts[0],
+                votes: parts[2]
+              };
+            });
+            this.set('topic', {
+              title: beautifulTitle,
+              verses: verses
+            });
+          }.bind(this));
+        },
+        _smartCaps: function(s){
+          var boringWords = ['and', 'from', 'with', 'against', 'the', 'to', 'your', 'in', 'of', 'or'];
+          return s.split(' ').map(w => boringWords.indexOf(w) === -1 ? w.substring(0, 1).toUpperCase() + w.substring(1, w.length) : w).join(' ');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
