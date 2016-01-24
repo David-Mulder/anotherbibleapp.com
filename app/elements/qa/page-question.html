@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="qa-post.html">
+<link rel="import" href="bible-markdown-editor.html">
 
 <dom-module id="page-question">
   <template>
@@ -27,9 +28,12 @@
         flex: 1;
       }
       hr.divider{
-        margin: 20px 0px;
+        display: block;
+        width: 100%;
+        max-width: 850px;
+        margin: 20px auto;
         border: 0px;
-        border-top: 1px solid rgba(0,0,0,.2);
+        border-top: 1px dotted rgba(0,0,0,.2);
       }
       #noAnswers{
         text-align: center;
@@ -37,26 +41,33 @@
       #noAnswers span{
         color: var(--secondary-text-on-primary-color-50);
       }
+      #newAnswer{
+        margin-top: 20px;
+      }
     </style>
-    <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{question}}"></auth-api>
+    <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{qas}}"></auth-api>
     <paper-drawer-panel right-drawer>
       <div main>
         <paper-toolbar>
           <intelligent-title title="Another Bible App" no-title-if-wide></intelligent-title>
         </paper-toolbar>
         <div class="page-content">
-          <qa-post post="{{question}}"></qa-post>
+          <qa-post is-question post="{{qas.question}}"></qa-post>
           <hr class="divider">
-          <div id="noAnswers">
+          <template is="dom-repeat" items="{{qas.answers}}" as="answer">
+            <qa-post type="answer" post="{{answer}}"></qa-post>
+          </template>
+          <div is-answer hidden$="{{anyAnswers}}">
             <span>Nobody has answered this question yet. Know somebody who can? Share this link with them!</span>
             <hr class="divider">
           </div>
-          <paper-card heading="Your Answer">
+          <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{id}}" param-text="{{answerText}}"></auth-api>
+          <paper-card heading="Your Answer" id="newAnswer">
             <div class="card-content">
-              <paper-textarea rows="4"></paper-textarea>
+              <bible-markdown-editor value="{{answerText}}"></bible-markdown-editor>
             </div>
             <div class="card-actions">
-              <paper-button>Submit your Answer</paper-button>
+              <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>
             </div>
           </paper-card>
         </div>
@@ -67,7 +78,7 @@
         </paper-toolbar>
         <div>
           <paper-card heading="Discussed texts">
-            <template is="dom-repeat" items="{{question.verses}}">
+            <template is="dom-repeat" items="{{qas.question.verses}}">
               <div class="card-actions">
                 <bible-snippet start="{{item}}" end="{{item}}"></bible-snippet>
               </div>
@@ -89,12 +100,19 @@
 
         },
         observers: [
-          'retrieveFromApi(id)'
+          'retrieveFromApi(id)',
+          'setAnyAnswers(qas.answers.splices)'
         ],
         ready: function(){
         },
         retrieveFromApi: function(){
           this.$.api.execute();
+        },
+        submitAnswer: function(){
+          this.$.newAnswerApi.execute();
+        },
+        setAnyAnswers: function(){
+          this.set('anyAnswers', this.qas.answers.length > 0);
         }
       });
     })();

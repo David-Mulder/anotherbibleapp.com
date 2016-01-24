@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="bible-markdown-editor.html">
 
 <dom-module id="page-new-question">
   <template>
@@ -23,24 +24,6 @@
         display: block;
         width: 100%;
         margin: auto;
-      }
-      .questionEditor{
-        width: 100%;
-        display: flex;
-      }
-      .questionEditor > div{
-        flex: 1;
-      }
-      #preview{
-        margin: 10px;
-        background: var(--accent-color-50);
-        padding: 0px 10px;
-      }
-
-      @media all and (orientation: portrait) {
-        .questionEditor{
-          flex-direction: column;
-        }
       }
 
       .stepper {
@@ -138,19 +121,11 @@
               <div class="step">
                 <div data-step="4"></div>
                 <div class="content">
-                  <div class="questionEditor">
-                    <div>
-                      <paper-textarea value="{{questionText}}" label="Your question in detail" rows="7" always-float-label></paper-textarea>
-                    </div>
-                    <div id="preview">
-                      <marked-element markdown="{{questionText}}">
-                        <div class="markdown-html"></div>
-                      </marked-element>
-                      <p style="font-size: 14px;opacity: .8">
-                        Note: Your question will always be shown right next to the verses you selected.
-                      </p>
-                    </div>
-                  </div>
+                  <bible-markdown-editor value="{{questionText}}" label="Your question in detail" rows="7">
+                    <p style="font-size: 14px;opacity: .8">
+                      Note: Your question will always be shown right next to the verses you selected.
+                    </p>
+                  </bible-markdown-editor>
                 </div>
               </div>
             </div>

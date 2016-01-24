@@ -1,13 +1,25 @@
 var Question = require('./model');
+var Answer = require('../answers/model');
 
 module.exports = {
   get: function(req, res){
     console.log(req.params.id);
-    Question.findOne({_id: req.params.id}).populate('user', 'displayName _id').exec(function(err, result){
+    Question.findOne({_id: req.params.id}).populate('user', 'displayName _id').exec(function(err, question){
       if(err){
         res.status(500).json(err);
       }else{
-        res.json(result.makePublic());
+        Answer.find({
+          question: req.params.id
+        }).populate('user', 'displayName _id').exec(function(err, answers){
+          if(err){
+            res.status(500).json(err);
+          }else{
+            res.json({
+              question: question.makePublic(),
+              answers: answers.map(a => a.makePublic())
+            });
+          }
+        });
       }
     });
   },
