@@ -1,2 +1,6 @@
  - Make verses linkable
- - NOTE hover
+ - NOTE hover gets cut off
+ - Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
+ - Continue reading
+ - Offline
+ - login stuff

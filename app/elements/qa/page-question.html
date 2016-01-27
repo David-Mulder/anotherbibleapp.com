@@ -44,6 +44,9 @@
       #newAnswer{
         margin-top: 20px;
       }
+      #drawerContent{
+        overflow: auto;
+      }
     </style>
     <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{qas}}"></auth-api>
     <paper-drawer-panel right-drawer>
@@ -83,7 +86,7 @@
         <paper-toolbar>
           <span>Related</span>
         </paper-toolbar>
-        <div>
+        <div id="drawerContent">
           <paper-card heading="Discussed texts">
             <template is="dom-repeat" items="{{qas.question.verses}}">
               <div class="card-actions">

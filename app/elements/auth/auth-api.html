@@ -28,7 +28,13 @@
           token: String,
           apiUrl: {
             type: String,
-            value: 'http://localhost:3000'
+            value: function(){
+              if(location.hostname === 'anotherbibleapp.com'){
+                return 'https://api.anotherbibleapp.com';
+              }else{
+                return 'http://localhost:8002';
+              }
+            }
           },
           loggedIn: {
             type: Boolean,
@@ -47,8 +53,11 @@
 
         ready: function(){
           apiElements.push(this);
+
           if('token' in localStorage){
             registerToken(localStorage.token);
+          }else{
+            this.set('token', '');
           }
         },
 
@@ -59,7 +68,7 @@
         execute: function(cb){
 
           return new Promise(function(resolve, reject){
-            if(this.token || this.unauthorized) {
+            if(this.token || this.unauthorized || true){
               var paramsSet = this._requiredParams.every((param) => {
                 var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
                 return typeof this.get(propertyName) !== 'undefined' && this.get(propertyName);

@@ -14,6 +14,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     app.set('params', {});
 
+    page(function(ctx, next){
+      app.forceNarrow = false;
+      next();
+    });
+
     page('/', function () {
       app.setTitle('');
       app.route = 'home';
@@ -26,10 +31,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //app.scrollPageToTop();
     });
 
-    page('/book/:name', function (data) {
+    page('/logout', function (data) {
+      delete localStorage.token;
+      location.href = '/';
+      //app.scrollPageToTop();
+    });
+
+    page('/book/:ref', function (data) {
       app.setTitle('Reading');
       app.route = 'book';
-      app.set('params.bookName', data.params.name);
+      app.set('params.bookRef', data.params.ref);
       //app.scrollPageToTop();
     });
 

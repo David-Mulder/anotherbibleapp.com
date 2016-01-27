@@ -17,7 +17,7 @@
             Over here you will later see a list of featured questions and answers.
           </div>
           <div class="card-actions">
-            <paper-button>Log Out</paper-button>
+            <paper-button on-tap="goToLogout">Log Out</paper-button>
           </div>
         </paper-card>
       </div>
@@ -61,13 +61,15 @@
 
         },
         ready: function(){
-          this.set('loggedIn', false);
         },
         goToSearch: function(){
           page.show('/search');
         },
         goToLogin: function(){
           page.show('/login');
+        },
+        goToLogout: function(){
+          page.show('/logout');
         }
       });
     })();

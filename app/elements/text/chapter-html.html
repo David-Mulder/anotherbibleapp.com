@@ -71,9 +71,6 @@
           var chapter = element.querySelector('chapter');
           var s = chapter.id.split(':')[0].split(' ');
           chapter.setAttribute('n', s[s.length - 1]);
-        },
-        attached: function(){
-          console.log('ATTACHED');
         }
       });
     })();

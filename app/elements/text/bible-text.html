@@ -28,10 +28,6 @@
       }
       paper-card{
       }
-      chapter{
-        display: block;
-        box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;
-      }
       p{
         text-align: justify;
       }
@@ -43,14 +39,19 @@
         font-style: italic;
       }
       vn.selected{
-
         background: var(--accent-color-200);
         color: var(--text-on-accent-color-200);
       }
     </style>
     <style>
-      .read{
-
+      :host([mode='read']){
+        background: white;
+      }
+      :host([mode='read']) chapter{
+        display: block;
+      }
+      :host([mode='read']) n, :host([mode='read']) pericope{
+        display: none;
       }
     </style>
     <style>
@@ -58,6 +59,8 @@
         background: var(--card-dialog-color);
         margin: 10px 10px 0px 10px;
         padding: 20px;
+        display: block;
+        box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;
       }
       :host([mode='study']) chapter::before{
         content: attr(n);
@@ -81,6 +84,25 @@
       }
       :host([mode='study']) n io{
         display: none;
+      }
+      :host([mode='study']) n{
+        position: relative;
+      }
+      :host([mode='study']) n:hover io{
+        display: block;
+        position: absolute;
+        left: 0px;
+        top: 29px;
+        background: var(--inverse-card-dialog-color);
+        color: var(--text-on-inverse-card-dialog-color);
+        width: 150px;
+        margin-left: -75px;
+        padding: 5px;
+        font-size: 10px;
+        font-family: Roboto;
+        font-weight: normal;
+        opacity: .9;
+        border-radius: 2px;
       }
       :host([mode='study']) n:after{
         content: 'NOTE';
@@ -123,8 +145,8 @@
         is: 'bible-text',
 
         properties: {
-          bookName: {
-            type: String,
+          textRef: {
+            type: Object,
             observer: 'loadBook'
           },
           chapters: {
@@ -133,7 +155,6 @@
           },
           mode: {
             type: String,
-            value: 'study',
             reflectToAttribute: true
           },
           selectedVerses: {
@@ -146,13 +167,17 @@
           }
         },
 
+        observers: [
+          'resetSizes(mode)'
+        ],
+
         ready: function() {
           //this.scopeSubtree(this.$.text, true);
           this.selectedVerses = [];
         },
 
         loadBook: function(){
-          var url = this.resolveUrl('text/'+this.bookName+'.xml');
+          var url = this.resolveUrl('text/'+this.textRef.book.name+'.xml');
 
           var httpRequest = new XMLHttpRequest();
           httpRequest.onreadystatechange = function(){
@@ -163,6 +188,9 @@
                 for(var i=0; i<chapters.length;i++){
                   this.push('chapters', chapters[i].outerHTML);
                 }
+                this.async(function(){
+                  this.scrollToReference();
+                });
                 //this.$.text.innerHTML = httpRequest.responseText;
               }
             }
@@ -170,6 +198,25 @@
           httpRequest.responseType = 'document';
           httpRequest.open('GET', url);
           httpRequest.send();
+        },
+
+        resetSizes: function(){
+          this.$.text.items.forEach(function(item, i){
+            this.$.text.updateSizeForItem(item);
+          }.bind(this));
+          var i = this.$.text._firstVisibleIndexVal;
+          this.async(function(){
+            this.$.text.scrollToIndex(i);
+          }, 0);
+        },
+
+        scrollToReference: function() {
+          if(this.textRef.chapter){
+            this.$.text.scrollToIndex(this.textRef.chapter);
+            if(this.textRef.verseStart){
+              this.set('selectedVerses', [this.textRef.toString()])
+            }
+          }
         },
 
         selectVerse: function(ev){

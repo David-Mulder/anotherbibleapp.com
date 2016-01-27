@@ -15,15 +15,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
 
+  /*
   app.displayInstalledToast = function() {
     // Check to make sure caching is actually enabled—it won't be in the dev environment.
     if (!document.querySelector('platinum-sw-cache').disabled) {
       document.querySelector('#caching-complete').show();
     }
   };
+  */
 
   app.setTitle = function(title){
-    console.log('set title to',title);
     if(title.length > 0){
       document.title = title + ' - Another Bible App';
     }else{

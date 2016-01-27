@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="./verse-information-drawer.html">
 
 <dom-module id="page-book">
@@ -46,16 +48,31 @@
         right: 30px;
         bottom: 20px;
       }
+      paper-toggle-button{
+        --paper-toggle-button-checked-bar:{
+          background: var(--accent-color);
+        };
+        -paper-toggle-button-checked-bar-color: var(--accent-color);
+        --paper-toggle-button-checked-button-color: var(--accent-color);
+        --paper-toggle-button-checked-ink-color: white;
+        --paper-toggle-button-label-color: var(--text-on-primary-color);
+        --paper-toggle-button-unchecked-button-color: var(--primary-color-100);
+      }
     </style>
+
     <utils-books id="bookUtils"></utils-books>
-    <paper-drawer-panel id="qaDrawerPanel" right-drawer responsive-width="700px" drawer-width="300px">
+    <iron-localstorage name="study-tools" value="{{studyTools}}"></iron-localstorage>
+
+    <paper-drawer-panel id="qaDrawerPanel" right-drawer responsive-width="700px" drawer-width="300px" force-narrow="{{!studyTools}}">
 
       <div main>
         <paper-toolbar>
           <intelligent-title title=""></intelligent-title>
+          <paper-toggle-button checked="{{studyTools}}">Study tools</paper-toggle-button>
+
         </paper-toolbar>
         <div id="textContainer">
-          <bible-text book-name="{{book}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="openQADrawer"></bible-text>
+          <bible-text text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="openQADrawer" mode="{{mode}}"></bible-text>
         </div>
         <paper-toast opened="{{newQuestionMode}}" text="Please tap on all the verses that are relevant to your question." duration="0" class="fit-bottom" opened>
           <span role="button" tabindex="0" style="color: #eeff41;margin: 10px" on-tap="qaNewQuestionReady">Tap here once you're done.</span>
@@ -84,23 +101,26 @@
         is: 'page-book',
 
         properties: {
-          book: {
+          ref: {
             type: String
           },
+          studyTools: Boolean,
           newQuestionMode: Boolean
         },
 
         observers: [
-          'bookChanged(book)'
+          'refChanged(ref)',
+          'setMode(studyTools)'
         ],
 
         ready: function(){
           this.set('newQuestionMode', false);
         },
 
-        bookChanged: function(){
-          var book = this.$.bookUtils.bookNameToBook(this.book);
-          app.setTitle(book.title);
+        refChanged: function(){
+          this.set('fullRef', this.$.bookUtils.parseReference(this.ref));
+          app.setTitle(this.fullRef.book.title);
+          this.setMode();
         },
 
         openQADrawer: function(){
@@ -118,7 +138,18 @@
         qaNewQuestionReady: function(){
           this.set('verseSelectionMode', 'single');
           this.set('newQuestionMode', false);
-          this.$.qa.newQuestionSelectionFinished();
+          //this.$.qa.newQuestionSelectionFinished();
+          page('/questions/ask/'+this.selectedVerses);
+        },
+
+        setMode: function(){
+          if(this.studyTools){
+            this.mode = 'study';
+            app.forceNarrow = false;
+          }else{
+            this.mode = 'read';
+            app.forceNarrow = true;
+          }
         }
 
       });

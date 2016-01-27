@@ -65,7 +65,7 @@
     <span id="browser-sync-binding"></span>
     <template is="dom-bind" id="app">
 
-      <paper-drawer-panel id="mainDrawer" responsive-width="1300px">
+      <paper-drawer-panel id="mainDrawer" responsive-width="1300px" force-narrow="{{forceNarrow}}">
         <!-- Drawer Scroll Header Panel -->
         <paper-scroll-header-panel drawer fixed>
 
@@ -88,7 +88,7 @@
             <iron-pages attr-for-selected="data-route" selected="{{route}}">
 
               <page-welcome data-route="home"></page-welcome>
-              <page-book data-route="book" book="{{params.bookName}}"></page-book>
+              <page-book data-route="book" ref="{{params.bookRef}}"></page-book>
               <page-search data-route="search" search-query="{{params.searchQuery}}"></page-search>
               <page-login data-route="login"></page-login>
               <page-new-question data-route="new-question" verses-string="{{params.newQuestionVerses}}"></page-new-question>
@@ -108,25 +108,34 @@
       </paper-drawer-panel>
 
       <!-- Uncomment next block to enable Service Worker support (1/2) -->
-      <!--
 	  <paper-toast id="caching-complete"
 				   duration="6000"
 				   text="Caching complete! This app will work offline.">
 	  </paper-toast>
 
+      <!--
 	  <platinum-sw-register auto-register
 							clients-claim
 							skip-waiting
 							on-service-worker-installed="displayInstalledToast">
-		<platinum-sw-cache default-cache-strategy="fastest"
-						   cache-config-file="cache-config.json">
-		</platinum-sw-cache>
+
+      <platinum-sw-import-script href="api-fetch-handle.js"></platinum-sw-import-script>
+      <platinum-sw-fetch handler="fastest" path="(.*)"></platinum-sw-fetch>
+
+		  <!--<platinum-sw-cache default-cache-strategy="fastest"
+			  			   cache-config-file="/cache-config.json">
+		  </platinum-sw-cache>- ->
+
 	  </platinum-sw-register>
-	  -->
+      -->
 
     </template>
 
   </div>
+  <script src="/bower_components/sw-toolbox/companion.js"></script>
+  <script>
+    navigator.serviceWorker.register('/sw.js');
+  </script>
 
   <!-- build:js scripts/app.js -->
   <script src="/scripts/app.js"></script>

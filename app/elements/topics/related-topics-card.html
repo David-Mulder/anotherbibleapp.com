@@ -45,16 +45,14 @@
           'verseChanged(verse)'
         ],
         ready: function(){
-          this.worker = new Worker(this.resolveUrl('../search/verse-topic-finder.js'));
+          this.worker = new Worker(this.resolveUrl('./verse-topic-finder.js'));
           this.worker.addEventListener('message', function(ev){
             this.noTopics = ev.data.length === 0;
             this.set('topics', ev.data);
-            console.log('new topics', ev.data);
+            //console.log('new topics', ev.data);
           }.bind(this));
         },
         verseChanged: function(){
-          console.log('test');
-          console.log(this.verse);
           if(this.verse){
             this.worker.postMessage({
               verseAsNumber: this.verse.toNumeric()
@@ -64,7 +62,8 @@
           }
         },
         openTopicPage: function(ev){
-          console.log(ev.model.topic);
+          page('/topic/'+ev.model.topic.title);
+          //console.log(ev.model.topic);
         },
         _smartCaps: function(s){
           var boringWords = ['and', 'from', 'with', 'against', 'the', 'to', 'your', 'in', 'of', 'or'];

@@ -6,11 +6,15 @@
       :host{
         display: block;
       }
+      .verse:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
     </style>
     <paper-card heading="{{topic.title}}" class="full-page">
 
       <template is="dom-repeat" items="{{topic.verses}}" as="snippet">
-        <div class="card-actions">
+        <div class="card-actions verse" on-tap="goToVerse">
           <bible-snippet start="{{snippet.start}}" end="{{snippet.end}}" highlight="{{searchQuery}}"></bible-snippet>
         </div>
       </template>
@@ -29,6 +33,11 @@
           topic: Object
         },
         ready: function(){
+        },
+        goToVerse: function(ev){
+          var snippet = ev.model.snippet;
+          page('/book/'+snippet.start);
+          console.log(snippet);
         }
       });
     })();
