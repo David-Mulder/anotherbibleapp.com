@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/gold-password-input/gold-password-input.html">
+<link rel="import" href="../utils/google-recaptcha.html">
+
+<dom-module id="page-register">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      #register paper-card{
+        max-width: 400px;
+        margin: 10px auto;
+        padding: 20px;
+      }
+      #register paper-card#login .card-content{
+        padding-top: 0px;
+      }
+      #register paper-card#login paper-input{
+        --paper-input-container: {
+          padding-top: 0px;
+        };
+      }
+      #register .card-content .actions{
+        padding-top: 30px;
+      }
+      google-recaptcha{
+        margin-top: 40px;
+      }
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Register"></intelligent-title>
+    </paper-toolbar>
+    <div id="register" class="page-content">
+      <auth-api id="api" method="put" action="user" param-display-name="{{displayName}}" param-email="{{username}}" param-password="{{password}}" logged-in="{{loggedIn}}" param-captcha-response="{{captchaResponse}}"></auth-api>
+      <form is="iron-form" id="form" method="post" action="/form/handler" on-submit="test" hidden="{{loggedIn}}">
+        <paper-card id="login" heading="Register">
+          <div class="card-content">
+            <paper-input type="text" value="{{displayName}}" autofocus label="Display Name"></paper-input>
+            <paper-input label="E-mail" value="{{username}}"></paper-input>
+            <gold-password-input label="Password" value="{{password}}" strength-meter></gold-password-input>
+            <google-recaptcha sitekey="6LdkoBYTAAAAABH1QTVoIqDvzZTsC0aTHwVAbWlv" response="{{captchaResponse}}"></google-recaptcha>
+            <div class="actions">
+              <paper-button class="primary" on-tap="register">Register</paper-button>
+            </div>
+          </div>
+        </paper-card>
+      </form>
+      <paper-card id="login" heading="Log in" hidden="{{!loggedIn}}">
+        <div class="card-content">
+          You are already registered.
+        </div>
+      </paper-card>
+    </div>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-register',
+
+        properties: {
+          captchaResponse: {
+            type: String,
+            value: ''
+          }
+        },
+        ready: function(){
+
+        },
+        arePasswordsTheSame: function(ev){
+          var input = ev.path.find(el => el.nodeName.toLowerCase() === 'paper-input');
+          if(this.password !== this.passwordRepeat && this.passwordRepeat.length >= this.password){
+            input.set('invalid', true);
+          }else{
+            input.set('invalid', false);
+          }
+        },
+        register: function(){
+          this.$.api.execute().then(function(){
+            app.set('params.username', this.username);
+            app.set('params.password', this.password);
+            page('/login');
+          }.bind(this)).catch(function(err){
+            app.toast(err.humanError);
+          });
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

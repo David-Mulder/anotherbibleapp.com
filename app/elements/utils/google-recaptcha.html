@@ -1,0 +1,84 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="google-recaptcha">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      #recaptcha{
+        width:302px;
+        height:76px;
+      }
+    </style>
+    <div id="recaptcha"></div>
+  </template>
+  <script>
+    (function() {
+      'use strict';
+
+      var recaptcha = new Promise(function(resolve, reject){
+        window.recaptchaElementCallback = function() {
+          resolve(grecaptcha);
+        };
+
+        var head= document.getElementsByTagName('head')[0];
+        var script= document.createElement('script');
+        script.setAttribute('async', '');
+        script.setAttribute('defer', '');
+        script.setAttribute('type', 'text/javascript');
+        script.setAttribute('src', 'https://www.google.com/recaptcha/api.js?onload=recaptchaElementCallback&render=explicit');
+        head.appendChild(script);
+      });
+
+      Polymer({
+        properties: {
+          response: {
+            type: String,
+            notify: true
+          }
+        },
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+        listeners: {
+          'iron-resize': 'setLocationOfBodyFloat'
+        },
+        ready: function(){
+          this.float = document.createElement('div');
+          this.float.style = 'position:absolute;display:flex;align-items:center;flex-direction: column;';
+          document.body.appendChild(this.float);
+          recaptcha.then(function(rc){
+            this.recaptchaId = rc.render(this.float, {
+              sitekey: '6LdkoBYTAAAAABH1QTVoIqDvzZTsC0aTHwVAbWlv',
+              callback: this.setResponse.bind(this)
+            });
+          }.bind(this));
+        },
+        setResponse: function(response){
+          this.set('response', response);
+        },
+        attached: function(){
+          parent = this;
+          while(parent = parent.parentNode){
+            parent.addEventListener('scroll', this.setLocationOfBodyFloat.bind(this));
+          }
+        },
+        setLocationOfBodyFloat: function(){
+          var rect = this.getBoundingClientRect();
+          if(rect.width && rect.height){
+            this.float.style.display = 'flex';
+            this.float.style.left = rect.left + 'px';
+            this.float.style.top = rect.top + 'px';
+            this.float.style.width = rect.width + 'px';
+            this.float.style.height = rect.height + 'px';
+          }else{
+            this.float.style.display = 'none';
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

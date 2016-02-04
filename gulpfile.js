@@ -129,7 +129,7 @@ gulp.task('serve', [], function () {
     }
   });
 
-  gulp.watch(['app/**/*'], reload);
+  //gulp.watch(['app/**/*'], reload);
 });
 
 // Build and serve the output from the dist build

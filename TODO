@@ -1,6 +1,22 @@
- - Make verses linkable
+ - split chapters in paragraphs...
+   - bible reference needs to resolve to `<pa>`... so... some kind of index
  - NOTE hover gets cut off
+   - use more expensive set up, maybe make citations work as well
  - Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
  - Continue reading
  - Offline
- - login stuff
+   - Installation notification
+   - Hide features when offline
+ - Edit questions and answers
+ - write documentation about asking questions
+ - add quick navigation functionality
+ - forgot my password
+ - add date to questions and answers
+ - Dashboard list of recent questions
+ - verse highlighting
+ - chat or other discussion forum
+ - open book list on dashboard (??? maybe bible books started reading)
+ - double verse results with overlapping ranges
+ - filter topical cards with in operator
+ - set custom char range for literal search with new operator
+ - write documentation for search

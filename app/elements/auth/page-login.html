@@ -64,13 +64,13 @@
         is: 'page-login',
 
         properties: {
-
+          username: String,
+          password: String
         },
         ready: function(){
         },
         login: function(){
           this.$.api.login().then(function(){
-            console.log('yay', this.loggedIn);
             if(this.loggedIn){
               page('/');
             }

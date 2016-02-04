@@ -28,8 +28,13 @@
       }
       paper-card{
       }
-      p{
+      pa{
+        display: block;
         text-align: justify;
+        margin: 20px 0px;
+      }
+      pa:first-of-type{
+        margin-top: 0px;
       }
       ul{
         list-style: none;
@@ -38,7 +43,7 @@
       ul li{
         font-style: italic;
       }
-      vn.selected{
+      vn.selected, vn.selected li{
         background: var(--accent-color-200);
         color: var(--text-on-accent-color-200);
       }
@@ -69,6 +74,9 @@
         font-size: 48px;
         padding-right: 10px;
         padding-bottom: 10px;
+      }
+      :host([mode='study']) pa:last-of-type{
+        margin-bottom: 0px;
       }
       :host([mode='study']) pericope{
         display: inline-block;
@@ -190,7 +198,7 @@
                 }
                 this.async(function(){
                   this.scrollToReference();
-                });
+                }, 500);
                 //this.$.text.innerHTML = httpRequest.responseText;
               }
             }
@@ -212,7 +220,7 @@
 
         scrollToReference: function() {
           if(this.textRef.chapter){
-            this.$.text.scrollToIndex(this.textRef.chapter);
+            this.$.text.scrollToIndex(this.textRef.chapter-1);
             if(this.textRef.verseStart){
               this.set('selectedVerses', [this.textRef.toString()])
             }

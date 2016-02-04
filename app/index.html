@@ -8,6 +8,8 @@
   <title>Another Bible App</title>
   <!-- Place favicon.ico in the `app/` directory -->
 
+  <link rel="shortcut icon" type="image/png" href="/images/favicon.png" />
+
   <!-- Chrome for Android theme color -->
   <meta name="theme-color" content="#795548">
 
@@ -90,7 +92,8 @@
               <page-welcome data-route="home"></page-welcome>
               <page-book data-route="book" ref="{{params.bookRef}}"></page-book>
               <page-search data-route="search" search-query="{{params.searchQuery}}"></page-search>
-              <page-login data-route="login"></page-login>
+              <page-login data-route="login" username="{{params.username}}" password="{{params.password}}"></page-login>
+              <page-register data-route="register"></page-register>
               <page-new-question data-route="new-question" verses-string="{{params.newQuestionVerses}}"></page-new-question>
               <page-question data-route="question" id="{{params.questionId}}"></page-question>
               <page-rules-questions data-route="rules-questions"></page-rules-questions>
@@ -107,11 +110,11 @@
         </paper-scroll-header-panel>
       </paper-drawer-panel>
 
-      <!-- Uncomment next block to enable Service Worker support (1/2) -->
+      <!-- Uncomment next block to enable Service Worker support (1/2)
 	  <paper-toast id="caching-complete"
 				   duration="6000"
 				   text="Caching complete! This app will work offline.">
-	  </paper-toast>
+	  </paper-toast> -->
 
       <!--
 	  <platinum-sw-register auto-register

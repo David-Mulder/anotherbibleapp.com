@@ -101,7 +101,7 @@
         }
         break;
     }
-  }
+  };
   var zip = new JSZip();
   var httpRequest = new XMLHttpRequest();
   httpRequest.onreadystatechange = function() {
@@ -288,6 +288,8 @@
           string = string.replace(/supplied>/g, 'sd>');
           string = string.replace(/<cite/g, '<ci');
           string = string.replace(/<\/cite/g, '</ci');
+          string = string.replace(/<p>/g, '<pa>');
+          string = string.replace(/<\/p>/g, '</pa>');
           string = string.replace(/info>/g, 'io>');
           string = string.replace(/NOT_FOR_PRINT/g, 'NFP');
           if(string.indexOf("xmlns") > -1){

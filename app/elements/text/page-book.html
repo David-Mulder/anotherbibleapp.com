@@ -58,6 +58,9 @@
         --paper-toggle-button-label-color: var(--text-on-primary-color);
         --paper-toggle-button-unchecked-button-color: var(--primary-color-100);
       }
+      #search{
+        margin-right: 10px;
+      }
     </style>
 
     <utils-books id="bookUtils"></utils-books>
@@ -68,8 +71,8 @@
       <div main>
         <paper-toolbar>
           <intelligent-title title=""></intelligent-title>
+          <paper-icon-button icon="search" id="search" on-tap="goToSearch" hidden="{{!studyTools}}"></paper-icon-button>
           <paper-toggle-button checked="{{studyTools}}">Study tools</paper-toggle-button>
-
         </paper-toolbar>
         <div id="textContainer">
           <bible-text text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="openQADrawer" mode="{{mode}}"></bible-text>
@@ -150,6 +153,10 @@
             this.mode = 'read';
             app.forceNarrow = true;
           }
+        },
+
+        goToSearch: function(){
+          page('/search/in:'+this.fullRef.book.name+' ');
         }
 
       });

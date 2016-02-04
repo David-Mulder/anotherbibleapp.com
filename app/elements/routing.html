@@ -31,6 +31,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       //app.scrollPageToTop();
     });
 
+    page('/register', function (data) {
+      app.setTitle('Register');
+      app.route = 'register';
+      //app.scrollPageToTop();
+    });
+
     page('/logout', function (data) {
       delete localStorage.token;
       location.href = '/';

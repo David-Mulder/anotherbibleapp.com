@@ -48,6 +48,10 @@
         top: 40%;
         cursor: pointer;
       }
+      .verse:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
     </style>
 
     <utils-books id="utils"></utils-books>
@@ -57,7 +61,7 @@
       <div id="triggerSearch" hidden$="{{!triggerSearchButton}}" on-tap="search">Click here to trigger a literal search</div>
       <div id="noResults" hidden$="{{!noResults}}">No verses found for your search query.</div>
       <template is="dom-repeat" items="{{results}}">
-        <div class="card-actions">
+        <div class="card-actions verse" on-tap="goToVerse">
           <bible-snippet start="{{item.firstVerse}}" end="{{item.lastVerse}}" highlight="{{searchQuery}}"></bible-snippet>
         </div>
       </template>
@@ -132,6 +136,11 @@
               console.log('ERROR YES', ev);
             });
           }.bind(this));
+        },
+        goToVerse: function(ev){
+          var verse = ev.model.item;
+          var start = this.$.utils.parseReference(verse.firstVerse);
+          page('/book/'+start);
         }
       });
     })();

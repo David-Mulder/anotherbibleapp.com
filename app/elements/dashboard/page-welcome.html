@@ -30,7 +30,7 @@
           </div>
           <div class="card-actions">
             <paper-button on-tap="goToLogin">Log In</paper-button>
-            <paper-button>Register</paper-button>
+            <paper-button on-tap="goToRegister">Register</paper-button>
           </div>
         </paper-card>
         <paper-card heading="Q&A">
@@ -70,6 +70,9 @@
         },
         goToLogout: function(){
           page.show('/logout');
+        },
+        goToRegister: function(){
+          page.show('/register');
         }
       });
     })();

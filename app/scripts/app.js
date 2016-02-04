@@ -99,4 +99,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     page('/');
   };
 
+  app.toast = function(msg){
+    var pt = document.createElement('paper-toast');
+    pt.opened = true;
+    pt.duration = 10000;
+    pt.text = msg;
+    document.body.appendChild(pt);
+  }
+
 })(document);

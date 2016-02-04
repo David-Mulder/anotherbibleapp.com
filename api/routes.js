@@ -10,7 +10,7 @@ module.exports = {
     app.get('/authenticate/:email/:password', authenticator.authenticate);
     app.get('/questions/list/:verse', questionController.listForVerse);
     app.get('/question/:id', questionController.get);
-    app.get('/user', userController.register); //todo: put
+    app.put('/user', userController.register); //todo: put
     app.put('/question', authenticator.isAuthenticated, questionController.create);
     app.put('/answer', authenticator.isAuthenticated, answerController.create);
     app.post('/upvote/:type/:id', authenticator.isAuthenticated, votingController.upvote);
