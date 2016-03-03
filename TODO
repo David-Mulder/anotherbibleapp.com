@@ -1,17 +1,26 @@
  - split chapters in paragraphs...
-   - bible reference needs to resolve to `<pa>`... so... some kind of index
- - NOTE hover gets cut off
-   - use more expensive set up, maybe make citations work as well
+   - DONE chapter numbers
+   - DONE bible reference needs to resolve to `<pa>`... so... some kind of index
+   - increase margin of last one and add license notice
+ - check jn 9:39
+ - DONE lazy loading
+ - DONE on tap verse set URL
+ - add license
+ - DONE NOTE hover gets cut off
+ - Support/fix citations in notes
+ - disable saving of reading position when referenced verse
  - Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
- - Continue reading
+ - DONE Continue reading
+ - Count topical bible references and add as weight in search
  - Offline
    - Installation notification
    - Hide features when offline
- - Edit questions and answers
+ - DONE Edit questions and answers
  - write documentation about asking questions
  - add quick navigation functionality
  - forgot my password
- - add date to questions and answers
+ - DONE add date to questions and answers
+ - relative date in qa-post
  - Dashboard list of recent questions
  - verse highlighting
  - chat or other discussion forum
@@ -20,3 +29,8 @@
  - filter topical cards with in operator
  - set custom char range for literal search with new operator
  - write documentation for search
+ - reapply firstIndex better after read -> study modus
+ - menu button not appearing on small screen load
+ - scroll happens after 'ask question' flow started
+ - move 'finish selection' in 'ask question' flow to sidebar... maybe
+ - user profile pages

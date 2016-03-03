@@ -57,11 +57,11 @@ module.exports = {
       if(req.params.type == 'answer'){
         Answer.findOne({
           _id: req.params.id
-        }).populate('user', 'displayName _id').exec(processVote);
+        }).populate('originalAuthor', 'displayName _id').exec(processVote);
       }else if(req.params.type == 'question'){
         Question.findOne({
           _id: req.params.id
-        }).populate('user', 'displayName _id').exec(processVote);
+        }).populate('originalAuthor', 'displayName _id').exec(processVote);
       }
     });
   }

@@ -41,7 +41,10 @@
           },
           narrow: {
             type: Boolean,
-            reflectToAttribute: true
+            reflectToAttribute: true,
+            value: function(){
+              return app.isNarrow();
+            }
           },
           noTitleIfWide: {
             reflectToAttribute: true

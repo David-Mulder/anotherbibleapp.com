@@ -90,14 +90,17 @@
             <iron-pages attr-for-selected="data-route" selected="{{route}}">
 
               <page-welcome data-route="home"></page-welcome>
-              <page-book data-route="book" ref="{{params.bookRef}}"></page-book>
-              <page-search data-route="search" search-query="{{params.searchQuery}}"></page-search>
-              <page-login data-route="login" username="{{params.username}}" password="{{params.password}}"></page-login>
+              <page-book data-route="book" ref$="{{params.bookRef}}"></page-book>
+              <page-search data-route="search" search-query$="{{params.searchQuery}}"></page-search>
+              <page-login data-route="login" username$="{{params.username}}" password$="{{params.password}}"></page-login>
               <page-register data-route="register"></page-register>
-              <page-new-question data-route="new-question" verses-string="{{params.newQuestionVerses}}"></page-new-question>
-              <page-question data-route="question" id="{{params.questionId}}"></page-question>
+              <page-edit-question data-route="edit-question" id$="{{params.questionId}}"></page-edit-question>
+              <page-edit-answer data-route="edit-answer" id$="{{params.answerId}}"></page-edit-answer>
+              <page-post-history data-route="post-history" id$="{{params.postId}}" post-type="{{params.postType}}"></page-post-history>
+              <page-new-question data-route="new-question" verses-string$="{{params.newQuestionVerses}}"></page-new-question>
+              <page-question data-route="question" id$="{{params.questionId}}"></page-question>
               <page-rules-questions data-route="rules-questions"></page-rules-questions>
-              <page-topic data-route="topic" topic-name="{{params.topicName}}"></page-topic>
+              <page-topic data-route="topic" topic-name$="{{params.topicName}}"></page-topic>
               <!--<section data-route="home">
 
 				<paper-material elevation="1" class="paper-font-body2">

@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
   uuid = require('uuid');
 var User = require('../users/model.js');
 var Question = require('../questions/model.js');
+var version = require('../../version.js');
 
 var schema = new Schema({
   text: {
@@ -11,9 +12,13 @@ var schema = new Schema({
   },
   upvotes: Array,
   downvotes: Array,
-  user: {
+  originalAuthor: {
     type: Schema.Types.ObjectId,
     required: true,
+    ref: 'User'
+  },
+  revisionAuthor: {
+    type: Schema.Types.ObjectId,
     ref: 'User'
   },
   question: {
@@ -23,8 +28,11 @@ var schema = new Schema({
   }
 });
 
+//schema.plugin(version);
+
 schema.methods.makePublic = function(userId){
   console.log('make answer public', userId);
+  console.log(this);
   var obj = this.toObject();
 
   obj.upvoted = obj.upvotes.some(uID => uID.equals(userId));
@@ -33,10 +41,18 @@ schema.methods.makePublic = function(userId){
   obj.downvotes = obj.downvotes.length;
   obj.score = obj.upvotes - obj.downvotes;
 
-  delete obj.user.password; //unnecessary, but just in case
+  delete obj.originalAuthor.password; //unnecessary, but just in case
   return obj;
 };
 
-var Answer = mongoose.model('answers', schema);
+var Answer;
+
+schema.plugin(version, {
+  get model(){
+    return Answer;
+  }
+});
+
+Answer = mongoose.model('answers', schema);
 
 module.exports = Answer;

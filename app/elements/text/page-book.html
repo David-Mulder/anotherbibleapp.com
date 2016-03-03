@@ -1,7 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="./bible-text.html">
 <link rel="import" href="./verse-information-drawer.html">
+<link rel="import" href="../qa/qa-related-questions-card.html">
 
 <dom-module id="page-book">
   <template>
@@ -75,7 +77,7 @@
           <paper-toggle-button checked="{{studyTools}}">Study tools</paper-toggle-button>
         </paper-toolbar>
         <div id="textContainer">
-          <bible-text text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="openQADrawer" mode="{{mode}}"></bible-text>
+          <bible-text id="text" text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="verseSelected" mode="{{mode}}" on-scroll="savePosition"></bible-text>
         </div>
         <paper-toast opened="{{newQuestionMode}}" text="Please tap on all the verses that are relevant to your question." duration="0" class="fit-bottom" opened>
           <span role="button" tabindex="0" style="color: #eeff41;margin: 10px" on-tap="qaNewQuestionReady">Tap here once you're done.</span>
@@ -121,12 +123,32 @@
         },
 
         refChanged: function(){
+          console.info('ref changed', this.ref);
+
           this.set('fullRef', this.$.bookUtils.parseReference(this.ref));
+          if(isNaN(this.fullRef.chapter) && typeof localStorage['book-reading-position-'+this.fullRef.book.name] !== 'undefined'){
+            var lastRead = this.$.bookUtils.parseReference(localStorage['book-reading-position-'+this.fullRef.book.name]);
+            if(!(lastRead.verseStart == 1 && lastRead.chapter == 1)){
+              app.ask('Do you wish to continue reading from your last position (~'+lastRead.toString()+')?', 'Continue reading...', ['No', 'Yes']).then(answer => {
+                if(answer == 'Yes'){
+                  this.set('fullRef', lastRead);
+                  this.$.text.highlightVerse = false;
+                }
+              }).catch(() => {
+
+              });
+            }
+            //this.set('fullRef', this.$.bookUtils.parseReference(localStorage['book-reading-position-'+this.fullRef.book.name]));
+            //this.$.text.highlightVerse = false;
+          }
           app.setTitle(this.fullRef.book.title);
           this.setMode();
         },
 
-        openQADrawer: function(){
+        verseSelected: function(){
+          if(this.selectedVerses.length == 1){
+            page.replace('/book/'+this.selectedVerses[0].replace(/ /g, ''), null, null, false);
+          }
           if(!this.newQuestionMode && this.selectedVerses.length > 0){
             this.$.qaDrawerPanel.openDrawer();
           }
@@ -156,7 +178,11 @@
         },
 
         goToSearch: function(){
-          page('/search/in:'+this.fullRef.book.name+' ');
+          page('/search/in:'+this.fullRef.book.name.replace(/ /g, '')+' ');
+        },
+
+        savePosition: function(ev){
+          localStorage['book-reading-position-'+this.fullRef.book.name] = ev.detail.verse;
         }
 
       });

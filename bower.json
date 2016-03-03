@@ -32,7 +32,8 @@
     "paper-radio-group": "PolymerElements/paper-radio-group#^1.0.9",
     "paper-spinner": "PolymerElements/paper-spinner#^1.1.0",
     "google-recaptcha": "cbalit/re-captcha#^1.1.0",
-    "gold-password-input": "MeTaNoV/gold-password-input#^1.1.0"
+    "gold-password-input": "MeTaNoV/gold-password-input#^1.1.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.4"
   },
   "devDependencies": {
     "web-component-tester": "*",

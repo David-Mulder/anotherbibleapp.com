@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="./chapter-html.html">
+<link rel="import" href="block-html.html">
 
 <dom-module id="bible-text">
   <template>
@@ -31,14 +31,13 @@
       pa{
         display: block;
         text-align: justify;
-        margin: 20px 0px;
-      }
-      pa:first-of-type{
-        margin-top: 0px;
+        padding-bottom: 15px;;
       }
       ul{
         list-style: none;
         padding-left: 20px;
+        margin: 0px;
+        padding-top: 20px;
       }
       ul li{
         font-style: italic;
@@ -60,42 +59,50 @@
       }
     </style>
     <style>
-      :host([mode='study']) chapter{
-        background: var(--card-dialog-color);
-        margin: 10px 10px 0px 10px;
-        padding: 20px;
-        display: block;
-        box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;
+      :host([mode='study']) block-html[chapter-start] > div{
+        margin-top: 10px;
+        padding-top: 20px;
       }
-      :host([mode='study']) chapter::before{
-        content: attr(n);
+      :host([mode='study']) block-html > div{
+        background: var(--card-dialog-color);
+        margin: 0px 10px 0px 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 1px;
+        padding-top: 0px;
+        display: block;
+        /*box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;*/
+      }
+      :host([mode='study']) block-html[chapter-start] > div::before{
+        content: attr(chapter-number);
         display: inline-block;
         float: left;
-        font-size: 48px;
-        padding-right: 10px;
-        padding-bottom: 10px;
+        font-size: 32px;
+        min-width: 40px;
+        text-align: center;
       }
-      :host([mode='study']) pa:last-of-type{
-        margin-bottom: 0px;
+      :host([mode='study']) block-html[chapter-start] > div::after{
+        content: '';
+        display: block;
+        clear: both;
       }
       :host([mode='study']) pericope{
-        display: inline-block;
+        display: block;
         text-indent:0px;
-        padding-left:10px;
-        padding-right:10px;
-        margin-top: 10px;
-        margin-bottom: 5px;
         font-size: .9em;
         font-weight: 400;
         text-align: left;
         text-decoration: underline;
+        padding-bottom: 15px;;
       }
+
       :host([mode='study']) n io{
         display: none;
       }
       :host([mode='study']) n{
         position: relative;
       }
+      /*
       :host([mode='study']) n:hover io{
         display: block;
         position: absolute;
@@ -112,12 +119,14 @@
         opacity: .9;
         border-radius: 2px;
       }
+      */
       :host([mode='study']) n:after{
         content: 'NOTE';
         position: relative; top: -1em;
         font-size: 7px;
         color: rgba(0, 0, 0, 0.6);
         font-family: Verdana;
+        cursor: pointer;
       }
       :host([mode='study']) vn[first]::before{
         content: attr(n);
@@ -137,9 +146,10 @@
         font-style: italic;
       }
     </style>
-    <iron-list id="text" items="{{chapters}}" as="book" on-tap="selectVerse">
+    <utils-books id="utils"></utils-books>
+    <iron-list id="text" items="{{blocks}}" as="block" on-tap="selectVerse" on-scroll="savePosition">
       <template>
-        <chapter-html html="{{book}}" selected-verses="{{selectedVerses}}"></chapter-html>
+        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" chapter-number="{{block.chapterNumber}}"></block-html>
       </template>
     </iron-list>
   </template>
@@ -161,6 +171,9 @@
             type: Array,
             value: []
           },
+          blocks: {
+            type: Array
+          },
           mode: {
             type: String,
             reflectToAttribute: true
@@ -172,6 +185,10 @@
           selectionMode: {
             type: String,
             value: 'single'
+          },
+          highlightVerse: {
+            type: Boolean,
+            value: true
           }
         },
 
@@ -182,9 +199,14 @@
         ready: function() {
           //this.scopeSubtree(this.$.text, true);
           this.selectedVerses = [];
+          this.blocks = [];
         },
 
         loadBook: function(){
+          console.info('loading book', this.textRef);
+
+          this.highlightVerse = true;
+
           var url = this.resolveUrl('text/'+this.textRef.book.name+'.xml');
 
           var httpRequest = new XMLHttpRequest();
@@ -192,20 +214,47 @@
             this.set('chapters', []);
             if(httpRequest.readyState === XMLHttpRequest.DONE) {
               if(httpRequest.status === 200) {
-                var chapters = httpRequest.responseXML.querySelectorAll('chapter');
-                for(var i=0; i<chapters.length;i++){
-                  this.push('chapters', chapters[i].outerHTML);
-                }
+
+                console.info('loaded book', this.textRef.book)
+
+                this.loadBlocksFromBook(httpRequest.responseXML);
+
                 this.async(function(){
                   this.scrollToReference();
                 }, 500);
-                //this.$.text.innerHTML = httpRequest.responseText;
+
               }
             }
           }.bind(this);
+
           httpRequest.responseType = 'document';
           httpRequest.open('GET', url);
           httpRequest.send();
+        },
+
+        loadBlocksFromBook: function(book){
+          this.blocks = [];
+          var chapters = [].slice.call(book.querySelectorAll('chapter'));
+
+          chapters.forEach((chapter, chapterI) => {
+            var chapterBlocks = [].slice.call(chapter.querySelectorAll('pa, pericope'));
+            chapterBlocks.forEach((block, i) => {
+              var firstVerse = block.querySelector('vn');
+              if(firstVerse){
+                var reference = this.$.utils.parseReference(firstVerse.id);
+              }
+              this.push('blocks', {
+                start: i == 0,
+                end: i == chapterBlocks.length - 1,
+                debug: i+'/'+(chapterBlocks.length -1),
+                html: block.outerHTML,
+                chapterNumber: chapterI + 1,
+                verseStart: firstVerse ? reference.toNumeric() : null
+              });
+            });
+          });
+
+          console.info('loaded', this.blocks, 'blocks');
         },
 
         resetSizes: function(){
@@ -219,35 +268,75 @@
         },
 
         scrollToReference: function() {
+
+          if(this.textRef.chapter) {
+            console.log('searching for', this.textRef.toNumeric());
+            var lastValidIndex;
+            for (var i = 0; i < this.blocks.length; i++) {
+              if (this.blocks[i].verseStart) {
+                if (this.blocks[i].verseStart > this.textRef.toNumeric()) {
+                  break;
+                }
+                lastValidIndex = i;
+              }
+            }
+            if (lastValidIndex) {
+              this.$.text.scrollToIndex(lastValidIndex);
+            }
+          }
+
+          if(this.highlightVerse){
+            if(this.textRef.verseStart){
+              this.set('selectedVerses', [this.textRef.toString()])
+            }
+          }
+          //this.blocks.findIndex(block => block.firstVerse);
+          /*
           if(this.textRef.chapter){
             this.$.text.scrollToIndex(this.textRef.chapter-1);
             if(this.textRef.verseStart){
               this.set('selectedVerses', [this.textRef.toString()])
             }
-          }
+          }*/
         },
 
         selectVerse: function(ev){
-          var verseNumberElement = ev.path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
-          if(this.selectionMode === 'multiple'){
-            if(verseNumberElement) {
-              var isSelected = this.selectedVerses.includes(verseNumberElement.id);
-              if (isSelected) {
-                //unselect
-                this.splice('selectedVerses', this.selectedVerses.indexOf(verseNumberElement.id), 1);
-              } else {
-                //select
-                this.push('selectedVerses', verseNumberElement.id);
+          if(ev.path[0].nodeName.toLowerCase() == 'n'){
+            app.msg(ev.path[0].textContent);
+          }else{
+            var verseNumberElement = ev.path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
+            if(this.selectionMode === 'multiple'){
+              if(verseNumberElement) {
+                var isSelected = this.selectedVerses.includes(verseNumberElement.id);
+                if (isSelected) {
+                  //unselect
+                  this.splice('selectedVerses', this.selectedVerses.indexOf(verseNumberElement.id), 1);
+                } else {
+                  //select
+                  this.push('selectedVerses', verseNumberElement.id);
+                }
+              }
+            }else{
+              if(!verseNumberElement || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)){
+                this.set('selectedVerses', []);
+              }else{
+                this.set('selectedVerses', verseNumberElement ? [verseNumberElement.id] : []);
               }
             }
-          }else{
-            if(!verseNumberElement || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)){
-              this.set('selectedVerses', []);
-            }else{
-              this.set('selectedVerses', verseNumberElement ? [verseNumberElement.id] : []);
-            }
+            this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
           }
-          this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
+        },
+
+        savePosition: function(){
+          this.debounce('saveScrollPosition', function(){
+            var firstIndex = this.$.text.firstVisibleIndex;
+            if(this.blocks[firstIndex].verseStart === null){
+              firstIndex++;
+            }
+            this.fire('scroll', {
+              verse: this.blocks[firstIndex].verseStart
+            });
+          }, 100);
         }
 
       });

@@ -4,7 +4,7 @@
 <link rel="import" href="qa-post.html">
 <link rel="import" href="bible-markdown-editor.html">
 
-<dom-module id="page-question">
+<dom-module id="page-post-history">
   <template>
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
@@ -49,48 +49,39 @@
       #drawerContent{
         overflow: auto;
       }
-      qa-post[type='answer']{
-        margin-bottom: 20px;
+      qa-post{
+        margin-bottom: 30px;
       }
     </style>
-    <auth-api id="api" action="qa/:id" param-id="{{id}}" response="{{qas}}"></auth-api>
+
+    <auth-api id="api" action=":postType/:id" param-id="{{id}}" param-post-type="{{postType}}" response="{{question}}" param-history></auth-api>
+
     <paper-drawer-panel right-drawer>
+
       <div main>
+
         <paper-toolbar>
           <intelligent-title title="Another Bible App" no-title-if-wide></intelligent-title>
         </paper-toolbar>
+
         <div class="page-content">
 
-          <qa-post type="question" post="{{qas.question}}"></qa-post>
+          <qa-post type="{{postType}}" post="{{question}}" no-voting no-actions></qa-post>
 
-          <hr class="divider">
-
-          <template is="dom-repeat" items="{{qas.answers}}" as="answer">
-            <qa-post type="answer" post="{{answer}}"></qa-post>
+          <template is="dom-repeat" items="{{question.revisions}}">
+            <qa-post type="{{postType}}" post="{{item}}" no-voting no-actions></qa-post>
           </template>
 
-          <div id="noAnswers" hidden$="{{anyAnswers}}">
-            <span>Nobody has answered this question yet. Know somebody who can? Share this link with them!</span>
-            <hr class="divider">
-          </div>
-
-          <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{id}}" param-text="{{answerText}}"></auth-api>
-
-          <paper-card heading="Your Answer" id="newAnswer">
-            <div class="card-content">
-              <bible-markdown-editor value="{{answerText}}"></bible-markdown-editor>
-            </div>
-            <div class="card-actions">
-              <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>
-            </div>
-          </paper-card>
-
         </div>
+
       </div>
+
       <div drawer>
+
         <paper-toolbar>
           <span>Related</span>
         </paper-toolbar>
+
         <div id="drawerContent">
           <paper-card heading="Discussed texts">
             <template is="dom-repeat" items="{{qas.question.verses}}">
@@ -100,7 +91,9 @@
             </template>
           </paper-card>
         </div>
+
       </div>
+
     </paper-drawer-panel>
   </template>
 
@@ -109,27 +102,23 @@
       'use strict';
 
       Polymer({
-        is: 'page-question',
-
         properties: {
-
-        },
-        listeners: {
-          'page-became-visible': 'retrieveFromApi'
+          postType: String
         },
         observers: [
+          'retrieveFromApi(id)',
           'setTitle(qas.question.title)',
           'setAnyAnswers(qas.answers.splices)'
         ],
-        ready: function(){
+        ready: function () {
         },
         retrieveFromApi: function(){
-          this.$.api.execute();
+          this.$.api.execute().then(function(){
+            console.log('ha', arguments);
+          });
         },
         submitAnswer: function(){
-          this.$.newAnswerApi.execute().then(() => {
-            this.retrieveFromApi();
-          });
+          this.$.newAnswerApi.execute();
         },
         setTitle: function(title){
           app.setTitle(title);

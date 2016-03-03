@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/marked-element/marked-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
@@ -168,7 +169,7 @@
         is: 'page-new-question',
 
         properties: {
-          versesString: Array,
+          versesString: String,
           verses: Array
         },
         observers: [

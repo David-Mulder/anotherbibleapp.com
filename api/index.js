@@ -6,6 +6,8 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var authenticator = require('./objects/users/authenticator');
 
+require('mongoose').Promise = Promise;
+
 mongoose.connect('mongodb://localhost/test');
 
 var app = express();

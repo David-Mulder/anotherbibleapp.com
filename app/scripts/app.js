@@ -32,24 +32,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   };
 
+  var lazyEventQueue = new WeakMap();
+
+  var lazyEvent = function(element, event, detail){
+    if(element.constructor == HTMLElement){
+      //element not yet registered, add to lazy event queue
+      var events = [];
+      if(lazyEventQueue.has(element)){
+        events = lazyEventQueue.get(element);
+      }
+      events.push([event, detail]);
+      lazyEventQueue.set(element, events);
+    }else{
+      element.fire(event, detail);
+    }
+  };
+
+  var lazyFireEvents = function(element){
+    if(lazyEventQueue.has(element)){
+      var events = lazyEventQueue.get(element);
+      console.log(events , 'for', element);
+      events.forEach(event => console.log(element,event[0], event[1]));
+      events.forEach(event => element.fire(event[0], event[1]));
+      lazyEventQueue.delete(element);
+    }else{
+      console.log('no events for', element);
+    }
+  };
+
+  app.loadedDependencies = [];
+  app.loadDependency = function(el){
+    if(app.loadedDependencies.indexOf(el) === -1){
+      console.debug('loading', el);
+      app.loadedDependencies.push(el);
+      app.importHref('/elements/' + el + '.html', function(){
+
+        document.getElementById('loading').style.opacity = 0;
+        window.dispatchEvent(new Event('resize'));
+
+        var element = document.querySelector(el.split('/').pop());
+        lazyFireEvents(element);
+
+      }, function(){
+        alert('Failed loading the requested page.');
+      });
+    }
+  };
+
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
   app.addEventListener('dom-change', function() {
     console.log('Our app is ready to rock!');
   });
 
+  app.isNarrow = function(){
+    return document.getElementById('mainDrawer').narrow;
+  };
+
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
-    // imports are loaded and elements have been registered
-    document.getElementById('loading').style.opacity = 0;
 
-    var func;
-    document.getElementById('mainDrawer').addEventListener('narrow-changed', func = function(){
+    document.getElementById('mainDrawer').addEventListener('narrow-changed', function(){
       document.body.dispatchEvent(new CustomEvent("narrow-changed", {
         detail: {
-          narrow: document.getElementById('mainDrawer').narrow
+          narrow: app.isNarrow()
         }
       }));
+    });
+
+    var func;
+    document.querySelector('iron-pages').addEventListener('iron-select', func = function(){
+      console.log('HIERJA, IRON SELECT');
+      lazyEvent(document.querySelector('iron-pages').selectedItem, 'page-became-visible', {});
+      console.log('page became visible event sent');
+      //document.querySelector('iron-pages').selectedItem.fire('page-became-visible');
     });
     func();
 
@@ -105,6 +161,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     pt.duration = 10000;
     pt.text = msg;
     document.body.appendChild(pt);
+  }
+
+  app.msg = function(msg, title){
+    var pd = document.createElement('paper-dialog');
+    pd.entryAnimation = 'scale-up-animation';
+    pd.innerHTML = '<h1></h1><div></div><div class="buttons"></div>';
+    pd.querySelector('div').textContent = msg;
+    pd.querySelector('h1').textContent = title;
+    if(typeof title == 'undefined'){
+      pd.querySelector('h1').style.display = 'none';
+    }
+    pd.withBackdrop = true;
+    document.body.appendChild(pd);
+    pd.opened = true;
+    pd.addEventListener('iron-overlay-closed', function(){
+      document.body.removeChild(pd);
+    });
+    return pd;
+  };
+
+  app.ask = function(msg, title, options){
+    return new Promise((resolve, reject) => {
+
+      var pd = app.msg(msg, title);
+
+      pd.addEventListener('iron-overlay-canceled', () => {
+        reject();
+      });
+
+      options.forEach((option, i) => {
+        var pb = document.createElement('paper-button');
+        pb.textContent = option;
+        pb.addEventListener('tap', function(){
+          pd.close();
+          resolve(option, i);
+        });
+        pd.querySelector('.buttons').appendChild(pb);
+      });
+
+    });
   }
 
 })(document);

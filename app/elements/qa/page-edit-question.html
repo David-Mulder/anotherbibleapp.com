@@ -1,0 +1,136 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="qa-post.html">
+<link rel="import" href="bible-markdown-editor.html">
+<link rel="import" href="../utils/utils-books.html">
+<link rel="import" href="../../bower_components/marked-element/marked-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="page-edit-question">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      qa-post{
+        max-width: 800px;
+        margin: auto;
+      }
+      .page-content paper-card{
+        max-width: 800px;
+      }
+      paper-drawer-panel [main]{
+        display: flex;
+        flex-direction: column;
+      }
+      paper-drawer-panel [drawer]{
+        display: flex;
+        flex-direction: column;
+      }
+      paper-drawer-panel [drawer] > div{
+        padding: 10px;
+        background: var(--primary-color-50);
+        flex: 1;
+      }
+      hr.divider{
+        display: block;
+        width: 100%;
+        max-width: 850px;
+        margin: 20px auto;
+        border: 0px;
+        border-top: 1px dotted rgba(0,0,0,.2);
+      }
+      #noAnswers{
+        text-align: center;
+      }
+      #noAnswers span{
+        color: var(--secondary-text-on-primary-color-50);
+      }
+      #newAnswer{
+        margin-top: 20px;
+      }
+      #drawerContent{
+        overflow: auto;
+      }
+      .page-content paper-card{
+        padding-top: 20px;
+        max-width: 1300px;
+      }
+      #verseContainer{
+        background: var(--accent-color-50);
+        padding: 10px;
+        padding-top: 5px;
+        padding-bottom: 10px;
+        margin-top: 15px;
+      }
+    </style>
+    <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{question}}"></auth-api>
+    <auth-api id="save" action="question/:id" param-id="{{id}}" method="POST" param-title="{{title}}" todo-param-category="{{category}}" param-text="{{text}}" param-verses="{{versesAsNumbers}}"></auth-api>
+    <utils-books id="utils"></utils-books>
+
+    <paper-toolbar>
+      <intelligent-title title="Edit question"></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+
+      <paper-card>
+        <div class="card-content">
+          <paper-input label="Question title" value="{{title}}"></paper-input>
+          <bible-markdown-editor label="Question in detail" value="{{text}}" rows="7"></bible-markdown-editor>
+          <div id="verseContainer">
+            <paper-input label="Verses" value="{{verseString}}" error-message="One of the verses can not be parsed" invalid="{{invalidVerseFound}}"></paper-input>
+          </div>
+        </div>
+        <div class="card-actions">
+          <paper-button on-tap="save">Save</paper-button>
+        </div>
+      </paper-card>
+
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          title: String,
+
+        },
+        observers: [
+          'retrieveFromApi(id)',
+          'setTitle(question.title)',
+          'setQuestion(question)',
+          'setVersesFromString(verseString)'
+        ],
+        ready: function(){
+        },
+        retrieveFromApi: function(){
+          this.$.api.execute();
+        },
+        submitAnswer: function(){
+          this.$.newAnswerApi.execute();
+        },
+        setTitle: function(title){
+          app.setTitle(title);
+        },
+        setQuestion: function(){
+          this.title = this.question.title;
+          this.text = this.question.text;
+          this.verseString = this.question.verses.map((v) => new BibleReference(v)).join(', ');
+        },
+        setVersesFromString: function(){
+          var verses = this.verseString.split(',').map(v => v.trim()).map(v => new BibleReference(v).toNumeric());
+          this.versesAsNumbers = verses.filter(vid => !isNaN(vid));
+          this.invalidVerseFound = verses.some(vid => isNaN(vid));
+        },
+        save: function(){
+          this.$.save.execute().then(function(question){
+            page('/question/'+question._id+'/');
+          });
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

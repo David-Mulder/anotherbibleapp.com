@@ -67,7 +67,7 @@
       <auth-api id="downvoteApi" method="POST" action="downvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
       <div class="card-content">
         <div class="post">
-          <div class="score">
+          <div class="score" hidden$="{{noVoting}}">
             <div class="upvote" data-voted$="{{post.upvoted}}" on-tap="upvote"></div>
             <div class="number">{{post.score}}</div>
             <div class="downvote" data-voted$="{{post.downvoted}}" on-tap="downvote"></div>
@@ -80,14 +80,16 @@
               <div class="html"></div>
             </marked-element>
             <div class="author">
-              By {{post.user.displayName}}
+              By {{post.originalAuthor.displayName}}
+              at {{post.updatedAt}}
             </div>
           </div>
         </div>
       </div>
-      <div class="card-actions">
+      <div class="card-actions" hidden$="{{noActions}}">
         <paper-button>Share</paper-button>
-        <paper-button>Edit</paper-button>
+        <paper-button on-tap="goToEdit">Edit</paper-button>
+        <paper-button on-tap="goToHistory">History</paper-button>
       </div>
     </paper-card>
   </template>
@@ -101,7 +103,9 @@
 
         properties: {
           post: Object,
-          type: String
+          type: String,
+          noVoting: Boolean,
+          noActions: Boolean
         },
         _equals: function(a,b){
           return a == b;
@@ -115,6 +119,12 @@
           this.$.downvoteApi.execute().then(function(post){
             this.set('post', post);
           }.bind(this));
+        },
+        goToEdit: function(){
+          page('/' + this.type + '/' + this.post._id + '/' + 'edit');
+        },
+        goToHistory: function(){
+          page('/' + this.type + '/' + this.post._id + '/' + 'history');
         }
       });
     })();

@@ -4,8 +4,11 @@ importScripts('bower_components/sw-toolbox/sw-toolbox.js');
 importScripts('cache-config.js');
 
 if(config.disabled){
+
   console.info('Service Worker *not* in action');
+
 }else{
+
   console.info('Service Worker in action', config);
 
   self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));

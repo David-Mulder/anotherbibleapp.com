@@ -68,81 +68,106 @@
         execute: function(cb){
 
           return new Promise(function(resolve, reject){
-            if(this.token || this.unauthorized || true){
-              var paramsSet = this._requiredParams.every((param) => {
-                var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
-                return typeof this.get(propertyName) !== 'undefined' && this.get(propertyName);
-              });
 
-              if(paramsSet){
-                var url = this._buildURL(this.action);
+            this.debounce('api.'+this.action, function(){
 
-                var fetchConfig = {
-                  method: this.method,
-                  headers: new Headers()
-                };
+              if(this.token || this.unauthorized || true){
+                var allSetParams = this._getSetParams();
+                var paramsSet = this._requiredParams.every(param => allSetParams.find(p => p.name == param));
 
-                fetchConfig.headers.set('Accept', 'application/json');
+                if(paramsSet){
+                  var url = this._buildURL(this.action);
+                  var urlParams = [];
 
-                if(this.loggedIn){
-                  //fetchConfig.headers.set('auth-token', this.token);
-                  url += '?token='+this.token;
-                }
+                  var fetchConfig = {
+                    method: this.method,
+                    headers: new Headers()
+                  };
 
-                var formDataParams = this._getUnusedParams();
-                if(formDataParams.length > 0){
-                  var data = {};
-                  formDataParams.forEach(function(param){
-                    var propertyName = 'param' + param.substring(0, 1).toUpperCase() + param.slice(1);
-                    data[param] = this.get(propertyName);
-                  }.bind(this));
-                  fetchConfig.body = JSON.stringify(data);
-                  fetchConfig.headers.set('Content-Type','application/json');
-                }
+                  fetchConfig.headers.set('Accept', 'application/json');
 
-                fetch(url, fetchConfig).then(function(response){
-
-                  this.status = response.status;
-                  return response.text();
-
-                }.bind(this)).then(function(text){
-
-                  var response = JSON.parse(text);
-
-                  if(this.status === 401 && response === 'Invalid token'){
-
-                    var pt = document.createElement('paper-toast');
-                    pt.opened = true;
-                    pt.duration = 10000;
-                    pt.text = 'It seems your login credentials are out of date. Please log out and log in again.';
-                    document.body.appendChild(pt);
-                    reject(response);
-
-                  }else if(this.status === 429){
-
-                    var pt = document.createElement('paper-toast');
-                    pt.opened = true;
-                    pt.duration = 10000;
-                    pt.text = 'Sorry, you are doing too many request within a minute. As a security measure this is not allowed.';
-                    document.body.appendChild(pt);
-                    reject(response);
-
-                  }else if(this.status === 200){
-
-                    resolve(response);
-                    this.response = response;
-
-                  }else{
-
-                    reject(response);
-
+                  if(this.loggedIn){
+                    //fetchConfig.headers.set('auth-token', this.token);
+                    urlParams.push(['token', this.token]);
                   }
 
-                }.bind(this));
-              }else{
-                reject('Not all parameters are set');
+                  var unusedParams = allSetParams.filter(param => this._requiredParams.indexOf(param.name) == -1);
+                  if(unusedParams.length > 0){
+                    if(this.method == 'GET'){
+                      unusedParams.forEach(function(param){
+                        urlParams.push([param.name, param.value]);
+                      }.bind(this));
+                    }else{
+                      var data = {};
+                      unusedParams.forEach(function(param){
+                        data[param.name] = param.value;
+                      }.bind(this));
+                      fetchConfig.body = JSON.stringify(data);
+                      console.info('body set', data);
+                      fetchConfig.headers.set('Content-Type','application/json');
+                    }
+                  }
+
+                  if(urlParams.length > 0){
+                    url += '?' + urlParams.map(p => encodeURIComponent(p[0]) + '=' + encodeURIComponent(p[1])).join('&');
+                  }
+
+                  console.info('fetch', url);
+
+                  fetch(url, fetchConfig).then(function(response){
+
+                    this.status = response.status;
+                    return response.text();
+
+                  }.bind(this)).then(function(text){
+
+                    var response = JSON.parse(text);
+
+                    if(this.status === 401 && response === 'Invalid token'){
+
+                      var pt = document.createElement('paper-toast');
+                      pt.opened = true;
+                      pt.duration = 10000;
+                      pt.text = 'It seems your login credentials are out of date. Please log out and log in again.';
+                      document.body.appendChild(pt);
+                      reject(response);
+
+                    }else if(this.status === 429){
+
+                      var pt = document.createElement('paper-toast');
+                      pt.opened = true;
+                      pt.duration = 10000;
+                      pt.text = 'Sorry, you are doing too many request within a minute. As a security measure this is not allowed.';
+                      document.body.appendChild(pt);
+                      reject(response);
+
+                    }else if(this.status === 200){
+
+                      resolve(response);
+                      this.response = response;
+
+                    }else{
+
+                      reject(response);
+
+                    }
+
+                  }.bind(this)).catch(function(err){
+
+                    var pt = document.createElement('paper-toast');
+                    pt.opened = true;
+                    pt.duration = 10000;
+                    pt.text = 'The database service seems offline, sorry for the inconvenience';
+                    document.body.appendChild(pt);
+                    reject(err);
+
+                  });
+                }else{
+                  reject('Not all parameters are set');
+                }
               }
-            }
+            }.bind(this));
+
           }.bind(this));
 
         },
@@ -169,8 +194,40 @@
           return url.split('/').filter(urlPart => urlPart.substr(0,1) === ':').map(urlPart => urlPart.split(':')[1]);
         },
 
+        _getSetParams: function(url){
+
+          var attributes = Array.prototype.slice.call(this.attributes).filter(function(a){
+            return a.nodeName.substring(0,6) == 'param-'
+          }).map(function(a){
+            //todo: properly capitalize multi - params
+            return {
+              value: a.nodeValue === '' ? true : a.nodeValue,
+              name: a.nodeName.split('-')[1]
+            }
+          });
+
+          var properties = Object.keys(this).filter(function(propName){
+            return propName.substring(0,5) == 'param'
+          }).map(function(propName){
+            return {
+              name: propName.substring(5, 6).toLowerCase() + propName.substring(6, propName.length),
+              value: this[propName]
+            };
+          }.bind(this));
+
+          return attributes.concat(properties);
+        },
+
         _getUnusedParams: function(){
-          var allParams = Object.keys(this).filter(function(propName){
+          var attributes = Array.prototype.slice.call(this.attributes).map(function(a){
+            return a.nodeName
+          }).filter(function(attName){
+            return attName.substring(0,6) == 'param-'
+          }).map(function(attName){
+            //todo: properly capitalize multi
+            return attName.split('-')[1];
+          });
+          var allParams = Object.keys(this).concat(attributes).filter(function(propName){
             return propName.substring(0,5) == 'param'
           }).map(function(propName){
             return propName.substring(5, 6).toLowerCase() + propName.substring(6, propName.length);

@@ -1,12 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="chapter-html">
+<dom-module id="block-html">
   <script>
     (function() {
       'use strict';
 
       Polymer({
-        is: 'chapter-html',
+        is: 'block-html',
 
         properties: {
           html: {
@@ -22,6 +22,7 @@
         ],
         setHTML: function(){
           var div = document.createElement('div');
+          div.setAttribute('chapter-number', this.chapterNumber);
           div.innerHTML = this.html;
           this.setSelectionClasses(div);
           this.setVerseNumberAttributes(div);
@@ -68,9 +69,9 @@
           }
         },
         setChapterAttributes: function(element){
-          var chapter = element.querySelector('chapter');
-          var s = chapter.id.split(':')[0].split(' ');
-          chapter.setAttribute('n', s[s.length - 1]);
+          //var chapter = element.querySelector('chapter');
+          //var s = chapter.id.split(':')[0].split(' ');
+          //chapter.setAttribute('n', s[s.length - 1]);
         }
       });
     })();

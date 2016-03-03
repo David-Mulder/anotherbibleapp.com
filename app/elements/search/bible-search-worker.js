@@ -4,6 +4,9 @@ importScripts('lib/smartStemmer.js');
 importScripts('lib/stringDistance.js');
 importScripts('data/stopWords.js');
 
+importScripts('../utils/utils-books/books.js');
+/*importScripts('../utils/utils-books/bibleReferenceParser.js');*/
+
 onmessage = function(ev){
   console.info('search for', ev.data);
   search(ev.data, 300).then(function(result){
@@ -118,25 +121,26 @@ var search = function(searchString, length){
     }).then(function(text){
       var NTIndex = text.indexOf('Mt 1:1| ');
       if(adjusters.in) {
+
         adjusters.in = adjusters.in.toLowerCase();
+
         if(adjusters.in == 'nt') {
           text = text.substring(NTIndex, text.length);
         }else if(adjusters.in == 'ot') {
           text = text.substring(0, NTIndex);
         }else{
 
-          var book = adjusters.in;
-          book = book.charAt(0).toUpperCase() + book.slice(1);
-
-          var bookLineRegex = new RegExp("^" + book + " .*?$", "gm")
-
+          var book = bibleBooks.findBook(adjusters.in);
+          var bookLineRegex = new RegExp("^" + book.name + " .*?$", "gm")
           var bookOnly = text.match(bookLineRegex);
           if (bookOnly) {
             text = bookOnly.join('\n');
           } else {
             text = '';
           }
+
         }
+
       }
       //console.log(text.length, text.split("\n").length);
 
