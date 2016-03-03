@@ -9,7 +9,7 @@
  - DONE NOTE hover gets cut off
  - Support/fix citations in notes
  - disable saving of reading position when referenced verse
- - Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
+ - DONE Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
  - DONE Continue reading
  - Count topical bible references and add as weight in search
  - Offline

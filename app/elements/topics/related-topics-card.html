@@ -44,6 +44,9 @@
         observers: [
           'verseChanged(verse)'
         ],
+        behaviors: [
+          abaBehaviors.text
+        ],
         ready: function(){
           this.worker = new Worker(this.resolveUrl('./verse-topic-finder.js'));
           this.worker.addEventListener('message', function(ev){
@@ -64,10 +67,6 @@
         openTopicPage: function(ev){
           page('/topic/'+ev.model.topic.title);
           //console.log(ev.model.topic);
-        },
-        _smartCaps: function(s){
-          var boringWords = ['and', 'from', 'with', 'against', 'the', 'to', 'your', 'in', 'of', 'or'];
-          return s.split(' ').map((w, i) => boringWords.indexOf(w) === -1 || i == 0 ? w.substring(0, 1).toUpperCase() + w.substring(1, w.length) : w).join(' ');
         }
       });
     })();

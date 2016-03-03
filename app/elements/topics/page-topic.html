@@ -32,6 +32,9 @@
         observers: [
           'topicChanged(topicName)'
         ],
+        behaviors: [
+          abaBehaviors.text
+        ],
         ready: function(){
 
         },
@@ -57,10 +60,6 @@
               verses: verses
             });
           }.bind(this));
-        },
-        _smartCaps: function(s){
-          var boringWords = ['and', 'from', 'with', 'against', 'the', 'to', 'your', 'in', 'of', 'or'];
-          return s.split(' ').map(w => boringWords.indexOf(w) === -1 ? w.substring(0, 1).toUpperCase() + w.substring(1, w.length) : w).join(' ');
         }
       });
     })();

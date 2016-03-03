@@ -21,7 +21,7 @@ module.exports = {
     app.post('/question/:id', authenticator.isAuthenticated, questionController.update);
     app.get('/questions/list/:verse', questionController.listForVerse);
 
-    app.put('/user', userController.register); //todo: put
+    app.put('/user', userController.register);
 
     app.get('/answer/:id', answerController.get);
     app.put('/answer', authenticator.isAuthenticated, answerController.create);

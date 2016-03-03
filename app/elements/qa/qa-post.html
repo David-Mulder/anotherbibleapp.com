@@ -107,9 +107,9 @@
           noVoting: Boolean,
           noActions: Boolean
         },
-        _equals: function(a,b){
-          return a == b;
-        },
+        behaviors:[
+          abaBehaviors.logic
+        ],
         upvote: function(){
           this.$.upvoteApi.execute().then(function(post){
             this.set('post', post);
