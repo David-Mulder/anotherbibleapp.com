@@ -42,7 +42,7 @@ BibleReference.prototype.toString = function(){
     str += ' ' + this.chapter;
     if(this.verseStart){
       str += ':' + this.verseStart;
-      if(this.verseEnd){
+      if(this.verseEnd && this.verseStart !== this.verseEnd){
         str += '-' + this.verseEnd;
       }
     }
@@ -55,7 +55,7 @@ BibleReference.prototype.toLongString = function(){
     str += ' ' + this.chapter;
     if(this.verseStart){
       str += ':' + this.verseStart;
-      if(this.verseEnd){
+      if(this.verseEnd && this.verseStart !== this.verseEnd){
         str += '-' + this.verseEnd;
       }
     }

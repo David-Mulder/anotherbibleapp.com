@@ -90,7 +90,8 @@
         properties: {
           searchQuery: {
             type: String,
-            notify: true
+            notify: true,
+            observer: '_setSearchStarted'
           },
           searchStarted: {
             type: Boolean,
@@ -98,11 +99,17 @@
           }
         },
 
+        _setSearchStarted: function(){
+          if(this.searchQuery.length){
+            this.searchStarted = true;
+          }
+        },
+
         _setValueIfEnter: function(ev){
           if(ev.keyCode == 13){
-            ev.target.blur();
-            this.searchQuery = ev.target.value;
-            this.searchStarted = true;
+            page('/search/'+ev.target.value);
+            //ev.target.blur();
+            //this.searchQuery = ev.target.value;
           }
         },
 

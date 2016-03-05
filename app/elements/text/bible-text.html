@@ -295,6 +295,9 @@
               }
             }
             if (lastValidIndex) {
+              if(isNaN(this.textRef.verseStart)){
+                lastValidIndex--;
+              }
               this.$.text.scrollToIndex(lastValidIndex);
             }
           }

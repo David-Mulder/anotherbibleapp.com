@@ -146,7 +146,6 @@ var calculateWeights = function(item, text, enteredWords, NTIndex, length){
   weights.popularity = item.lines.reduce(function(total, line){
     return total + parseInt(line.split('|')[1]);
   },0) / item.lines.length / 10;
-  console.log(weights.popularity);
 
   weights.length = item.matchLength/length;
   weights.numberOfMatches = item.allIndexes.length;
@@ -198,8 +197,8 @@ var search = function(searchString, length){
         return false;
       }else if(word.indexOf(":") > -1){
         var adjuster = word.split(":");
-        if(adjuster[0] == "in" && adjuster[1]){
-          adjusters.in = adjuster[1];
+        if(adjuster[0].length && adjuster[1]){
+          adjusters[adjuster[0]] = adjuster[1];
         }else{
           return true;
         }
@@ -212,7 +211,7 @@ var search = function(searchString, length){
     fetch('data/stemmedBible.txt').then(function(response){
       return response.text();
     }).then(function(text){
-      var NTIndex = text.indexOf('Mt 1:1| ');
+      var NTIndex = text.indexOf('Mt 1:1|');
       if(adjusters.in) {
 
         adjusters.in = adjusters.in.toLowerCase();
@@ -272,7 +271,7 @@ var search = function(searchString, length){
 
       results.forEach(function(result) {
         result.weights = calculateWeights(result, text, enteredWords, NTIndex, length);
-        result.score = (1-result.weights.lengthPercentagePerMatch) * result.weights.wordDistance + (result.weights.NT ? 0.001 : 0) + result.weights.popularity/4;
+        result.score = (1-result.weights.lengthPercentagePerMatch) * result.weights.wordDistance + (result.weights.NT ? 0.001 : 0) + result.weights.popularity/2.5;
       });
 
       var results = results.sort(function(a,b){
@@ -280,7 +279,14 @@ var search = function(searchString, length){
       });
 
       //todo: add option to increase number of results
-      results.splice(25);
+      console.log(adjusters);
+      if(adjusters.results){
+        if(adjusters.results != 'all'){
+          results.splice(adjusters.results);
+        }
+      }else{
+        results.splice(25);
+      }
 
       results = results.filter(function(result){
         //console.log('start', result.verses[0].split(' ')[0]);

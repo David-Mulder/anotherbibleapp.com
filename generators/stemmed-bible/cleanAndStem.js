@@ -52,6 +52,8 @@ fetch("./plainBible.txt").then(function(response){
   text = text.replace(/\n /g," ");
   text = text.replace(/\n\n/g,"");
 
+  //text = text.substring(0, 200000);
+
   //add chapter numbers to single chapter books
   var singleChapterBooks = ['Ob', 'Phm', '2 Jn', '3 Jn', 'Jud'];
   singleChapterBooks.forEach(function(book){
@@ -75,7 +77,7 @@ fetch("./plainBible.txt").then(function(response){
         return verseRef + "|" + topicalCounter(ref.toNumeric()) + "| " + words.map(removeStopWords).map(smartStemmerIncludingOriginalWOrd).filter(removeEmptyElements).join(" ") + " ";
       }
     }
-  }).filter(l => l.length > 0).join("\n");
+  }).filter(l => l && l.length > 0).join("\n");
 
   document.write("<pre>"+text);
 

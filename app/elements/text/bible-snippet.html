@@ -62,7 +62,7 @@
           }).then(function(text){
             var startIndex = text.indexOf('<vn id="'+this.startReference.toString()+'">');
             if(startIndex === -1){
-              console.warn('not ofund start point')
+              console.warn('not found start point', this.startReference.toString())
               return;
             }
             var endIndex = text.indexOf('<vn id="'+this.endReference.toString()+'">');

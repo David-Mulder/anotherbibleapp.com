@@ -57,13 +57,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.set('params.newQuestionVerses', data.params.verses);
     });
 
-    page('/search', function() {
-      app.loadDependency('search/page-search');
-      app.setTitle('Search');
-      app.route = 'search';
-      app.set('params.searchQuery', '');
-    });
-
     page('/:questionOrAnswer/:id/history', function(data) {
       app.loadDependency('qa/page-post-history');
       app.setTitle('History');
@@ -91,6 +84,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Question');
       app.route = 'question';
       app.set('params.questionId', data.params.id);
+    });
+
+    page('/search', function() {
+      app.loadDependency('search/page-search');
+      app.setTitle('Search');
+      app.route = 'search';
+      app.set('params.searchQuery', '');
     });
 
     page('/search/:query', function (data) {
