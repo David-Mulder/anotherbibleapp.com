@@ -22,11 +22,13 @@
         ],
         setHTML: function(){
           var div = document.createElement('div');
-          div.setAttribute('chapter-number', this.chapterNumber);
+          if(this.chapterNumber){
+            div.setAttribute('chapter-number', this.chapterNumber);
+          }
+
           div.innerHTML = this.html;
           this.setSelectionClasses(div);
           this.setVerseNumberAttributes(div);
-          this.setChapterAttributes(div);
           this.innerHTML = '';
           this.appendChild(div);
           //this.scopeSubtree(this.$.html, false);
@@ -67,11 +69,6 @@
             }
             cVerse = verses[i].id;
           }
-        },
-        setChapterAttributes: function(element){
-          //var chapter = element.querySelector('chapter');
-          //var s = chapter.id.split(':')[0].split(' ');
-          //chapter.setAttribute('n', s[s.length - 1]);
         }
       });
     })();

@@ -59,15 +59,23 @@ fetch("./plainBible.txt").then(function(response){
   });
 
   var verseMatch = /^([0-9]?.*?([0-9]|title))\s(.*)$/;
-  text = text.split("\n").map(function(line, i){
-    var result = verseMatch.exec(line);
-    if(result) {
-      var verseText = result[3];
-      var verseRef = result[1];
-      var words = verseText.split(/\s/);
-      return verseRef + "| " + words.map(removeStopWords).map(smartStemmerIncludingOriginalWOrd).filter(removeEmptyElements).join(" ") + " ";
+  text = text.split("\n").map(function(line, i, arr){
+    if(i % 100 == 0){
+      console.log(i, '/', arr.length);
     }
-  }).join("\n");
+    //var result = verseMatch.exec(line);
+    var result = line.split('\t');
+    if(result.length == 2) {
+      //var verseText = result[3];
+      //var verseRef = result[1];
+      [verseRef, verseText] = result;
+      var ref = new BibleReference(verseRef);
+      if(!isNaN(ref.toNumeric())){
+        var words = verseText.split(/\s/);
+        return verseRef + "|" + topicalCounter(ref.toNumeric()) + "| " + words.map(removeStopWords).map(smartStemmerIncludingOriginalWOrd).filter(removeEmptyElements).join(" ") + " ";
+      }
+    }
+  }).filter(l => l.length > 0).join("\n");
 
   document.write("<pre>"+text);
 

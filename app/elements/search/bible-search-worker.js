@@ -15,6 +15,27 @@ onmessage = function(ev){
   });
 };
 
+//adapted from http://stackoverflow.com/a/14853974/1266242
+var arrayEquals = function (arr1, arr2) {
+  // compare lengths - can save a lot of time
+  if (arr1.length != arr2.length)
+    return false;
+
+  for (var i = 0, l=arr1.length; i < l; i++) {
+    // Check if we have nested arrays
+    if (arr1[i] instanceof Array && arr2[i] instanceof Array) {
+      // recurse into the nested arrays
+      if (!arrayEquals(arr1[i], arr2[i]))
+        return false;
+    }
+    else if (arr1[i] != arr2[i]) {
+      // Warning - two different object instances will never be equal: {x:20} != {x:20}
+      return false;
+    }
+  }
+  return true;
+};
+
 var getIntersectingRanges = function(arrays, range) {
   return arrays
   // build one array with all values
@@ -91,6 +112,78 @@ var getEndOfWord = function(text, point){
   return point;
 };
 
+var calculateWordDistances = function(item, text, enteredWords){
+  var bestWordDistances = [];
+
+  item.forEach(function (wordIndexes, i) {
+    var wordDistances = [];
+    wordIndexes.forEach(function (index) {
+      var foundString = substrUpTo(text, index + 1, " ").split("=");
+      var word, stemmedWord;
+      stemmedWord = foundString[0];
+      if (foundString.length == 1) {
+        word = foundString[0];
+      } else {
+        word = foundString[1].replace('$', stemmedWord);
+        if (word == '^') {
+          word = stemmedWord.charAt(0).toUpperCase() + stemmedWord.slice(1)
+        }
+      }
+      wordDistances.push(stringDistance(enteredWords[i], word));
+    });
+    bestWordDistances.push(Math.max.apply(Math, wordDistances));
+    //console.groupEnd();
+  });
+
+  return bestWordDistances;
+};
+
+var calculateWeights = function(item, text, enteredWords, NTIndex, length){
+  var weights = {};
+  var wordDistances = calculateWordDistances(item, text, enteredWords);
+  weights.wordDistance = wordDistances.reduce(function(a, b) { return a + b; }) / wordDistances.length;
+
+  weights.popularity = item.lines.reduce(function(total, line){
+    return total + parseInt(line.split('|')[1]);
+  },0) / item.lines.length / 10;
+  console.log(weights.popularity);
+
+  weights.length = item.matchLength/length;
+  weights.numberOfMatches = item.allIndexes.length;
+  weights.lengthPercentagePerMatch = weights.length / weights.numberOfMatches;
+  weights.NT = item.allIndexes[0] > NTIndex;
+  return weights;
+};
+
+var getLines = function(text, indexes){
+  return text.substring(getStartOfLine(text, indexes[0]), getEndOfWord(text, indexes[indexes.length-1])).split('\n');
+};
+
+var getVerses = function(item){
+  return item.lines.map(function(line){
+    return line.split('|')[0];
+  });
+};
+
+var getMatchLength = function(indexes){
+  return (indexes[indexes.length - 1] - (indexes[0]-1));
+};
+
+var deduplicateResults = function(results){
+  //we put the shortest matches first, so that when deduplicating we keep the highest quality matches
+  var results = results.sort(function(a,b){
+    return b.matchLength - a.matchLength;
+  });
+
+  var uniqueResults = [];
+  results.forEach(function(result) {
+    if(!uniqueResults.some(item => arrayEquals(result.verses, item.verses))){
+      uniqueResults.push(result);
+    }
+  });
+  return uniqueResults;
+};
+
 var search = function(searchString, length){
 
   return new Promise(function(resolve, reject){
@@ -162,64 +255,38 @@ var search = function(searchString, length){
         }
         return indexes;
       });
+
       var results = getIntersectingRanges(indexes, length);
       //console.log("number of results:", results.length, indexes);
-      results.forEach(function(result){
-        //result = result.sort();
-        result.allIndexes = [];
-        result.weights = {};
 
-        var bestWordDistances = [];
-        result.forEach(function(wordIndexes, i){
-          var wordDistances = [];
-          wordIndexes.forEach(function(index){
-            var foundString = substrUpTo(text,index+1," ").split("=");
-            var word, stemmedWord;
-            stemmedWord = foundString[0];
-            if(foundString.length == 1){
-              word = foundString[0];
-            }else{
-              word = foundString[1].replace('$', stemmedWord);
-              if(word == '^'){
-                word = stemmedWord.charAt(0).toUpperCase() + stemmedWord.slice(1)
-              }
-            }
-            wordDistances.push(stringDistance(enteredWords[i], word))
-            result.allIndexes.push(index);
-          });
-          bestWordDistances.push(Math.max.apply(Math, wordDistances));
-          //console.groupEnd();
-        });
+      results.forEach(function(result) {
+        result.allIndexes = result.reduce((arr, wordIndexes) => arr.concat(wordIndexes), []).sort();
+        result.matchLength = getMatchLength(result.allIndexes);
+        result.lines = getLines(text, result.allIndexes);
+        //todo: use result.lines instead of text
+        result.verses = getVerses(result);
+        //result.weights = {};
+      });
 
-        result.weights.wordDistance = bestWordDistances.reduce(function(a, b) { return a + b; }) / bestWordDistances.length;
-        result.allIndexes.sort();
+      results = deduplicateResults(results);
 
-        result.weights.length = (result.allIndexes[result.allIndexes.length - 1] - (result.allIndexes[0]-1))/length;
-        result.weights.numberOfMatches = result.allIndexes.length;
-        result.weights.lengthPercentagePerMatch = result.weights.length / result.weights.numberOfMatches;
-        result.weights.NT = result.allIndexes[0] > NTIndex;
-
-        result.score = (1-result.weights.lengthPercentagePerMatch) * result.weights.wordDistance + (result.weights.NT ? 0.001 : 0);
-
+      results.forEach(function(result) {
+        result.weights = calculateWeights(result, text, enteredWords, NTIndex, length);
+        result.score = (1-result.weights.lengthPercentagePerMatch) * result.weights.wordDistance + (result.weights.NT ? 0.001 : 0) + result.weights.popularity/4;
       });
 
       var results = results.sort(function(a,b){
         return b.score - a.score;
       });
 
-      results.splice(101);
-
-      results.forEach(function(result) {
-        var line = text.substring(getStartOfLine(text, result.allIndexes[0]), getEndOfWord(text, result.allIndexes[result.allIndexes.length-1]));
-        //todo: remove duplicate verse ranges from results
-        result.verses = line.split('\n').map(function(line){
-          return line.split('| ')[0];
-        });
-      });
+      //todo: add option to increase number of results
+      results.splice(25);
 
       results = results.filter(function(result){
         //console.log('start', result.verses[0].split(' ')[0]);
         //console.log('end', result.verses[result.verses.length - 1].split(' ')[0]);
+
+        //filtering out stuff that passes book borders I think?
         return result.verses[0].split(' ')[0] === result.verses[result.verses.length - 1].split(' ')[0];
       });
 

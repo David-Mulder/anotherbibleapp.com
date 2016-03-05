@@ -100,6 +100,21 @@ module.exports = {
     });
   },
 
+  listRecent: function(req, res){
+    Question
+      .find({'downvotes.0': {$exists: false}})
+      .sort('-updatedAt')
+      .limit(5)
+      .populate('originalAuthor', 'displayName _id')
+      .exec(function(err, result){
+      if(err){
+        res.status(500).json(err);
+      }else{
+        res.json(result.map(question => question.makePublic()));
+      }
+    });
+  },
+
   listForVerse: function(req, res){
     Question.find({
       verses: parseInt(req.params.verse)

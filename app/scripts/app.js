@@ -101,10 +101,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     var func;
+    var oldSelectedPage;
     document.querySelector('iron-pages').addEventListener('iron-select', func = function(){
-      console.log('HIERJA, IRON SELECT');
-      lazyEvent(document.querySelector('iron-pages').selectedItem, 'page-became-visible', {});
-      console.log('page became visible event sent');
+      var pages = document.querySelector('iron-pages');
+      var page = document.querySelector('iron-pages').selectedItem
+      if(oldSelectedPage !== page){
+        lazyEvent(page, 'page-became-visible', {});
+        console.log('page became visible event sent', page);
+        oldSelectedPage = page;
+      }
       //document.querySelector('iron-pages').selectedItem.fire('page-became-visible');
     });
     func();

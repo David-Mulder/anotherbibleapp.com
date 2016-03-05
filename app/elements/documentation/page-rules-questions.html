@@ -10,7 +10,7 @@
       }
     </style>
     <paper-toolbar>
-      <span>How to Write and Ask a Good Question</span>
+      <intelligent-title title="How to Write and Ask a Good Question"></intelligent-title>
     </paper-toolbar>
     <div class="page-content">
       <paper-card heading="Writing a Question">
@@ -101,15 +101,6 @@ and you continue like normal again.</code>
 
         properties: {
 
-        },
-        ready: function(){
-          this.set('loggedIn', false);
-        },
-        goToSearch: function(){
-          page.show('/search');
-        },
-        goToLogin: function(){
-          page.show('/login');
         }
       });
     })();

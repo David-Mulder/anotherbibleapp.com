@@ -1,26 +1,44 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="./card-recent-questions.html">
 
 <dom-module id="page-welcome">
   <template>
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
+    <style>
+      card-recent-questions{
+        max-width: 700px;
+        margin: auto;
+      }
+    </style>
     <paper-toolbar>
       <intelligent-title no-title-if-wide></intelligent-title>
       <span class="flex"></span>
       <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
+      <paper-menu-button horizontal-align="right">
+        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+        <paper-menu class="dropdown-content">
+          <paper-item on-tap="goToLicense">License</paper-item>
+          <paper-item hidden="{{!loggedIn}}" on-tap="goToLogout">Log&nbsp;out</paper-item>
+        </paper-menu>
+      </paper-menu-button>
     </paper-toolbar>
     <div class="page-content">
       <auth-api logged-in="{{loggedIn}}"></auth-api>
-      <div hidden="{{!loggedIn}}">
+      <template is="dom-if" if="{{loggedIn}}">
         <paper-card heading="Welcome back">
           <div class="card-content">
-            Over here you will later see a list of featured questions and answers.
+            Below you can find recently asked questions and books you have recently started reading. Swipe from the left to get an overview of all books or if you're looking for a specific text use the search function in the top right.
           </div>
           <div class="card-actions">
-            <paper-button on-tap="goToLogout">Log Out</paper-button>
+            <paper-button on-tap="goToLogout">Dismiss</paper-button>
           </div>
         </paper-card>
-      </div>
+
+        <card-recent-questions></card-recent-questions>
+      </template>
       <div hidden="{{loggedIn}}">
         <paper-card heading="Welcome to Another Bible App">
           <div class="card-content">
@@ -40,10 +58,10 @@
         </paper-card>
         <paper-card heading="Focused reading">
           <div class="card-content">
-            The Bible is 'just' a collection of books and letters and stuff like verses, notes, pericopes (the headers in
-            between paragraphs) and all those things were later added. All of these are incredibly useful when reading,
-            but only distract from the real text. By default this app will hide all these things, although they are just
-            a click away if you need them.
+            The Bible is 'just' a collection of books and letters. Stuff like verses, notes, pericopes (the headers in
+            between paragraphs) and all those things were added later. Naturally these are incredibly useful when deeply
+            studying a specific text, but only distract from the original text as a whole. By default this app will hide
+            all these things, although they are just a tap away if you need them.
           </div>
         </paper-card>
       </div>
@@ -70,6 +88,9 @@
         },
         goToLogout: function(){
           page.show('/logout');
+        },
+        goToLicense: function(){
+          page.show('/bible/license');
         },
         goToRegister: function(){
           page.show('/register');

@@ -46,6 +46,13 @@
         background: var(--accent-color-200);
         color: var(--text-on-accent-color-200);
       }
+      .license{
+        margin-bottom: 20px;
+      }
+      .license p{
+        margin-top:0px;
+        font-size: small;
+      }
     </style>
     <style>
       :host([mode='read']){
@@ -149,7 +156,7 @@
     <utils-books id="utils"></utils-books>
     <iron-list id="text" items="{{blocks}}" as="block" on-tap="selectVerse" on-scroll="savePosition">
       <template>
-        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" chapter-number="{{block.chapterNumber}}"></block-html>
+        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" chapter-number="{{block.chapterNumber}}" class$="{{block.class}}"></block-html>
       </template>
     </iron-list>
   </template>
@@ -252,6 +259,13 @@
                 verseStart: firstVerse ? reference.toNumeric() : null
               });
             });
+          });
+
+          this.push('blocks', {
+            start: true,
+            end: true,
+            html: '<p>Scripture quotations marked (LEB) are from the Lexham English Bible. Copyright 2012 Logos Bible Software. Lexham is a registered trademark of Logos Bible Software.</p>',
+            class: 'license'
           });
 
           console.info('loaded', this.blocks, 'blocks');

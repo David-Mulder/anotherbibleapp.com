@@ -23,6 +23,11 @@
         border: 1px solid #eee;
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
         height: 40px;
+        max-width: 800px;
+        margin: auto;
+        @apply(--layout-flex);
+        @apply(--layout-center);
+        @apply(--layout-horizontal);
       }
 
       .search-box iron-icon {
@@ -40,13 +45,6 @@
       .content {
         padding: 8px;
       }
-
-      .search-box {
-        @apply(--layout-flex);
-        @apply(--layout-center);
-        @apply(--layout-horizontal);
-      }
-
       .search-box input {
         @apply(--layout-flex);
       }

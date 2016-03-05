@@ -1,0 +1,107 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="card-recent-questions">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: flex;
+        flex-direction: column;
+      }
+      #content{
+        flex: 1;
+        position: relative;
+      }
+      paper-fab{
+        position:absolute;
+        bottom: 20px;
+        right: 20px;
+      }
+      #noResult{
+        margin-top: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: var(--secondary-text-on-primary-color-50);
+      }
+      paper-card{
+        margin: 0px;
+        width: 100%;
+      }
+      paper-button{
+        color: var(--primary-color);
+        font-weight: bold;
+        margin: 0px;
+      }
+      #content .question-link{
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+      #content .question-link:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
+      .info{
+        margin-top: 5px;
+        margin-left: 5px;
+        display: block;
+        font-size: small;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+    </style>
+    <auth-api id="api" action="questions/list/recent" response="{{questions}}"></auth-api>
+
+    <div id="content">
+
+      <paper-card heading="Recent Questions">
+        <template is="dom-repeat" items="{{questions}}" as="question">
+          <div class="card-actions question-link" on-tap="gotoQuestionPage">
+            <span>{{question.title}}</span>
+            <div class="info">
+              <span class="verses">by {{question.originalAuthor.displayName}}</span>
+              <span class="verses">about {{question.verses}}</span>
+            </div>
+          </div>
+        </template>
+        <!--
+        <div class="card-actions">
+          <paper-button on-tap="newQuestion">Ask a question</paper-button>
+        </div>
+        -->
+      </paper-card>
+
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          relatedQuestions: {
+            type: Boolean,
+            value: false
+          },
+          noResults: {
+            type: Boolean,
+            value: false
+          }
+        },
+        observers: [
+        ],
+        ready: function(){
+          //todo: retrigger when page became visible?
+          this.$.api.execute().then(() => {
+            this.questions.map(question => {
+              question.verses = question.verses.map(verse => new BibleReference(verse).toLongString()).join(', ');
+            });
+          });
+        },
+        gotoQuestionPage: function(ev){
+          page('/question/'+ev.model.question._id)
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

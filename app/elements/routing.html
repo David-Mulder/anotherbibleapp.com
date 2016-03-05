@@ -23,36 +23,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.loadDependency('dashboard/page-welcome');
       app.setTitle('');
       app.route = 'home';
-      //app.scrollPageToTop();
     });
 
     page('/login', function (data) {
       app.loadDependency('auth/page-login');
       app.setTitle('Log in');
       app.route = 'login';
-      //app.scrollPageToTop();
     });
 
     page('/register', function (data) {
       app.loadDependency('auth/page-register');
       app.setTitle('Register');
       app.route = 'register';
-      //app.scrollPageToTop();
     });
 
     page('/logout', function (data) {
       delete localStorage.token;
       location.href = '/';
-      //app.scrollPageToTop();
     });
 
     page('/book/:ref', function (data) {
+      console.info('going through route /book/:ref');
       app.loadDependency('text/page-book');
       app.setTitle('Reading');
       app.route = 'book';
-      console.info('book ref', data.params.ref);
       app.set('params.bookRef', data.params.ref);
-      //app.scrollPageToTop();
     });
 
     page('/questions/ask/:verses', function (data) {
@@ -60,7 +55,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Ask a Question');
       app.route = 'new-question';
       app.set('params.newQuestionVerses', data.params.verses);
-      //app.scrollPageToTop();
     });
 
     page('/search', function() {
@@ -68,7 +62,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Search');
       app.route = 'search';
       app.set('params.searchQuery', '');
-      //app.scrollPageToTop();
     });
 
     page('/:questionOrAnswer/:id/history', function(data) {
@@ -77,7 +70,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.route = 'post-history';
       app.set('params.postId', data.params.id);
       app.set('params.postType', data.params.questionOrAnswer);
-      //app.scrollPageToTop();
     });
 
     page('/question/:id/edit', function(data) {
@@ -85,7 +77,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Edit Question');
       app.route = 'edit-question';
       app.set('params.questionId', data.params.id);
-      //app.scrollPageToTop();
     });
 
     page('/answer/:id/edit', function(data) {
@@ -93,7 +84,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Edit Answer');
       app.route = 'edit-answer';
       app.set('params.answerId', data.params.id);
-      //app.scrollPageToTop();
     });
 
     page('/question/:id', function(data) {
@@ -101,7 +91,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Question');
       app.route = 'question';
       app.set('params.questionId', data.params.id);
-      //app.scrollPageToTop();
     });
 
     page('/search/:query', function (data) {
@@ -115,7 +104,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.loadDependency('documentation/page-rules-questions');
       app.setTitle('How to ask a Question');
       app.route = 'rules-questions';
-      //app.scrollPageToTop();
     });
 
     page('/topic/:name', function (data) {
@@ -123,7 +111,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.setTitle('Topical Bible Index');
       app.route = 'topic';
       app.set('params.topicName', data.params.name);
-      //app.scrollPageToTop();
+    });
+
+    page('/bible/license', function (data) {
+      app.loadDependency('documentation/page-license');
+      app.setTitle('License');
+      app.route = 'license';
     });
 
     // add #! before urls

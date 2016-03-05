@@ -33,7 +33,8 @@
     "paper-spinner": "PolymerElements/paper-spinner#^1.1.0",
     "google-recaptcha": "cbalit/re-captcha#^1.1.0",
     "gold-password-input": "MeTaNoV/gold-password-input#^1.1.0",
-    "paper-dialog": "PolymerElements/paper-dialog#^1.0.4"
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.4",
+    "paper-menu-button": "PolymerElements/paper-menu-button#^1.0.4"
   },
   "devDependencies": {
     "web-component-tester": "*",
