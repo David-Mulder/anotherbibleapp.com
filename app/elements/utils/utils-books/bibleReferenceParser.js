@@ -37,10 +37,30 @@ var BibleReference = function(vs){
   this.verseEnd = verseEnd;
 };
 BibleReference.prototype.toString = function(){
-  return this.book.name + ' ' + this.chapter + ':' + this.verse;
+  var str = this.book.name;
+  if(this.chapter){
+    str += ' ' + this.chapter;
+    if(this.verseStart){
+      str += ':' + this.verseStart;
+      if(this.verseEnd){
+        str += '-' + this.verseEnd;
+      }
+    }
+  }
+  return str;
 };
 BibleReference.prototype.toLongString = function(){
-  return this.book.title + ' ' + this.chapter + ':' + this.verse;
+  var str = this.book.title;
+  if(this.chapter){
+    str += ' ' + this.chapter;
+    if(this.verseStart){
+      str += ':' + this.verseStart;
+      if(this.verseEnd){
+        str += '-' + this.verseEnd;
+      }
+    }
+  }
+  return str;
 };
 BibleReference.prototype.toNumeric = function(){
   var verse = this.verseStart || 1;

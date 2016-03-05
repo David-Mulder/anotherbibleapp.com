@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="card-welcome-back">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+        display: block;
+      }
+      #card .card-content{
+        padding-top: 0px;
+      }
+    </style>
+
+    <paper-card id="card" heading="Welcome back">
+      <div class="card-content">
+        Below you can find recently asked questions and books you have recently started reading. Swipe from the left to get an overview of all books or if you're looking for a specific text use the search function in the top right.
+      </div>
+      <div class="card-actions">
+        <paper-button on-tap="dismiss">Dismiss</paper-button>
+      </div>
+    </paper-card>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        ready: function(){
+          if(localStorage['hideWelcomeBackCard']){
+            this.dismiss();
+          }
+        },
+        dismiss: function(){
+          localStorage['hideWelcomeBackCard'] = true;
+          this.style.display = 'none';
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

@@ -58,6 +58,7 @@
         color: var(--secondary-text-on-background-color)
       }
     </style>
+
     <paper-toolbar class="medium-tall">
       <intelligent-title no-title-if-wide></intelligent-title>
       <div class="search-box bottom">
@@ -66,6 +67,7 @@
         <iron-icon icon="av:mic"></iron-icon>
       </div>
     </paper-toolbar>
+
     <div class="content">
       <div class="instructions" hidden$="{{searchStarted}}">
         Enter your search query above. To search in a specific book use <code>in:Matthew</code>
@@ -75,6 +77,7 @@
         <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>
       </div>
     </div>
+
   </template>
 
   <script>

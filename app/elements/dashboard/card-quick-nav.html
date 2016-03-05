@@ -1,0 +1,48 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+
+<dom-module id="card-quick-nav">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+        display: block;
+      }
+      paper-card {
+        display: block;
+      }
+      #card .card-content{
+        padding-top: 0px;
+        margin-top: -20px;
+      }
+    </style>
+
+    <paper-card id="card" heading="Quick Navigation">
+      <div class="card-content">
+        <paper-input label="Enter a bible reference and hit enter..." on-keyup="checkForEnter"></paper-input>
+      </div>
+    </paper-card>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        checkForEnter: function(ev){
+          if(ev.keyCode == 13){
+            var reference = new BibleReference(ev.target.value);
+            if(reference.book){
+              ev.target.blur();
+              page('/book/'+reference.toString());
+            }else{
+              app.toast('Sorry, this reference was not recognized. The format should be like `Mt 1:1` or `Matthew 1:1`')
+            }
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

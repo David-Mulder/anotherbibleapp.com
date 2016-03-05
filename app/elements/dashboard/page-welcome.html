@@ -2,15 +2,18 @@
 <link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="./card-recent-questions.html">
+<link rel="import" href="./card-welcome-back.html">
+<link rel="import" href="./card-quick-nav.html">
 
 <dom-module id="page-welcome">
   <template>
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
-      card-recent-questions{
+      card-recent-questions, card-welcome-back, card-quick-nav{
         max-width: 700px;
         margin: auto;
+        margin-bottom: 20px;
       }
     </style>
     <paper-toolbar>
@@ -26,19 +29,15 @@
       </paper-menu-button>
     </paper-toolbar>
     <div class="page-content">
-      <auth-api logged-in="{{loggedIn}}"></auth-api>
-      <template is="dom-if" if="{{loggedIn}}">
-        <paper-card heading="Welcome back">
-          <div class="card-content">
-            Below you can find recently asked questions and books you have recently started reading. Swipe from the left to get an overview of all books or if you're looking for a specific text use the search function in the top right.
-          </div>
-          <div class="card-actions">
-            <paper-button on-tap="goToLogout">Dismiss</paper-button>
-          </div>
-        </paper-card>
 
+      <auth-api logged-in="{{loggedIn}}"></auth-api>
+
+      <template is="dom-if" if="{{loggedIn}}">
+        <card-welcome-back></card-welcome-back>
+        <card-quick-nav></card-quick-nav>
         <card-recent-questions></card-recent-questions>
       </template>
+
       <div hidden="{{loggedIn}}">
         <paper-card heading="Welcome to Another Bible App">
           <div class="card-content">
@@ -64,6 +63,7 @@
             all these things, although they are just a tap away if you need them.
           </div>
         </paper-card>
+
       </div>
     </div>
   </template>
