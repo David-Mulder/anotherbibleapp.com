@@ -163,6 +163,10 @@
 
                   });
                 }else{
+                  console.group('Not all parameters are set');
+                  console.log('Required', this._requiredParams);
+                  console.log('Set', allSetParams);
+                  console.groupEnd();
                   reject('Not all parameters are set');
                 }
               }

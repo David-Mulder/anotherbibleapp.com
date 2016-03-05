@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../utils/relative-time.html">
 
 <dom-module id="qa-post">
   <template>
@@ -81,7 +82,7 @@
             </marked-element>
             <div class="author">
               By {{post.originalAuthor.displayName}}
-              at {{post.updatedAt}}
+              <relative-time time="{{post.updatedAt}}"></relative-time>
             </div>
           </div>
         </div>

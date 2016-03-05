@@ -22,13 +22,13 @@
  - add quick navigation functionality
  - forgot my password
  - highlighting not implemented or working in topical cards
- - search page before actually searching looks incorrect
+ - DONE search page before actually searching looks incorrect
  - sync reading positions in db
  - add questions to search
  - change 'recent questions' to 'recent activity'
  - add browsing option of recent activity rather than just top 10
  - DONE add date to questions and answers
- - relative date in qa-post
+ - DONE relative date in qa-post
  - DONE Dashboard list of recent questions
  - verse highlighting
  - chat or other discussion forum

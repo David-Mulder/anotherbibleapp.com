@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="relative-time">
+  <template>
+    <style>
+
+    </style>
+    <span class="time">{{timeAgo}}</span>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+
+        properties: {
+          time: {
+            type: Date,
+            observer: 'setTimeAgo'
+          }
+        },
+        observers: [
+        ],
+        setTimeAgo: function(){
+          var time = new Date(this.time);
+          var now = new Date(),
+            secondsPast = (now.getTime() - time.getTime()) / 1000;
+          var timeAgo = '';
+
+          if(secondsPast < 60){
+            timeAgo = parseInt(secondsPast) + ' seconds ago';
+          }else if(secondsPast < 3600){
+            timeAgo = parseInt(secondsPast/60) + ' minutes ago';
+          }else if(secondsPast <= 86400){
+            timeAgo = parseInt(secondsPast/3600) + ' hours ago';
+          }else{
+            var day = time.getDate();
+            var month = time.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ","");
+            var year = time.getFullYear() == now.getFullYear() ? "" :  " " + time.getFullYear();
+            timeAgo = 'on ' + day + " " + month + year;
+          }
+          this.timeAgo = timeAgo;
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

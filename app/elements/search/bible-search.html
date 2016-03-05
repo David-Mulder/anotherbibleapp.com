@@ -128,8 +128,8 @@
           }.bind(this));
         },
         goToVerse: function(ev){
-          console.log(this.$.utils.parseReference(ev.model.item.firstVerse).toString(), ev.model.item._debug.weights, ev.model.item._debug.weights.popularity);
-          return;
+          //console.log(this.$.utils.parseReference(ev.model.item.firstVerse).toString(), ev.model.item._debug.weights, ev.model.item._debug.weights.popularity);
+          //return;
           var verse = ev.model.item;
           var start = this.$.utils.parseReference(verse.firstVerse);
           page('/book/'+start);
