@@ -79,25 +79,14 @@
           searchQuery: {
             type: String,
             observer: 'triggerSearch'
-          },
-          instantSearch: {
-            type: Boolean
           }
         },
         ready: function(){
           this.set('triggerSearchButton', false);
         },
         triggerSearch: function(){
-          this.set('results', []);
-          if(this.instantSearch){
-            this.debounce('search bible', function(){
-              this.search();
-            }, 100);
-          }else{
-            console.log('too true');
-            this.noResults = false;
-            this.set('triggerSearchButton', true);
-          }
+          this.noResults = false;
+          this.set('triggerSearchButton', true);
         },
         search: function(){
           console.log('bit false');

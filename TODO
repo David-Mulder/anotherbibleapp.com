@@ -21,6 +21,7 @@
  - make 'i have read rules' required
  - add quick navigation functionality
  - forgot my password
+ - highlighting not implemented or working in topical cards
  - search page before actually searching looks incorrect
  - sync reading positions in db
  - add questions to search

@@ -43,10 +43,19 @@
       }
 
       .content {
-        padding: 8px;
+        overflow:auto;
+        padding: 0px 10px;
+        flex:1;
       }
       .search-box input {
         @apply(--layout-flex);
+      }
+      .instructions{
+        max-width: 800px;
+        margin: auto;
+        margin-top: 30px;
+        text-align: center;
+        color: var(--secondary-text-on-background-color)
       }
     </style>
     <paper-toolbar class="medium-tall">
@@ -57,10 +66,14 @@
         <iron-icon icon="av:mic"></iron-icon>
       </div>
     </paper-toolbar>
-    <div style="overflow:auto;padding: 0px 10px;flex:1;">
-      <topical-search search-query="{{searchQuery}}" on-no-results="triggerBibleSearch"></topical-search>
-
-      <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>
+    <div class="content">
+      <div class="instructions" hidden$="{{searchStarted}}">
+        Enter your search query above. To search in a specific book use <code>in:Matthew</code>
+      </div>
+      <div hidden$="{{!searchStarted}}">
+        <topical-search search-query="{{searchQuery}}" on-no-results="triggerBibleSearch"></topical-search>
+        <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>
+      </div>
     </div>
   </template>
 
@@ -75,6 +88,10 @@
           searchQuery: {
             type: String,
             notify: true
+          },
+          searchStarted: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -82,6 +99,7 @@
           if(ev.keyCode == 13){
             ev.target.blur();
             this.searchQuery = ev.target.value;
+            this.searchStarted = true;
           }
         },
 
