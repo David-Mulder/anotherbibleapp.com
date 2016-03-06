@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="synced-settings">
+  <template>
+    <auth-api id="set" method="post" action="user/settings/:setting" param-setting="{{setting}}" param-value="{{value}}"></auth-api>
+    <auth-api id="get" action="user/settings/:setting" param-setting="{{setting}}"></auth-api>
+    <auth-api id="getAll" action="user/settings"></auth-api>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var jsonObjectToObject = function(obj){
+        Object.keys(obj).forEach(function(key){
+          obj[key].value = JSON.parse(obj[key].value);
+        });
+        return obj;
+      };
+      //todo: sync from offline to online storage...
+
+      var didStartupSync = false;
+
+      Polymer({
+
+        properties: {
+
+        },
+        ready: function(){
+          if(typeof localStorage.settings === 'undefined'){
+            localStorage.settings = '{}';
+          }
+          if(!didStartupSync){
+            didStartupSync = true;
+            this._sync();
+          }
+        },
+        _sync: function(){
+          //todo: probably should rewrite half this function... but the API should stay constant
+        },
+        _saveLocal: function(setting, value){
+          var settings = JSON.parse(localStorage.settings);
+          settings[setting] = {
+            value: value,
+            updatedAt: Date.now()
+          };
+          localStorage.settings = JSON.stringify(settings);
+        },
+        _saveCloud: function(setting, value){
+          this.setting = setting;
+          this.value = JSON.stringify(value);
+          this.$.set.execute().catch();
+        },
+        saveSetting: function(settingName, value){
+          console.info('save setting', settingName, 'to value', value);
+          this._saveLocal(settingName, value);
+          if(this.$.set.loggedIn){
+            this._saveCloud(settingName, value);
+          }
+        },
+        _getAllLocalSettings: function(){
+          return JSON.parse(localStorage.settings);
+        },
+        getSetting: function(settingName){
+
+          return new Promise(function(resolve, reject){
+
+            var settings = this._getAllLocalSettings();
+            var localSetting = settings[settingName];
+
+            if(typeof localSetting == 'undefined'){
+              var localValue = null;
+              var localDate = new Date(0);
+            }else{
+              var localValue = localSetting.value;
+              var localDate = new Date(localSetting.updatedAt);
+            }
+
+            var finishWithLocal = function(){
+              if (typeof localSetting === 'undefined') {
+                reject('No such setting');
+              } else {
+                resolve(localValue);
+              }
+            };
+
+            if(this.$.get.loggedIn) {
+              this.setting = settingName;
+              this.$.get.execute().then(function (setting) {
+                var cloudDate = new Date(setting.updatedAt);
+                var cloudValue = JSON.parse(setting.value);
+                if(cloudValue === null){
+                  finishWithLocal();
+                }else{
+                  if (cloudDate > localDate) {
+                    resolve(cloudValue);
+                    console.info('value', cloudValue);
+                    this._saveLocal(settingName, cloudValue)
+                  } else {
+                    finishWithLocal();
+                    this._saveCloud(settingName, localValue);
+                  }
+                }
+              }.bind(this)).catch(function () {
+                finishWithLocal();
+              }.bind(this));
+            }else{
+              finishWithLocal();
+            }
+          }.bind(this));
+        },
+        _getAllCloudSettings: function(){
+          return new Promise(function(resolve, reject){
+            this.$.getAll.execute().then(function(value){
+              console.info('all', value);
+            }).catch(function(){
+              reject();
+            });
+          }.bind(this));
+        },
+        getAllSettings: function(){
+          return new Promise(function (resolve) {
+
+            var finishWithLocal = function(){
+              resolve(this._getAllLocalSettings());
+            };
+
+            if(this.$.getAll.loggedIn) {
+              this.$.getAll.execute().then(function (value) {
+                resolve(jsonObjectToObject(value));
+              }).catch(function (err) {
+                finishWithLocal();
+              });
+            }else{
+              finishWithLocal();
+            }
+
+          }.bind(this));
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
