@@ -72,17 +72,23 @@
     <paper-drawer-panel id="qaDrawerPanel" right-drawer responsive-width="700px" drawer-width="300px" force-narrow="{{!studyTools}}">
 
       <div main>
+
         <paper-toolbar>
           <intelligent-title title=""></intelligent-title>
           <paper-icon-button icon="search" id="search" on-tap="goToSearch" hidden="{{!studyTools}}"></paper-icon-button>
           <paper-toggle-button checked="{{studyTools}}">Study tools</paper-toggle-button>
         </paper-toolbar>
+
         <div id="textContainer">
+
           <bible-text id="text" text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="verseSelected" mode="{{mode}}" on-scroll="savePosition"></bible-text>
+
         </div>
+
         <paper-toast opened="{{newQuestionMode}}" text="Please tap on all the verses that are relevant to your question." duration="0" class="fit-bottom" opened>
           <span role="button" tabindex="0" style="color: #eeff41;margin: 10px" on-tap="qaNewQuestionReady">Tap here once you're done.</span>
         </paper-toast>
+
       </div>
       <div drawer>
         <verse-information-drawer verses="{{selectedVerses}}" on-new-question="qaNewQuestionMode"></verse-information-drawer>

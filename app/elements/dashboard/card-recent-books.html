@@ -45,7 +45,7 @@
           books: Array
         },
 
-        ready: function(){
+        reload: function(){
           this.$.settings.getAllSettings().then(function(settings){
 
             console.info('settings', JSON.parse(JSON.stringify(settings)));

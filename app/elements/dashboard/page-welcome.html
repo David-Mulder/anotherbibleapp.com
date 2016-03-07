@@ -85,7 +85,7 @@
         <auth-api logged-in="{{loggedIn}}"></auth-api>
 
         <template is="dom-if" if="{{loggedIn}}">
-          <card-welcome-back></card-welcome-back>
+          <card-welcome-back narrow="{{narrow}}"></card-welcome-back>
           <card-quick-nav></card-quick-nav>
           <card-recent-books></card-recent-books>
           <card-recent-questions></card-recent-questions>
@@ -131,8 +131,16 @@
         properties: {
 
         },
+        listeners: {
+          'page-became-visible': '_fireReloads'
+        },
         ready: function(){
 
+        },
+        _fireReloads: function(){
+          console.log('JAAAA');
+          if(this.$$('card-recent-books')) this.$$('card-recent-books').reload();
+          if(this.$$('card-recent-questions')) this.$$('card-recent-questions').reload();
         },
         _setTitleMargin: function(ev){
           var marginTop = (128-ev.detail.y)/128*-20;

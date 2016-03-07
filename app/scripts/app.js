@@ -155,6 +155,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     page('/');
   };
 
+  app.isHome = function(){
+    return app.route === 'home';
+  };
+
   app.toast = function(msg){
     var pt = document.createElement('paper-toast');
     pt.opened = true;

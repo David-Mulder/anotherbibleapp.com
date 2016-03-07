@@ -3,8 +3,8 @@
    - DONE bible reference needs to resolve to `<pa>`... so... some kind of index
    - DONE increase margin of last one and add license notice
  - check jn 9:39
- - IMPORTANT: When dashboard fits fully on screen, background is visibible under it
- - increase padding on text in reading modus
+ - When dashboard fits fully on screen, background is visibible under it
+ - DONE increase padding on text in reading modus
  - DONE Bible markdown extension
  - max-height bible-snippet maybe with scroll?
  - hide home button on home
@@ -26,6 +26,9 @@
  - make 'i have read rules' required
  - DONE add quick navigation functionality
  - forgot my password
+ - add comments
+ - reload dashboard
+ - empty local and memory settings after login, but not after register
  - highlighting not implemented or working in topical cards
  - DONE search page before actually searching looks incorrect
  - DONE sync reading positions in db

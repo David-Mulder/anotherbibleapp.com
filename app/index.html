@@ -74,7 +74,7 @@
           <!-- Drawer Toolbar -->
           <paper-toolbar id="drawerToolbar">
             <span class="title" style="margin-left:0px;">Books & Letters</span>
-            <paper-icon-button icon="home" on-tap="goToHome"></paper-icon-button>
+            <paper-icon-button icon="home" on-tap="goToHome" hidden$="{{isHome(route)}}"></paper-icon-button>
           </paper-toolbar>
           <div style="position:absolute;left:0px;top:0px;bottom:0px;right:0px;overflow: auto;">
             <books-list></books-list>

@@ -114,7 +114,16 @@
           });
 
         },
+        _saveMemory: function(settingName, value){
+          settings.then(function(settings){
+            settings[settingName] = {
+              value: value,
+              updatedAt: Date.now()
+            };
+          });
+        },
         saveSetting: function(settingName, value){
+          this._saveMemory(settingName, value);
           this._saveLocal(settingName, value);
           if(this.$.set.loggedIn){
             this._saveCloud(settingName, value);

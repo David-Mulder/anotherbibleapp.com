@@ -78,8 +78,7 @@
         },
         observers: [
         ],
-        ready: function(){
-          //todo: retrigger when page became visible?
+        reload: function(){
           this.$.api.execute().then(() => {
             this.questions.map(question => {
               question.verses = question.verses.map(verse => new BibleReference(verse).toLongString()).join(', ');
