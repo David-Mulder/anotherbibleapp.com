@@ -23,6 +23,10 @@ module.exports = {
     app.get('/questions/list/:verse', questionController.listForVerse);
 
     app.put('/user', userController.register);
+    app.get('/user/settings', authenticator.isAuthenticated, userController.getAllSettings);
+    app.get('/user/settings/reset', authenticator.isAuthenticated, userController.resetSettings);
+    app.get('/user/settings/:setting', authenticator.isAuthenticated, userController.getSetting);
+    app.post('/user/settings/:setting', authenticator.isAuthenticated, userController.saveSetting);
 
     app.get('/answer/:id', answerController.get);
     app.put('/answer', authenticator.isAuthenticated, answerController.create);

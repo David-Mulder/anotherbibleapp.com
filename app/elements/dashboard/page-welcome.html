@@ -1,71 +1,124 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
 <link rel="import" href="./card-recent-questions.html">
 <link rel="import" href="./card-welcome-back.html">
 <link rel="import" href="./card-quick-nav.html">
+<link rel="import" href="./card-recent-books.html">
 
 <dom-module id="page-welcome">
   <template>
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
-      card-recent-questions, card-welcome-back, card-quick-nav{
+      card-recent-questions, card-welcome-back, card-quick-nav, card-recent-books{
         max-width: 700px;
         margin: auto;
-        margin-bottom: 20px;
+        margin-bottom: 8px;
+      }
+      @media all and (min-width: 500px) {
+        card-recent-questions, card-welcome-back, card-quick-nav, card-recent-books {
+          margin-bottom: 16px;
+        }
+      }
+      paper-scroll-header-panel{
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 0px;
+        display: flex;
+        background-color: var(--primary-color-50);
+        --paper-scroll-header-container:{
+          background-color: var(--primary-color);
+        };
+        --paper-scroll-header-panel-full-header: {
+          background-image: url('/images/top-header.png');
+          background-size: cover;
+          background-position: 0px 0px;
+        };
+        --paper-scroll-header-panel-condensed-header: {
+          background-color: var(--primary-color);
+        };
+      }
+      paper-toolbar{
+        background: transparent;
+      }
+      paper-toolbar #wideTitle{
+        text-align: center;
+        margin-left: 0px !important;
+        margin-top: -20px;
+        font-size: 32px;
+      }
+      .card-content{
+        flex: 1;
       }
     </style>
-    <paper-toolbar>
-      <intelligent-title no-title-if-wide></intelligent-title>
-      <span class="flex"></span>
-      <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
-      <paper-menu-button horizontal-align="right">
-        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-        <paper-menu class="dropdown-content">
-          <paper-item on-tap="goToLicense">License</paper-item>
-          <paper-item hidden="{{!loggedIn}}" on-tap="goToLogout">Log&nbsp;out</paper-item>
-        </paper-menu>
-      </paper-menu-button>
-    </paper-toolbar>
-    <div class="page-content">
+    <paper-scroll-header-panel condenses keep-condensed-header on-paper-header-transform="_setTitleMargin">
 
-      <auth-api logged-in="{{loggedIn}}"></auth-api>
+      <paper-toolbar class="tall">
 
-      <template is="dom-if" if="{{loggedIn}}">
-        <card-welcome-back></card-welcome-back>
-        <card-quick-nav></card-quick-nav>
-        <card-recent-questions></card-recent-questions>
-      </template>
+        <intelligent-title no-title-if-wide title="" narrow="{{narrow}}"></intelligent-title>
+        <span class="title bottom centered" id="wideTitle" hidden$="{{narrow}}">Another Bible App</span>
+        <span class="title bottom" hidden$="{{!narrow}}">Another Bible App</span>
 
-      <div hidden="{{loggedIn}}">
-        <paper-card heading="Welcome to Another Bible App">
-          <div class="card-content">
-            There are a lot of Bible Apps out there, so thanks for using this one. To use the Q&A parts of the app fully
-            you need to register and log in. If you want to just read go right ahead and pick the book from the left drawer.
-            Use search in the top right even offline to find bible verses.
-          </div>
-          <div class="card-actions">
-            <paper-button on-tap="goToLogin">Log In</paper-button>
-            <paper-button on-tap="goToRegister">Register</paper-button>
-          </div>
-        </paper-card>
-        <paper-card heading="Q&A">
-          <div class="card-content">
-            An integral part of this bible app is the ability to ask and answer questions about bible texts.
-          </div>
-        </paper-card>
-        <paper-card heading="Focused reading">
-          <div class="card-content">
-            The Bible is 'just' a collection of books and letters. Stuff like verses, notes, pericopes (the headers in
-            between paragraphs) and all those things were added later. Naturally these are incredibly useful when deeply
-            studying a specific text, but only distract from the original text as a whole. By default this app will hide
-            all these things, although they are just a tap away if you need them.
-          </div>
-        </paper-card>
+        <span class="flex"></span>
 
-      </div>
-    </div>
+        <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
+
+        <paper-menu-button horizontal-align="right">
+
+          <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+
+          <paper-menu class="dropdown-content">
+            <paper-item on-tap="goToLicense">License</paper-item>
+            <paper-item hidden="{{!loggedIn}}" on-tap="goToLogout">Log&nbsp;out</paper-item>
+          </paper-menu>
+
+        </paper-menu-button>
+
+      </paper-toolbar>
+
+      <div class="page-content">
+
+        <auth-api logged-in="{{loggedIn}}"></auth-api>
+
+        <template is="dom-if" if="{{loggedIn}}">
+          <card-welcome-back></card-welcome-back>
+          <card-quick-nav></card-quick-nav>
+          <card-recent-books></card-recent-books>
+          <card-recent-questions></card-recent-questions>
+        </template>
+
+        <div hidden="{{loggedIn}}">
+          <paper-card heading="Welcome to Another Bible App">
+            <div class="card-content">
+              There are a lot of Bible Apps out there, so thanks for using this one. To use the Q&A parts of the app fully
+              you need to register and log in. If you want to just read go right ahead and pick the book from the left drawer.
+              Use search in the top right even offline to find bible verses.
+            </div>
+            <div class="card-actions">
+              <paper-button on-tap="goToLogin">Log In</paper-button>
+              <paper-button on-tap="goToRegister">Register</paper-button>
+            </div>
+          </paper-card>
+          <paper-card heading="Q&A">
+            <div class="card-content">
+              An integral part of this bible app is the ability to ask and answer questions about bible texts.
+            </div>
+          </paper-card>
+          <paper-card heading="Focused reading">
+            <div class="card-content">
+              The Bible is 'just' a collection of books and letters. Stuff like verses, notes, pericopes (the headers in
+              between paragraphs) and all those things were added later. Naturally these are incredibly useful when deeply
+              studying a specific text, but only distract from the original text as a whole. By default this app will hide
+              all these things, although they are just a tap away if you need them.
+            </div>
+          </paper-card>
+
+        </div>
+    </paper-scroll-header-panel>
   </template>
 
   <script>
@@ -79,6 +132,13 @@
 
         },
         ready: function(){
+
+        },
+        _setTitleMargin: function(ev){
+          var marginTop = (128-ev.detail.y)/128*-20;
+          var fontSize = 22+(128-ev.detail.y)/128*10;
+          this.$.wideTitle.style.marginTop = marginTop + 'px';
+          this.$.wideTitle.style.fontSize = fontSize + 'px';
         },
         goToSearch: function(){
           page.show('/search');

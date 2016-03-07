@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../utils/relative-time.html">
+<link rel="import" href="./bible-markdown.html">
 
 <dom-module id="qa-post">
   <template>
@@ -77,9 +78,12 @@
             <template is="dom-if" if="{{_equals(type, 'question')}}">
               <h1>{{post.title}}</h1>
             </template>
+            <bible-markdown markdown="{{post.text}}"></bible-markdown>
+            <!--
             <marked-element markdown="{{post.text}}">
               <div class="html"></div>
             </marked-element>
+            -->
             <div class="author">
               By {{post.originalAuthor.displayName}}
               <relative-time time="{{post.updatedAt}}"></relative-time>

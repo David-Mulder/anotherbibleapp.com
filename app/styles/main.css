@@ -26,6 +26,7 @@ body {
 }
 #loading .toolbar{
   height: 64px;
+  height: 168px;
   background: rgb(121,85,72);
   color: white;
   font-size: 20px;

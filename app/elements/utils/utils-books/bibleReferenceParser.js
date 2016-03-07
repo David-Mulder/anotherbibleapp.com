@@ -2,9 +2,11 @@ var bibleReferenceParserRegex = new RegExp('^([a-zA-Z0-9 ]+?) ?(([0-9]*?)(([: ])
 
 //var BibleReference = function(bookObject, chapter, verseStart, verseEnd){
 var BibleReference = function(vs){
-  //todo: can be shorter than 8 if leading 0
-  if(/^[0-9]{8}$/.test(vs)){
+  if(/^[0-9]{7,8}$/.test(vs)){
     //numeric reference
+    if(vs.toString().length == 7){
+      vs = '0' + vs;
+    }
     var book = parseInt(vs.toString().substring(0,2));
     var chapter = parseInt(vs.toString().substring(2,5));
     var verse = parseInt(vs.toString().substring(5,8));
@@ -13,7 +15,7 @@ var BibleReference = function(vs){
     var bookObject = bibleBooks[book-1];
   }else{
     //normal reference
-    var matches = bibleReferenceParserRegex.exec(vs);
+    var matches = bibleReferenceParserRegex.exec(vs.trim());
     if(matches){
       var bookObject = bibleBooks.findBook(matches[1]);
       if(bookObject && bookObject.matchQuality <= 30 && !matches[3]){
@@ -30,12 +32,52 @@ var BibleReference = function(vs){
     }
   }
 
+  this._debug = vs;
+
   this.book = bookObject;
   this.chapter = chapter;
   this.verse = verseStart;
   this.verseStart = verseStart;
   this.verseEnd = verseEnd;
 };
+
+Object.defineProperty(BibleReference.prototype, 'valid', {
+  enumerable: false,
+  configurable: false,
+  get: function(){
+    return typeof this.book != 'undefined';
+  }
+});
+
+Object.defineProperty(BibleReference.prototype, 'start', {
+  enumerable: false,
+  configurable: false,
+  get: function(){
+    var originalEnd = this.verseEnd;
+    var reference = new BibleReference(this.toNumeric());
+    this.verseEnd = originalEnd;
+    return reference;
+  }
+});
+
+Object.defineProperty(BibleReference.prototype, 'end', {
+  enumerable: false,
+  configurable: false,
+  get: function(){
+    if(this.verseEnd){
+      var originalStart = this.verseStart;
+      this.verseStart = this.verseEnd;
+      this.verseEnd = undefined;
+      var reference = new BibleReference(this.toNumeric());
+      this.verseEnd = this.verseStart;
+      this.verseStart = originalStart;
+      return reference;
+    }else{
+      return this.start;
+    }
+  }
+});
+
 BibleReference.prototype.toString = function(){
   var str = this.book.name;
   if(this.chapter){

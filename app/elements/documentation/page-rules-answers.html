@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-rules-answers">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="How to write a Good Answer"></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <paper-card heading="How to write a Good Answer">
+        <div class="card-content">
+          When it comes to writing questions there are a whole lot more rules and guidelines to keep in mind than with answers. The only thing to keep in mind with an answer is that you're trying to write an answer that's useful for anyone, not just the person who asked the question. Beyond that also please always mention your denomination if you have any reason to believe your answer is specific to it.
+        </div>
+      </paper-card>
+      <paper-card heading="Formatting">
+        <div class="card-content">
+          This site uses Markdown to handle it's formatting with a couple additions, here are the most important things to know:
+          <ul>
+            <li>
+              To start a new paragraph just leave an empty line in between.
+              <code><!--
+              -->First paragraph.
+
+                <!--              -->Second paragraph.<!--
+            --></code>
+            </li>
+            <li>
+              To quote someone put it on an a standalone line with a &gt; in front.
+              <code>Augustine claimed that:
+
+                > And here you place your quote
+                > even if it spans multiple lines.
+
+                and you continue like normal again.</code>
+            </li>
+            <li>
+              To link a Bible verse use `[Mt 3:3]` for example, to quote a bible passage use the quotation syntax from above
+              with just
+              <code>> Mt 3:3-4</code>
+            </li>
+          </ul>
+          For full instructions (making text bold, italic, underline, a header, etc.) just Google for 'markdown'.
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

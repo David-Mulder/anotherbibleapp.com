@@ -8,7 +8,8 @@ var UserSchema = new Schema({
   email: {type: String, required: true, unique: true},
   password: {type: String, required: true},
   info: String,
-  reputation: Number
+  reputation: Number,
+  settings: {type: Object, default: {}}
 });
 
 UserSchema.pre('save', function(next) {

@@ -292,6 +292,7 @@
           string = string.replace(/<\/p>/g, '</pa>');
           string = string.replace(/info>/g, 'io>');
           string = string.replace(/NOT_FOR_PRINT/g, 'NFP');
+          string = string.replace(/title="BibleLEB2: ?(.*?)"/g, 'ref="$1"');
           if(string.indexOf("xmlns") > -1){
             string = string.replace(new RegExp(" xmlns=\".*?\"","g"),"");
           }
@@ -299,8 +300,8 @@
           //console.log(doc.querySelector("chapter").innerHTML)
         }
         var blob = zip.generate({
-          type : "blob",
-          compression:"DEFLATE"
+          type: "blob",
+          compression: "DEFLATE"
         });
         document.getElementById("link").href = window.URL.createObjectURL(blob);
         document.getElementById("link").download = "bible.zip";

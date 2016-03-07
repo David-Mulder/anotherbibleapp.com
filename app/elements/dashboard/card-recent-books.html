@@ -1,0 +1,96 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../utils/relative-time.html">
+
+<dom-module id="card-recent-books">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+        display: block;
+      }
+      #card{
+        display: block;
+      }
+      #card .card-content{
+        padding-top: 0px;
+      }
+      relative-time{
+        color: var(--secondary-text-on-card-dialog-color);
+        font-size: smaller;
+      }
+      .book:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
+    </style>
+    <synced-settings id="settings"></synced-settings>
+    <paper-card id="card" heading="Recent Books">
+      <template is="dom-repeat" items="{{books}}" as="book">
+        <div class="card-actions book" on-tap="goToBook">
+          {{book.title}}
+
+          <relative-time time="{{book.date}}"></relative-time>
+        </div>
+      </template>
+    </paper-card>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          books: Array
+        },
+
+        ready: function(){
+          this.$.settings.getAllSettings().then(function(settings){
+
+            console.info('settings', JSON.parse(JSON.stringify(settings)));
+
+            var settingNames = Object.keys(settings);
+
+            var settingNameStart = 'book-reading-position-';
+
+            settingNames = settingNames.filter(function(name){
+              return name.substring(0, settingNameStart.length) === settingNameStart;
+            });
+
+            settings = settingNames.map(function(setting){
+              settings[setting].value.date = new Date(settings[setting].value.date);
+              return settings[setting];
+            });
+
+            settings.sort(function(a, b){
+              return b.value.date - a.value.date;
+            });
+
+            settings.splice(3);
+
+            this.books = [];
+
+            settings.forEach(function(setting){
+              var reference = new BibleReference(setting.value.position);
+              this.push('books', {
+                title: reference.book.title,
+                reference: reference.toString(),
+                date: setting.value.date
+              });
+            }.bind(this));
+
+          }.bind(this));
+        },
+
+        goToBook: function(ev){
+          window.doSavePosition = true;
+
+          page('/book/'+ev.model.book.reference);
+        }
+
+      });
+    })();
+  </script>
+
+</dom-module>

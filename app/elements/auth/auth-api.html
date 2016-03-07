@@ -154,11 +154,13 @@
 
                   }.bind(this)).catch(function(err){
 
-                    var pt = document.createElement('paper-toast');
-                    pt.opened = true;
-                    pt.duration = 10000;
-                    pt.text = 'The database service seems offline, sorry for the inconvenience';
-                    document.body.appendChild(pt);
+                    if(navigator.onLine){
+                      var pt = document.createElement('paper-toast');
+                      pt.opened = true;
+                      pt.duration = 10000;
+                      pt.text = 'The database service seems offline, sorry for the inconvenience';
+                      document.body.appendChild(pt);
+                    }
                     reject(err);
 
                   });

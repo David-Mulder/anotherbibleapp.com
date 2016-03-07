@@ -151,11 +151,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   };
 
-  // Scroll page to top and expand header
-  app.scrollPageToTop = function() {
-    document.getElementById('mainContainer').scrollTop = 0;
-  };
-
   app.goToHome = function(){
     page('/');
   };
@@ -166,7 +161,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     pt.duration = 10000;
     pt.text = msg;
     document.body.appendChild(pt);
-  }
+  };
 
   app.msg = function(msg, title){
     var pd = document.createElement('paper-dialog');

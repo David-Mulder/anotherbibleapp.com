@@ -2,8 +2,7 @@
 
 <dom-module id="synced-settings">
   <template>
-    <auth-api id="set" method="post" action="user/settings/:setting" param-setting="{{setting}}" param-value="{{value}}"></auth-api>
-    <auth-api id="get" action="user/settings/:setting" param-setting="{{setting}}"></auth-api>
+    <auth-api id="set" method="post" action="user/settings/:setting" param-setting="{{settingName}}" param-value="{{value}}" param-updated-at="{{updatedAt}}"></auth-api>
     <auth-api id="getAll" action="user/settings"></auth-api>
   </template>
 
@@ -11,15 +10,13 @@
     (function() {
       'use strict';
 
-      var jsonObjectToObject = function(obj){
-        Object.keys(obj).forEach(function(key){
-          obj[key].value = JSON.parse(obj[key].value);
-        });
-        return obj;
-      };
-      //todo: sync from offline to online storage...
-
-      var didStartupSync = false;
+      var settingResolution;
+      var settings = new Promise(function(resolve){
+        settingResolution = function(settings){
+          console.log('SETTINGS LOADED');
+          resolve(settings);
+        };
+      });
 
       Polymer({
 
@@ -30,112 +27,101 @@
           if(typeof localStorage.settings === 'undefined'){
             localStorage.settings = '{}';
           }
-          if(!didStartupSync){
-            didStartupSync = true;
-            this._sync();
+
+          this.sync();
+        },
+        _dateify: function(obj, prop){
+          Object.keys(obj).forEach(function(key){
+            obj[key][prop] = new Date(obj[key][prop]);
+          });
+        },
+        _getAllLocalSettings: function(){
+          var settings = JSON.parse(localStorage.settings);
+          this._dateify(settings, 'updatedAt');
+          return settings;
+        },
+        sync: function(){
+
+          var localSettings = this._getAllLocalSettings();
+
+          if(this.$.getAll.loggedIn){
+            this.$.getAll.execute().then(function(cloudSettings){
+
+              //cloudSetting values in JSON still
+
+              this._dateify(cloudSettings, 'updatedAt');
+
+              Object.keys(cloudSettings).forEach(function(settingName){
+                if(typeof localSettings[settingName] !== 'undefined'){
+                  var diff = Math.abs(localSettings[settingName].updatedAt - cloudSettings[settingName].updatedAt);
+                  if(diff > 30000) {
+                    if (localSettings[settingName].updatedAt > cloudSettings[settingName].updatedAt) {
+                      this._saveCloud(settingName, localSettings[settingName].value, localSettings[settingName].updatedAt);
+                    } else {
+                      this._saveLocal(settingName, JSON.parse(cloudSettings[settingName].value), cloudSettings[settingName].updatedAt);
+                    }
+                  }else{
+                    console.log('diff (', diff, ') so small, not updating', settingName);
+                  }
+                }else{
+                  this._saveLocal(settingName, JSON.parse(cloudSettings[settingName].value), cloudSettings[settingName].updatedAt);
+                }
+
+              }.bind(this));
+
+              Object.keys(localSettings).forEach(function(settingName){
+                if(typeof cloudSettings[settingName] == 'undefined'){
+                  this._saveCloud(settingName, localSettings[settingName].value, localSettings[settingName].updatedAt);
+                }
+              }.bind(this));
+
+              settingResolution(this._getAllLocalSettings());
+
+            }.bind(this)).catch(function(){
+              //no internet
+              settingResolution(this._getAllLocalSettings());
+            }.bind(this));
+          }else{
+            settingResolution(this._getAllLocalSettings());
           }
         },
-        _sync: function(){
-          //todo: probably should rewrite half this function... but the API should stay constant
-        },
-        _saveLocal: function(setting, value){
+        _saveLocal: function(settingName, value, updatedAt){
+          console.info('updating local', settingName);
           var settings = JSON.parse(localStorage.settings);
-          settings[setting] = {
+          settings[settingName] = {
             value: value,
-            updatedAt: Date.now()
+            updatedAt: updatedAt || Date.now()
           };
           localStorage.settings = JSON.stringify(settings);
         },
-        _saveCloud: function(setting, value){
-          this.setting = setting;
+        _saveCloud: function(settingName, value, updatedAt){
+          console.info('updating cloud', settingName);
+          this.settingName = settingName;
           this.value = JSON.stringify(value);
-          this.$.set.execute().catch();
+          this.updatedAt = updatedAt || Date.now();
+          this.$.set.execute().catch(function(){});
+        },
+        getSetting: function(settingName) {
+
+          return new Promise(function (resolve, reject) {
+            settings.then(function(settings){
+              if(typeof settings[settingName] !== 'undefined'){
+                resolve(settings[settingName].value);
+              }else{
+                reject('No such setting ' + settingName);
+              }
+            });
+          });
+
         },
         saveSetting: function(settingName, value){
-          console.info('save setting', settingName, 'to value', value);
           this._saveLocal(settingName, value);
           if(this.$.set.loggedIn){
             this._saveCloud(settingName, value);
           }
         },
-        _getAllLocalSettings: function(){
-          return JSON.parse(localStorage.settings);
-        },
-        getSetting: function(settingName){
-
-          return new Promise(function(resolve, reject){
-
-            var settings = this._getAllLocalSettings();
-            var localSetting = settings[settingName];
-
-            if(typeof localSetting == 'undefined'){
-              var localValue = null;
-              var localDate = new Date(0);
-            }else{
-              var localValue = localSetting.value;
-              var localDate = new Date(localSetting.updatedAt);
-            }
-
-            var finishWithLocal = function(){
-              if (typeof localSetting === 'undefined') {
-                reject('No such setting');
-              } else {
-                resolve(localValue);
-              }
-            };
-
-            if(this.$.get.loggedIn) {
-              this.setting = settingName;
-              this.$.get.execute().then(function (setting) {
-                var cloudDate = new Date(setting.updatedAt);
-                var cloudValue = JSON.parse(setting.value);
-                if(cloudValue === null){
-                  finishWithLocal();
-                }else{
-                  if (cloudDate > localDate) {
-                    resolve(cloudValue);
-                    console.info('value', cloudValue);
-                    this._saveLocal(settingName, cloudValue)
-                  } else {
-                    finishWithLocal();
-                    this._saveCloud(settingName, localValue);
-                  }
-                }
-              }.bind(this)).catch(function () {
-                finishWithLocal();
-              }.bind(this));
-            }else{
-              finishWithLocal();
-            }
-          }.bind(this));
-        },
-        _getAllCloudSettings: function(){
-          return new Promise(function(resolve, reject){
-            this.$.getAll.execute().then(function(value){
-              console.info('all', value);
-            }).catch(function(){
-              reject();
-            });
-          }.bind(this));
-        },
         getAllSettings: function(){
-          return new Promise(function (resolve) {
-
-            var finishWithLocal = function(){
-              resolve(this._getAllLocalSettings());
-            };
-
-            if(this.$.getAll.loggedIn) {
-              this.$.getAll.execute().then(function (value) {
-                resolve(jsonObjectToObject(value));
-              }).catch(function (err) {
-                finishWithLocal();
-              });
-            }else{
-              finishWithLocal();
-            }
-
-          }.bind(this));
+          return settings;
         }
       });
     })();

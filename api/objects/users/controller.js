@@ -60,5 +60,46 @@ module.exports = {
     });
 
     //res.send(req.body);
+  },
+  getAllSettings: function(req, res){
+    User.findOne({ _id: req.user._id}).exec().then(function(user){
+      res.json(user.settings);
+    });
+  },
+  resetSettings: function(req, res){
+    User.findOne({ _id: req.user._id}).exec().then(function(user){
+      user.settings = {};
+      user.save().then(function(){
+        res.json('true');
+      }).catch(function(err){
+        res.json(err);
+      });
+    });
+  },
+  getSetting: function(req, res){
+    User.findOne({ _id: req.user._id}).select('settings').exec().then(function(user){
+      if(req.params.setting in user.settings){
+        res.json(user.settings[req.params.setting]);
+      }else{
+        res.json({
+          value: null,
+          updatedAt: new Date(0)
+        });
+      }
+
+    });
+  },
+  saveSetting: function(req, res){
+    if(/^[a-zA-Z\-0-9]+$/.test(req.params.setting)){
+      var update = {};
+
+      update['settings.'+req.params.setting] = {
+        value: req.body.value,
+        updatedAt: new Date(req.body.updatedAt) || new Date()
+      };
+      User.where({ _id: req.user._id}).update(update).then(function(result){
+        res.json(result.ok);
+      });
+    }
   }
 };

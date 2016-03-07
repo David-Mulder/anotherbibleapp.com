@@ -106,6 +106,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.route = 'rules-questions';
     });
 
+    page('/help/how-to-answer', function (data) {
+      app.loadDependency('documentation/page-rules-answers');
+      app.setTitle('How to write a Good Answer');
+      app.route = 'rules-answers';
+    });
+
     page('/topic/:name', function (data) {
       app.loadDependency('topics/page-topic');
       app.setTitle('Topical Bible Index');

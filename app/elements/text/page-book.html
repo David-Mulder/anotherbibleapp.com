@@ -66,6 +66,7 @@
     </style>
 
     <utils-books id="bookUtils"></utils-books>
+    <synced-settings id="settings"></synced-settings>
     <iron-localstorage name="study-tools" value="{{studyTools}}"></iron-localstorage>
 
     <paper-drawer-panel id="qaDrawerPanel" right-drawer responsive-width="700px" drawer-width="300px" force-narrow="{{!studyTools}}">
@@ -139,23 +140,32 @@
           console.info('ref changed', this.ref);
           this.set('fullRef', this.$.bookUtils.parseReference(this.ref));
 
-          if(isNaN(this.fullRef.chapter) && typeof localStorage['book-reading-position-'+this.fullRef.book.name] !== 'undefined'){
-            var lastRead = this.$.bookUtils.parseReference(localStorage['book-reading-position-'+this.fullRef.book.name]);
-            if(!(lastRead.verseStart == 1 && lastRead.chapter == 1)){
-              app.ask('Do you wish to continue reading from your last position (~'+lastRead.toString()+')?', 'Continue reading...', ['No', 'Yes']).then(answer => {
-                if(answer == 'Yes'){
-                this.set('fullRef', lastRead);
-                this.$.text.highlightVerse = false;
-              }
-            }).catch(() => {
+          if(isNaN(this.fullRef.chapter)){
 
-              });
-            }
-            //this.set('fullRef', this.$.bookUtils.parseReference(localStorage['book-reading-position-'+this.fullRef.book.name]));
-            //this.$.text.highlightVerse = false;
+            this.$.settings.getSetting('book-reading-position-'+this.fullRef.book.name).then(function(setting){
+              var lastRead = this.$.bookUtils.parseReference(setting.position);
+              if(!(lastRead.verseStart == 1 && lastRead.chapter == 1)){
+
+                app.ask('Do you wish to continue reading from your last position (~'+lastRead.toString()+')?', 'Continue reading...', ['No', 'Yes']).then(function(answer){
+                  if(answer == 'Yes'){
+                    this.set('fullRef', lastRead);
+                    this.$.text.highlightVerse = false;
+                  }
+                }.bind(this)).catch(function(){});
+
+              }
+
+            }.bind(this)).catch(function(err){});
             this.disableLocationSaving = false;
+
           }else{
-            this.disableLocationSaving = true;
+            //explicitedly piercing the router in case of navigation from the recent books card
+            if(window.doSavePosition){
+              this.disableLocationSaving = false;
+              delete window.doSavePosition;
+            }else{
+              this.disableLocationSaving = true;
+            }
           }
           app.setTitle(this.fullRef.book.title);
           this.setMode();
@@ -199,7 +209,10 @@
 
         savePosition: function(ev){
           if(!this.disableLocationSaving){
-            localStorage['book-reading-position-'+this.fullRef.book.name] = ev.detail.verse;
+            this.$.settings.saveSetting('book-reading-position-'+this.fullRef.book.name, {
+              position: ev.detail.verse,
+              date: new Date()
+            });
           }
         }
 

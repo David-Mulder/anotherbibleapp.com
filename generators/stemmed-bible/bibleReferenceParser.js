@@ -13,7 +13,7 @@ var BibleReference = function(vs){
     var bookObject = bibleBooks[book-1];
   }else{
     //normal reference
-    var matches = bibleReferenceParserRegex.exec(vs);
+    var matches = bibleReferenceParserRegex.exec(vs.trim());
     if(matches){
       var bookObject = bibleBooks.findBook(matches[1]);
       if(bookObject && bookObject.matchQuality <= 20 && !matches[3]){

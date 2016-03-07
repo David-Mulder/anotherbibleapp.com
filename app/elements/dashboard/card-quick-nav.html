@@ -19,7 +19,7 @@
 
     <paper-card id="card" heading="Quick Navigation">
       <div class="card-content">
-        <paper-input label="Enter a bible reference and hit enter..." on-keyup="checkForEnter"></paper-input>
+        <paper-input error-message="Reference not recognized, format should be like `Mt 1:1` or `Matthew 1:1`" invalid="{{invalid}}" label="Enter a bible reference and hit enter..." on-keyup="checkForEnter"></paper-input>
       </div>
     </paper-card>
 
@@ -31,13 +31,14 @@
 
       Polymer({
         checkForEnter: function(ev){
+          this.invalid = false;
           if(ev.keyCode == 13){
             var reference = new BibleReference(ev.target.value);
             if(reference.book){
               ev.target.blur();
               page('/book/'+reference.toString());
             }else{
-              app.toast('Sorry, this reference was not recognized. The format should be like `Mt 1:1` or `Matthew 1:1`')
+              this.invalid = true;
             }
           }
         }

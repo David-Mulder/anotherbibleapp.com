@@ -1,14 +1,19 @@
- - split chapters in paragraphs...
+ - DONE split chapters in paragraphs...
    - DONE chapter numbers
    - DONE bible reference needs to resolve to `<pa>`... so... some kind of index
    - DONE increase margin of last one and add license notice
  - check jn 9:39
+ - IMPORTANT: When dashboard fits fully on screen, background is visibible under it
+ - increase padding on text in reading modus
+ - DONE Bible markdown extension
+ - max-height bible-snippet maybe with scroll?
+ - hide home button on home
  - DONE lazy loading
  - DONE on tap verse set URL
  - DONE add license
  - DONE NOTE hover gets cut off
  - Check logged out views
- - Support/fix citations in notes
+ - DONE Support/fix citations in notes
  - DONE disable saving of reading position when referenced verse
  - DONE Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
  - DONE Continue reading
@@ -19,11 +24,11 @@
  - DONE Edit questions and answers
  - write documentation about asking questions
  - make 'i have read rules' required
- - add quick navigation functionality
+ - DONE add quick navigation functionality
  - forgot my password
  - highlighting not implemented or working in topical cards
  - DONE search page before actually searching looks incorrect
- - sync reading positions in db
+ - DONE sync reading positions in db
  - add questions to search
  - change 'recent questions' to 'recent activity'
  - add browsing option of recent activity rather than just top 10
@@ -32,14 +37,17 @@
  - DONE Dashboard list of recent questions
  - verse highlighting
  - chat or other discussion forum
- - open book list on dashboard (??? maybe bible books started reading) (just like google now with different cards)
- - double verse results with overlapping ranges
+ - DONE open book list on dashboard (??? maybe bible books started reading) (just like google now with different cards)
+ - DONE double verse results with overlapping ranges
  - filter topical cards with in operator
  - set custom char range for literal search with new operator
  - write documentation for search
  - reapply firstIndex better after read -> study modus
  - DONE menu button not appearing on small screen load
- - scroll happens after 'ask question' flow started
+ - scroll happens after 'ask question' flow started (???)
  - move 'finish selection' in 'ask question' flow to sidebar... maybe
  - user profile pages
  - show vote counts on question cards
+ - use online service to load greek/hebrew original
+ - use online service to do synonym search
+ - share posts

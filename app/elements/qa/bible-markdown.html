@@ -1,0 +1,65 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<script src="/bower_components/markdown-js/lib/markdown.js"></script>
+
+<dom-module id="bible-markdown">
+  <template>
+    <style>
+
+    </style>
+    <div id="html"></div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          markdown: {
+            type: String,
+            observer: '_render'
+          }
+        },
+        _render: function(){
+
+          var md = this.markdown;
+          console.log(md);
+
+          md = md.replace(/\[(.*?)\](?!\()/g, function(match, capture){
+            var reference = new BibleReference(capture);
+            if(reference.valid){
+              return '['+capture+'](/book/'+reference.toString()+')';
+            }else{
+              return match;
+            }
+          });
+
+          var tree = markdown.parse(md);
+
+          var html = markdown.renderJsonML( markdown.toHTMLTree( tree ) );
+
+          html = html.replace(/<blockquote><p>(.*?)<\/p><\/blockquote>/g, function(match, capture){
+            console.log('match', arguments);
+            var reference = new BibleReference(capture);
+            console.info('ref',reference);
+            if(reference.valid){
+              return '<blockquote><p><bible-snippet start="'+reference.start.toNumeric()+'" end="'+reference.end.toNumeric()+'"></bible-snippet></p></blockquote>';
+            }else{
+              return match;
+            }
+          });
+
+          this.$.html.innerHTML = html;
+
+          console.log(html);
+        },
+        ready: function(){
+          //console.log(this.markdown);
+          //var tree = markdown.parse(this.markdown);
+          //console.log(tree);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
