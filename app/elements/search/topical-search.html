@@ -47,7 +47,7 @@
     <utils-books id="utils"></utils-books>
 
     <template is="dom-repeat" items="{{topics}}" as="topic">
-      <topic-card topic="{{topic}}" class="card"></topic-card>
+      <topic-card topic="{{topic}}" class="card" search-query="{{searchQuery}}"></topic-card>
     </template>
 
   </template>
@@ -71,6 +71,7 @@
           return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         },
         triggerSearch: function(query){
+
           if(query.length == 0){
             return false;
           }
@@ -103,16 +104,23 @@
               console.error('some error occured...')
             });
           }, 100);
+
         },
+
         _search: function(searchString){
+
           this.loading = true;
           this.noResults = false;
+
           return new Promise(function(resolve, reject){
+
             if(this.worker){
               //this might I guess lead to unresolved promises laying around...
               this.worker.terminate();
             }
+
             this.worker = new Worker(this.resolveUrl('topical-search-worker.js'));
+
             this.worker.postMessage(searchString);
             this.worker.addEventListener('message', function(ev){
               this.loading = false;
@@ -123,7 +131,9 @@
               //console.error('ERROR YES', ev);
               reject(ev);
             });
+
           }.bind(this));
+
         }
       });
     })();

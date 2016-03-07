@@ -29,6 +29,8 @@
  - add comments
  - reload dashboard
  - empty local and memory settings after login, but not after register
+ - fix links to be secondary color everywhere
+ - add sepia and white on black reading modus
  - highlighting not implemented or working in topical cards
  - DONE search page before actually searching looks incorrect
  - DONE sync reading positions in db
@@ -54,3 +56,5 @@
  - use online service to load greek/hebrew original
  - use online service to do synonym search
  - share posts
+ - refactor app.toast/ask/etc to a... element or behavior
+ - DONE make question links look better

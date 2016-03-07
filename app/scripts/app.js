@@ -159,12 +159,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     return app.route === 'home';
   };
 
-  app.toast = function(msg){
+  app.toast = function(msg, duration){
     var pt = document.createElement('paper-toast');
+    pt.duration = duration || 10000;
     pt.opened = true;
-    pt.duration = 10000;
     pt.text = msg;
     document.body.appendChild(pt);
+    return pt;
+  };
+
+  app.askToast = function(msg, options){
+    return new Promise((resolve, reject) => {
+      var pt = app.toast(msg, 25000);
+
+      options.forEach((option, i) => {
+        var pb = document.createElement('paper-button');
+        pb.textContent = option;
+        pb.addEventListener('tap', function () {
+          pt.close();
+          resolve(option, i);
+        });
+        pt.appendChild(pb);
+      });
+    });
   };
 
   app.msg = function(msg, title){

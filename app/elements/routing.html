@@ -79,7 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.set('params.answerId', data.params.id);
     });
 
-    page('/question/:id', function(data) {
+    page('/question/:id/:test?', function(data) {
       app.loadDependency('qa/page-question');
       app.setTitle('Question');
       app.route = 'question';

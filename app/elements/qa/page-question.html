@@ -131,6 +131,7 @@
           });
         },
         setTitle: function(title){
+          page.replace('/question/'+this.id+'/'+title.toLowerCase().replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));
           app.setTitle(title);
         },
         setAnyAnswers: function(){
