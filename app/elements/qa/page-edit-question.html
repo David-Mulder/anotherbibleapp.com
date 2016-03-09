@@ -60,6 +60,12 @@
         padding-bottom: 10px;
         margin-top: 15px;
       }
+      #title{
+        --paper-input-container-input: {
+          font-size: 22px;
+        };
+
+      }
     </style>
     <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{question}}"></auth-api>
     <auth-api id="save" action="question/:id" param-id="{{id}}" method="POST" param-title="{{title}}" todo-param-category="{{category}}" param-text="{{text}}" param-verses="{{versesAsNumbers}}"></auth-api>
@@ -72,7 +78,7 @@
 
       <paper-card>
         <div class="card-content">
-          <paper-input label="Question title" value="{{title}}"></paper-input>
+          <paper-input id="title" label="Question title" value="{{title}}"></paper-input>
           <bible-markdown-editor label="Question in detail" value="{{text}}" rows="7"></bible-markdown-editor>
           <div id="verseContainer">
             <paper-input label="Verses" value="{{verseString}}" error-message="One of the verses can not be parsed" invalid="{{invalidVerseFound}}"></paper-input>

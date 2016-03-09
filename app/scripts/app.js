@@ -25,6 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   */
 
   app.setTitle = function(title){
+    app.title = title;
     if(title.length > 0){
       document.title = title + ' - Another Bible App';
     }else{
