@@ -3,6 +3,7 @@ var questionController = require('./objects/questions/controller');
 var answerController = require('./objects/answers/controller');
 var votingController = require('./objects/votes/controller');
 var userController = require('./objects/users/controller');
+var searchController = require('./objects/search/controller');
 
 module.exports = {
   register: function(app){
@@ -34,6 +35,8 @@ module.exports = {
 
     app.post('/upvote/:type/:id', authenticator.isAuthenticated, votingController.upvote);
     app.post('/downvote/:type/:id', authenticator.isAuthenticated, votingController.downvote);
+
+    app.get('/synonyms/:word', searchController.synonyms);
 
     app.get('/', function (req, res) {
       res.send('Hello Worldd!');

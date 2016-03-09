@@ -19,6 +19,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       next();
     });
 
+    page(function(ctx, next){
+      document.body.dispatchEvent(new CustomEvent("page-navigation", {
+        detail: {
+        }
+      }));
+      next();
+    });
+
     page('/', function () {
       app.loadDependency('dashboard/page-welcome');
       app.setTitle('');
@@ -110,6 +118,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.loadDependency('documentation/page-rules-answers');
       app.setTitle('How to write a Good Answer');
       app.route = 'rules-answers';
+    });
+
+    page('/help/search', function (data) {
+      app.loadDependency('documentation/page-search-docs');
+      app.route = 'search-docs';
     });
 
     page('/topic/:name', function (data) {

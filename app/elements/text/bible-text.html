@@ -169,7 +169,7 @@
 
     <iron-list id="text" items="{{blocks}}" as="block" on-tap="_handleTapOnText" on-scroll="savePosition">
       <template>
-        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" chapter-number="{{block.chapterNumber}}" class$="{{block.class}}"></block-html>
+        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" chapter-number="{{block.chapterNumber}}" class$="{{block.class}}" parent="{{this}}"></block-html>
       </template>
     </iron-list>
   </template>
@@ -220,6 +220,7 @@
           //this.scopeSubtree(this.$.text, true);
           this.selectedVerses = [];
           this.blocks = [];
+          this.this = this;
         },
 
         loadBook: function(){
@@ -265,6 +266,8 @@
           this.blocks = [];
           var chapters = [].slice.call(book.querySelectorAll('chapter'));
 
+          var s = new XMLSerializer();
+
           chapters.forEach((chapter, chapterI) => {
             var chapterBlocks = [].slice.call(chapter.querySelectorAll('pa, pericope'));
             chapterBlocks.forEach((block, i) => {
@@ -272,11 +275,14 @@
               if(firstVerse){
                 var reference = this.$.utils.parseReference(firstVerse.id);
               }
+
+              //todo: consider switching to simply passing the raw xml object instead of stringifying
+
               this.push('blocks', {
                 start: i == 0,
                 end: i == chapterBlocks.length - 1,
                 debug: i+'/'+(chapterBlocks.length -1),
-                html: block.outerHTML,
+                html: block.outerHTML || s.serializeToString(block),
                 chapterNumber: chapterI + 1,
                 verseStart: firstVerse ? reference.toNumeric() : null
               });
@@ -290,7 +296,7 @@
             class: 'license'
           });
 
-          console.info('loaded', this.blocks, 'blocks');
+          console.info('loaded', this.blocks.length, 'blocks');
         },
 
         resetSizes: function(){
@@ -341,21 +347,21 @@
           }*/
         },
         _handleTapOnNote: function(ev){
-          if(ev.path[0].nodeName.toLowerCase() == 'ci'){
+          if(Polymer.dom(ev).path[0].nodeName.toLowerCase() == 'ci'){
             this.$.note.opened = false;
             var reference = new BibleReference(ev.path[0].getAttribute('ref'));
             page('/book/'+reference);
           }
         },
         _handleTapOnText: function(ev){
-          if(ev.path[0].nodeName.toLowerCase() == 'n'){
+          if(Polymer.dom(ev).path[0].nodeName.toLowerCase() == 'n'){
             var note = ev.path[0].innerHTML;
             this.$.note.querySelector('.content').innerHTML = note;
             this.$.note.opened = true;
           }
 
           if(true){
-            var verseNumberElement = ev.path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
+            var verseNumberElement = Polymer.dom(ev).path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
             if(this.selectionMode === 'multiple'){
               if(verseNumberElement) {
                 var isSelected = this.selectedVerses.includes(verseNumberElement.id);

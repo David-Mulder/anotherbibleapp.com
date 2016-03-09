@@ -70,7 +70,8 @@
 
     <div class="content">
       <div class="instructions" hidden$="{{searchStarted}}">
-        Enter your search query above. To search in a specific book use <code>in:Matthew</code>
+        Enter your search query above. To search in a specific book use <code>in:Matthew</code><br><br>
+        To learn more about search, <a href="/help/search">tap here</a>.
       </div>
       <div hidden$="{{!searchStarted}}">
         <topical-search search-query="{{searchQuery}}" on-no-results="triggerBibleSearch"></topical-search>

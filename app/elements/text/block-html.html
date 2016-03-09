@@ -27,6 +27,8 @@
           }
 
           div.innerHTML = this.html;
+          this.parent.scopeSubtree(div, false);
+
           this.setSelectionClasses(div);
           this.setVerseNumberAttributes(div);
           this.innerHTML = '';

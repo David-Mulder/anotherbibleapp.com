@@ -2,12 +2,12 @@
    - DONE chapter numbers
    - DONE bible reference needs to resolve to `<pa>`... so... some kind of index
    - DONE increase margin of last one and add license notice
- - check jn 9:39
+ - DONE check jn 9:39
  - When dashboard fits fully on screen, background is visibible under it
  - DONE increase padding on text in reading modus
  - DONE Bible markdown extension
  - max-height bible-snippet maybe with scroll?
- - hide home button on home
+ - DONE hide home button on home
  - DONE lazy loading
  - DONE on tap verse set URL
  - DONE add license
@@ -22,19 +22,21 @@
    - Installation notification
    - Hide features when offline
  - DONE Edit questions and answers
- - write documentation about asking questions
+ - DONE write documentation about asking questions
+ - remove setTitle calls from routing
  - make 'i have read rules' required
  - DONE add quick navigation functionality
  - forgot my password
  - add comments
- - reload dashboard
+ - DONE reload dashboard
  - empty local and memory settings after login, but not after register
  - fix links to be secondary color everywhere
  - add sepia and white on black reading modus
- - highlighting not implemented or working in topical cards
+ - DONE highlighting not implemented or working in topical cards
  - DONE search page before actually searching looks incorrect
  - DONE sync reading positions in db
  - add questions to search
+ - when no recent books add message
  - change 'recent questions' to 'recent activity'
  - add browsing option of recent activity rather than just top 10
  - DONE add date to questions and answers
@@ -44,9 +46,10 @@
  - chat or other discussion forum
  - DONE open book list on dashboard (??? maybe bible books started reading) (just like google now with different cards)
  - DONE double verse results with overlapping ranges
+ - combine sequential related bible verses
  - filter topical cards with in operator
- - set custom char range for literal search with new operator
- - write documentation for search
+ - DONE set custom char range for literal search with new operator
+ - DONE write documentation for search
  - reapply firstIndex better after read -> study modus
  - DONE menu button not appearing on small screen load
  - scroll happens after 'ask question' flow started (???)

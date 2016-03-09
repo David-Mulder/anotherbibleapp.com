@@ -9,7 +9,7 @@ importScripts('../utils/utils-books/books.js');
 
 onmessage = function(ev){
   console.info('search for', ev.data);
-  search(ev.data, 300).then(function(result){
+  search(ev.data).then(function(result){
     postMessage(result);
     close();
   });
@@ -183,7 +183,7 @@ var deduplicateResults = function(results){
   return uniqueResults;
 };
 
-var search = function(searchString, length){
+var search = function(searchString){
 
   return new Promise(function(resolve, reject){
 
@@ -207,6 +207,8 @@ var search = function(searchString, length){
         return word.length;
       }
     });
+
+    var range = adjusters.range || 300;
 
     fetch('data/stemmedBible.txt').then(function(response){
       return response.text();
@@ -255,7 +257,8 @@ var search = function(searchString, length){
         return indexes;
       });
 
-      var results = getIntersectingRanges(indexes, length);
+      console.log('RANGE', range);
+      var results = getIntersectingRanges(indexes, range);
       //console.log("number of results:", results.length, indexes);
 
       results.forEach(function(result) {
@@ -270,7 +273,7 @@ var search = function(searchString, length){
       results = deduplicateResults(results);
 
       results.forEach(function(result) {
-        result.weights = calculateWeights(result, text, enteredWords, NTIndex, length);
+        result.weights = calculateWeights(result, text, enteredWords, NTIndex, range);
         result.score = (1-result.weights.lengthPercentagePerMatch) * result.weights.wordDistance + (result.weights.NT ? 0.001 : 0) + result.weights.popularity/2.5;
       });
 

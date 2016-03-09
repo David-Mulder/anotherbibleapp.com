@@ -35,8 +35,8 @@
         };
         --paper-scroll-header-panel-full-header: {
           background-image: url('/images/top-header.png');
-          background-size: cover;
-          background-position: 0px 0px;
+          background-size: cover !important;
+          background-position: 0px 0px !important;
         };
         --paper-scroll-header-panel-condensed-header: {
           background-color: var(--primary-color);
@@ -138,7 +138,6 @@
 
         },
         _fireReloads: function(){
-          console.log('JAAAA');
           if(this.$$('card-recent-books')) this.$$('card-recent-books').reload();
           if(this.$$('card-recent-questions')) this.$$('card-recent-questions').reload();
         },

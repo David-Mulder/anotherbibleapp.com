@@ -165,6 +165,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     pt.opened = true;
     pt.text = msg;
     document.body.appendChild(pt);
+    pt.addEventListener('iron-overlay-closed', function(){
+      document.body.removeChild(pt);
+    });
+    var dismisser = function(){
+      pt.opened = false;
+      document.body.removeEventListener('page-navigation', dismisser);
+    };
+    document.body.addEventListener('page-navigation', dismisser);
+
     return pt;
   };
 

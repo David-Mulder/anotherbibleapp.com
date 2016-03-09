@@ -1,0 +1,50 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-search-docs">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Search"></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <paper-card heading="Introduction">
+        <div class="card-content">
+          Searching is one of the most unique and complex aspects of this application. The search functionality can be split up in two different aspects: the topical search engine and the literal search engine. The topical search engine will search for a theme and find verses that are most relevant, even if the books in the Bible don't speak directly about the issue (e.g. 'trinity' or 'celebrating halloween'). The literal search engine on the other hand will look through the Bible for literal keywords and try to sort them by relevancy.
+        </div>
+      </paper-card>
+      <paper-card heading="Topical search">
+        <div class="card-content">
+          The topical search is build upon the openly available topical bible index from <a href="http://www.openbible.info">openbible.info</a>. The unique thing about this topical index is that it's open and a collaborative effort of thousands and thousands of users. The disadvantage of this however that it contains some very weird themes and some of the results make no sense at all (verses pulled entirely out of their context). Try to keep this in mind and if you come across particularly bad topics (examples of currently blacklisted topics are things like 'atlantis', 'anime', etc.) please contact me and I will backlist it.
+        </div>
+      </paper-card>
+      <paper-card heading="Literal search">
+        <div class="card-content">
+          The literal search engine will search for the terms you typed in throughout the entire bible. It will search across verse borders, do fuzzy matching and work offline, something that is somewhat unique.<br><br>
+          It's possible to use operators to further control your searches:
+          <ul>
+            <li>The <code class="inline">in:</code> operator is used to limit a search to only a specific book (using <code class="inline">in:Matthew</code> for example) or the Old or New testament (using <code class="inline">in:NT</code>)</li>
+            <li>The <code class="inline">results:</code> operator can be used to increase the number of results. By default only 25 results are retrieved, but you can set this to an arbitrary number (<code class="inline">results:50</code>) or even retrieve all results (<code class="inline">results:all</code>)</li>
+            <li>The <code class="inline">range:</code> operator affects how close to each other the searched for words need to be. This is a metric that is hard to describe exactly, however by default it is <code class="inline">300</code> and just increase or decrease it by trial and error if you are so inclined.</li>
+          </ul>
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>
