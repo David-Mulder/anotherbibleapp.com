@@ -113,6 +113,14 @@
           background-color: rgba(0,0,0,.2);
         };
       }
+      paper-button{
+        --paper-button-disabled: {
+          background: transparent;
+        }
+      }
+      paper-button[disabled] iron-icon{
+        color: rgba(0,0,0,.2);
+      }
     </style>
 
     <paper-card>
@@ -164,7 +172,7 @@
           <span class="label">Share</span>
         </paper-button>
         <paper-icon-button icon="create" on-tap="goToEdit"></paper-icon-button>
-        <paper-button on-tap="goToHistory">
+        <paper-button on-tap="goToHistory" disabled$="{{!hasHistory}}">
           <iron-icon icon="history"></iron-icon>
           <span class="label edited" hidden="{{!showRevision}}">edited by {{post.revisionAuthor.displayName}}</span>
         </paper-button>
@@ -211,7 +219,8 @@
           post: Object,
           type: String,
           noVoting: Boolean,
-          noActions: Boolean
+          noActions: Boolean,
+          hasHistory: Boolean
         },
         observers: [
           'postChanged(post.*)'
@@ -225,6 +234,11 @@
             this.showRevision = true;
           }else{
             this.showRevision = false;
+          }
+          if(this.post.version > 1){
+            this.hasHistory = true;
+          }else{
+            this.hasHistory = false;
           }
         },
         upvote: function(){

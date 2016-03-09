@@ -41,6 +41,10 @@
         padding: 10px 20px 0px 20px;
         margin: 0px;
       }
+      .html .verses, .markdown .verses{
+        margin: 0px 20px 10px 20px;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
       .html bible-markdown, .markdown pre{
         margin: 0px 20px;
         display: block;
@@ -53,6 +57,7 @@
       .markdown pre{
         margin-top: 16px;
         margin-bottom: 16px;
+        white-space: pre-wrap;
       }
       .html .time, .markdown .time{
         padding: 0px 20px 15px 20px;
@@ -65,46 +70,79 @@
     <paper-card>
 
       <template is="dom-if" if="{{_equals(mode, 'html')}}">
+
         <div class="html side-by-side">
+
           <div hidden$="{{newVersionOnly}}">
+
             <h2>Old:</h2>
+
             <h3 hidden$="{{!_equals(type, 'question')}}">{{old.title}}</h3>
             <bible-markdown markdown="{{old.text}}"></bible-markdown>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
+
             <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+
           </div>
+
           <div>
+
             <h2>New:</h2>
+
             <h3 hidden$="{{!_equals(type, 'question')}}">{{new.title}}</h3>
             <bible-markdown markdown="{{new.text}}"></bible-markdown>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
+
             <template is="dom-if" if="{{newVersionOnly}}">
               <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
             </template>
+
             <template is="dom-if" if="{{!newVersionOnly}}">
               <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
             </template>
+
           </div>
+
         </div>
+
       </template>
+
       <template is="dom-if" if="{{_equals(mode, 'markdown')}}">
+
         <div class="markdown side-by-side">
+
           <div hidden$="{{newVersionOnly}}">
+
             <h2>Old:</h2>
+
             <pre class="title" hidden$="{{!_equals(type, 'question')}}"># {{old.title}}</pre>
             <pre class="text">{{old.text}}</pre>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
+
             <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+
           </div>
+
           <div>
+
             <h2>New:</h2>
+
             <pre class="title" hidden$="{{!_equals(type, 'question')}}"># {{new.title}}</pre>
             <pre>{{new.text}}</pre>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
+
             <template is="dom-if" if="{{newVersionOnly}}">
               <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
             </template>
+
             <template is="dom-if" if="{{!newVersionOnly}}">
               <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
             </template>
+
           </div>
+
         </div>
+
       </template>
 
     </paper-card>
@@ -124,18 +162,24 @@
           }
         },
         observers: [
-          '_newSet(new)'
+          '_newSet(new)',
+          '_oldSet(old)'
         ],
         behaviors:[
           abaBehaviors.logic
         ],
         _newSet: function(){
-          console.log('oooold', this.old);
+          if(this.new.verses)
+            this.new.verseString = this.new.verses.map(v => new BibleReference(v)).join(', ');
           if(!this.old){
             this.newVersionOnly = true;
           }else{
             this.newVersionOnly = false;
           }
+        },
+        _oldSet: function(){
+          if(this.old.verses)
+            this.old.verseString = this.old.verses.map(v => new BibleReference(v)).join(', ');
         }
       });
     })();

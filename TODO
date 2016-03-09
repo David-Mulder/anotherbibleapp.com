@@ -3,7 +3,7 @@
    - DONE bible reference needs to resolve to `<pa>`... so... some kind of index
    - DONE increase margin of last one and add license notice
  - DONE check jn 9:39
- - When dashboard fits fully on screen, background is visibible under it
+ - When dashboard fits fully on screen, background is visible under it
  - DONE increase padding on text in reading modus
  - DONE Bible markdown extension
  - max-height bible-snippet maybe with scroll?
@@ -49,8 +49,8 @@
  - DONE double verse results with overlapping ranges
  - combine sequential related bible verses
  - discussed text not linkable
- - show revision authors correctly (in history as well)
- - voting causes versioning
+ - DONE show revision authors correctly (in history as well)
+ - DONE voting causes versioning
  - make title big in new questoin
  - filter topical cards with in operator
  - DONE set custom char range for literal search with new operator
@@ -58,7 +58,6 @@
  - reapply firstIndex better after read -> study modus
  - DONE menu button not appearing on small screen load
  - scroll happens after 'ask question' flow started (???)
- - move 'finish selection' in 'ask question' flow to sidebar... maybe
  - user profile pages
  - show vote counts on question cards
  - use online service to load greek/hebrew original
@@ -68,6 +67,9 @@
  - DONE make question links look better
  - notifications (push) (https://developers.google.com/web/updates/2015/03/push-notifications-on-the-open-web?hl=en)
  - privacy & terms of use
- - make markdown view in history
+ - DONE make markdown view in history
  - DONE clean down and upvotes from revisions
- - redesign history page and add updatedAt
+ - DONE redesign history page and add updatedAt
+ - DONE add verses to history
+ - add diff view in history
+ - disable voting on your own posts
