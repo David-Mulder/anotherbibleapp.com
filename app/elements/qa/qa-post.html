@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../utils/relative-time.html">
 <link rel="import" href="./bible-markdown.html">
+<link rel="import" href="/bower_components/iron-icons/editor-icons.html">
+
+<!-- todo: lazy load only if needed? -->
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
 
 <dom-module id="qa-post">
   <template>
@@ -63,10 +67,53 @@
       .post .text{
         flex: 1;
       }
+      .card-actions paper-icon-button, .card-actions paper-button{
+        color: var(--secondary-text-on-card-dialog-color);
+        min-width: 0px;
+      }
+      .actions{
+        display: flex;
+      }
+      .actions paper-button{
+        padding: 8px;
+      }
+      .actions .comment-count{
+        display: inline-block;
+        padding-left: 4px;
+      }
+      .comment{
+        padding: 16px 16px 16px 34px !important;
+        background: rgba(0,0,0,.017);
+      }
+      .comment .user{
+        font-weight: bold;
+      }
+      .comment .date{
+        float: right;
+        font-size: smaller;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+      .add-comment{
+        display: flex;
+        background: rgba(0,0,0,.017);
+      }
+      .add-comment paper-input{
+        flex: 1;
+        --paper-input-container-label: {
+          color: rgba(0,0,0,.3);
+        };
+        --paper-input-container-underline: {
+          background-color: rgba(0,0,0,.2);
+        };
+      }
     </style>
+
     <paper-card>
+
       <auth-api id="upvoteApi" method="POST" action="upvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
       <auth-api id="downvoteApi" method="POST" action="downvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
+      <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}"></auth-api>
+
       <div class="card-content">
         <div class="post">
           <div class="score" hidden$="{{noVoting}}">
@@ -91,12 +138,39 @@
           </div>
         </div>
       </div>
-      <div class="card-actions" hidden$="{{noActions}}">
+
+      <div class="card-actions actions" hidden$="{{noActions}}">
         <!-- <paper-button>Share</paper-button> -->
-        <paper-button on-tap="goToEdit">Edit</paper-button>
-        <paper-button on-tap="goToHistory">History</paper-button>
+        <paper-icon-button icon="create" on-tap="goToEdit"></paper-icon-button>
+        <paper-icon-button icon="history" on-tap="goToHistory"></paper-icon-button>
+        <div class="flex"></div>
+        <paper-button on-tap="toggleComments">
+          <iron-icon icon="editor:mode-comment"></iron-icon>
+          <span class="comment-count">{{post.comments.length}}</span>
+        </paper-button>
       </div>
+
+      <template is="dom-if" if="{{commentsVisible}}">
+
+        <template is="dom-repeat" items="{{post.comments}}" as="comment">
+          <div class="card-actions comment">
+            <div class="date"><relative-time time="{{comment.date}}"></relative-time></div>
+            <div class="user">{{comment.user.displayName}}</div>
+            <div class="text">
+              {{comment.text}}
+            </div>
+          </div>
+        </template>
+
+        <div class="card-actions add-comment">
+          <paper-input label="Add a comment" no-label-float on-keyup="_checkForCommentSubmit" value="{{commentText}}"></paper-input>
+          <paper-icon-button icon="send" on-tap="addComment"></paper-icon-button>
+        </div>
+
+      </template>
+
     </paper-card>
+
   </template>
 
   <script>
@@ -112,9 +186,15 @@
           noVoting: Boolean,
           noActions: Boolean
         },
+        observers: [
+          'postChanged(post.*)'
+        ],
         behaviors:[
           abaBehaviors.logic
         ],
+        postChanged: function(){
+          this.commentsVisible = false;
+        },
         upvote: function(){
           this.$.upvoteApi.execute().then(function(post){
             this.set('post', post);
@@ -130,6 +210,21 @@
         },
         goToHistory: function(){
           page('/' + this.type + '/' + this.post._id + '/' + 'history');
+        },
+        toggleComments: function(){
+          this.commentsVisible = this.commentsVisible ? false : true;
+        },
+        _checkForCommentSubmit: function(ev){
+          if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
+            this.addComment();
+          }
+        },
+        addComment: function(){
+          this.$.addCommentApi.execute().then(function(comment){
+            this.push('post.comments', comment);
+            this.commentsVisible = true;
+            this.commentText = '';
+          }.bind(this));
         }
       });
     })();

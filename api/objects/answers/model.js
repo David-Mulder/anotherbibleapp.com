@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
   uuid = require('uuid');
 var User = require('../users/model.js');
 var Question = require('../questions/model.js');
+var Comment = require('../comments/model.js');
 var version = require('../../version.js');
 
 var schema = new Schema({
@@ -25,7 +26,11 @@ var schema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
     ref: 'Question'
-  }
+  },
+  comments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Comment'
+  }]
 });
 
 //schema.plugin(version);

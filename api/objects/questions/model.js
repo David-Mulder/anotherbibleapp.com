@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
   uuid = require('uuid');
 var User = require('../users/model.js');
 var version = require('../../version.js');
+var Comment = require('../comments/model.js');
 
 var schema = new Schema({
   title: {
@@ -31,7 +32,11 @@ var schema = new Schema({
   revisionAuthor: {
     type: Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  comments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Comment'
+  }]
 });
 
 schema.methods.makePublic = function(userId){

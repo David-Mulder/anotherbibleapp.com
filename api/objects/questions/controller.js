@@ -43,22 +43,43 @@ module.exports = {
     Question
       .findOne({_id: req.params.id})
       .populate('originalAuthor', 'displayName _id')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'user',
+          select: 'displayName _id'
+        }
+      })
       .exec(function(err, question){
         if(err){
           res.status(500).json(err);
         }else{
-          Answer.find({
-            question: req.params.id
-          }).populate('originalAuthor', 'displayName _id').exec(function(err, answers){
-            if(err){
-              res.status(500).json(err);
-            }else{
-              res.json({
-                question: question.makePublic(userId),
-                answers: answers.map(a => a.makePublic(userId))
-              });
-            }
-          });
+          Answer
+            .find({
+              question: req.params.id
+            })
+            .populate('originalAuthor', 'displayName _id')
+            .populate({
+              path: 'comments',
+              populate: {
+                path: 'user',
+                select: 'displayName _id'
+              }
+            })
+            .exec(function(err, answers){
+              if(err){
+                res.status(500).json(err);
+              }else{
+                var answers = answers.map(a => a.makePublic(userId));
+                  answers.sort(function(a, b){
+                  return b.score - a.score;
+                });
+                res.json({
+                  question: question.makePublic(userId),
+                  answers: answers
+                });
+              }
+            });
         }
     });
   },

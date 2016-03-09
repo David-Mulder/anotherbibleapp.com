@@ -4,6 +4,7 @@ var answerController = require('./objects/answers/controller');
 var votingController = require('./objects/votes/controller');
 var userController = require('./objects/users/controller');
 var searchController = require('./objects/search/controller');
+var commentController = require('./objects/comments/controller');
 
 module.exports = {
   register: function(app){
@@ -17,21 +18,23 @@ module.exports = {
 
     app.get('/qa/:id', questionController.getWithAnswers);
 
-    app.get('/question/:id', questionController.get);
-    app.put('/question', authenticator.isAuthenticated, questionController.create);
-    app.post('/question/:id', authenticator.isAuthenticated, questionController.update);
-    app.get('/questions/list/recent', questionController.listRecent);
-    app.get('/questions/list/:verse', questionController.listForVerse);
-
     app.put('/user', userController.register);
     app.get('/user/settings', authenticator.isAuthenticated, userController.getAllSettings);
     app.get('/user/settings/reset', authenticator.isAuthenticated, userController.resetSettings);
     app.get('/user/settings/:setting', authenticator.isAuthenticated, userController.getSetting);
     app.post('/user/settings/:setting', authenticator.isAuthenticated, userController.saveSetting);
 
+    app.get('/question/:id', questionController.get);
+    app.put('/question', authenticator.isAuthenticated, questionController.create);
+    app.post('/question/:id', authenticator.isAuthenticated, questionController.update);
+    app.get('/questions/list/recent', questionController.listRecent);
+    app.get('/questions/list/:verse', questionController.listForVerse);
+
     app.get('/answer/:id', answerController.get);
     app.put('/answer', authenticator.isAuthenticated, answerController.create);
     app.post('/answer/:id', authenticator.isAuthenticated, answerController.update);
+
+    app.put('/comment/:type/:id', authenticator.isAuthenticated, commentController.create);
 
     app.post('/upvote/:type/:id', authenticator.isAuthenticated, votingController.upvote);
     app.post('/downvote/:type/:id', authenticator.isAuthenticated, votingController.downvote);
