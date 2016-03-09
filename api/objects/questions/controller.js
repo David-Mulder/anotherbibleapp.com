@@ -43,6 +43,7 @@ module.exports = {
     Question
       .findOne({_id: req.params.id})
       .populate('originalAuthor', 'displayName _id')
+      .populate('revisionAuthor', 'displayName _id')
       .populate({
         path: 'comments',
         populate: {
@@ -59,6 +60,7 @@ module.exports = {
               question: req.params.id
             })
             .populate('originalAuthor', 'displayName _id')
+            .populate('revisionAuthor', 'displayName _id')
             .populate({
               path: 'comments',
               populate: {

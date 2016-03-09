@@ -1,6 +1,5 @@
 var express = require('express');
 var routes = require('./routes.js');
-var rateLimit = require('express-rate-limit');
 var cors = require('cors');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
@@ -23,13 +22,6 @@ app.use(cors({
     callback(null, originIsWhitelisted);
   }
 }));
-
-// rate limiter:
-var limiter = rateLimit({
-  delayAfter: 10,
-  max: 15
-});
-app.use(limiter);
 
 // form data parser:
 app.use(bodyParser.json());

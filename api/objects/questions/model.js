@@ -56,7 +56,8 @@ var Question;
 schema.plugin(version, {
   get model(){
     return Question;
-  }
+  },
+  ignore: ['upvotes', 'downvotes']
 });
 
 Question = mongoose.model('questions', schema);

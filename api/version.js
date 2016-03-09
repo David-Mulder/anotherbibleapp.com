@@ -15,8 +15,11 @@ var Revision = mongoose.model('revisions', revisionSchema);
 
 module.exports = exports = function(schema, options) {
 
+  options.ignore = options.ignore || [];
+
   schema.add({ updatedAt: Date })
-  schema.add({ version: Number })
+  schema.add({ createdAt: {type: Date, default: Date.now} });
+  schema.add({ version: Number });
 
   schema.post('init', function() {
     this._original = this.toObject();
@@ -24,21 +27,40 @@ module.exports = exports = function(schema, options) {
 
   schema.pre('save', function (next) {
 
-    this.updatedAt = new Date();
+    var modified = false;
+    schema.eachPath(prop => {
+      if(this.isModified(prop)){
+        if(options.ignore.indexOf(prop) == -1){
+          console.log(options.ignore, options.ignore.indexOf(prop), prop);
+          modified = true;
+        }
+      }
+    });
+    console.log('MOD',modified);
 
     if(this._original){
-      if(typeof this._original.version == 'undefined'){
-        this._original.version = 1;
+
+      if(modified) {
+
+        this.updatedAt = new Date();
+
+        if (typeof this._original.version == 'undefined') {
+          this._original.version = 1;
+        }
+
+        var revision = new Revision({
+          data: this._original,
+          parent: this._id
+        });
+        revision.save();
+
+        this.version = this._original.version + 1;
       }
 
-      var revision = new Revision({
-        data: this._original,
-        parent: this._id
-      });
-      revision.save();
-
-      this.version = this._original.version + 1;
+    }else{
+      this.updatedAt = new Date();
     }
+
 
     next();
 

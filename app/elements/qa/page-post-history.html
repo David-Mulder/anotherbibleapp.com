@@ -1,14 +1,15 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../text/bible-snippet.html">
-<link rel="import" href="qa-post.html">
+<link rel="import" href="card-post-history.html">
 <link rel="import" href="bible-markdown-editor.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
 
 <dom-module id="page-post-history">
   <template>
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
-      qa-post{
+      card-post-history{
         max-width: 800px;
         margin: auto;
       }
@@ -48,52 +49,33 @@
       #drawerContent{
         overflow: auto;
       }
-      qa-post{
-        margin-bottom: 30px;
+      card-post-history{
+        margin-bottom: 15px;
       }
     </style>
 
-    <auth-api id="api" action=":postType/:id" param-id="{{id}}" param-post-type="{{postType}}" response="{{question}}" param-history></auth-api>
+    <auth-api id="api" action=":postType/:id" param-id="{{id}}" param-post-type="{{postType}}" param-history></auth-api>
 
-    <paper-drawer-panel right-drawer>
-
-      <div main>
-
-        <paper-toolbar>
-          <intelligent-title title="Another Bible App" no-title-if-wide></intelligent-title>
-        </paper-toolbar>
-
-        <div class="page-content">
-
-          <qa-post type="{{postType}}" post="{{question}}" no-voting no-actions></qa-post>
-
-          <template is="dom-repeat" items="{{question.revisions}}">
-            <qa-post type="{{postType}}" post="{{item}}" no-voting no-actions></qa-post>
-          </template>
-
+      <paper-toolbar class="medium-tall">
+        <intelligent-title title="Post history"></intelligent-title>
+        <div class="bottom fit">
+          <paper-tabs selected="{{mode}}" attr-for-selected="data-mode">
+            <!--<paper-tab data-mode="inline">Inline changes</paper-tab>-->
+            <paper-tab data-mode="html">Side-by-side</paper-tab>
+            <paper-tab data-mode="markdown">Side-by-side markdown</paper-tab>
+          </paper-tabs>
         </div>
+      </paper-toolbar>
+
+      <div class="page-content">
+
+        <template is="dom-repeat" items="{{revisions}}" as="revision">
+          <card-post-history type="{{postType}}" new="{{revision.new}}" old="{{revision.old}}" mode="{{mode}}"></card-post-history>
+        </template>
 
       </div>
 
-      <div drawer>
 
-        <paper-toolbar>
-          <span>Related</span>
-        </paper-toolbar>
-
-        <div id="drawerContent">
-          <paper-card heading="Discussed texts">
-            <template is="dom-repeat" items="{{qas.question.verses}}">
-              <div class="card-actions">
-                <bible-snippet start="{{item}}" end="{{item}}"></bible-snippet>
-              </div>
-            </template>
-          </paper-card>
-        </div>
-
-      </div>
-
-    </paper-drawer-panel>
   </template>
 
   <script>
@@ -102,22 +84,72 @@
 
       Polymer({
         properties: {
-          postType: String
+          postType: String,
+          revisions: Array,
+          mode: {
+            type: String,
+            value: 'html'
+          }
         },
         observers: [
-          'retrieveFromApi(id)',
-          'setTitle(qas.question.title)',
-          'setAnyAnswers(qas.answers.splices)'
+          /*'retrieveFromApi(id)',*/
         ],
-        ready: function () {
+        listeners: {
+          'page-became-visible': 'retrieveFromApi'
         },
         retrieveFromApi: function(){
-          this.$.api.execute().then(function(){
+          this.revisions = [];
+          this.$.api.execute().then(function(post){
+            /*
             console.log('ha', arguments);
-          });
-        },
-        submitAnswer: function(){
-          this.$.newAnswerApi.execute();
+            this.push('revisions', {
+              old: post,
+              new: post
+            });
+            var prevPost = post;
+            post.revisions.forEach(function(post){
+              this.push('revisions', {
+                old: prevPost,
+                new: post
+              });
+              prevPost = post;
+            }.bind(this));
+            console.log('ho', this.revisions);
+            */
+            /*
+            var prevPost;
+            for(var i=post.revisions.length-1;i>=0;i--){
+              var thisPost = post.revisions[i];
+              if(i == post.revisions.length-1){
+                this.push('revisions', {
+                  new: thisPost
+                });
+              }else{
+                this.push('revisions', {
+                  old: prevPost,
+                  new: thisPost
+                });
+              }
+              prevPost = thisPost;
+            }
+            this.push('revisions', {
+              old: prevPost,
+              new: post
+            });
+            */
+            this.push('revisions', {
+              old: post.revisions[0],
+              new: post
+            });
+            for(var i=1;i<post.revisions.length;i++){
+              var prevPost = post.revisions[i];
+              var thisPost = post.revisions[i - 1];
+              this.push('revisions', {
+                old: prevPost,
+                new: thisPost
+              });
+            }
+          }.bind(this));
         },
         setTitle: function(title){
           app.setTitle(title);

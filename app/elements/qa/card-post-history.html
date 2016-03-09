@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../utils/relative-time.html">
+<link rel="import" href="./bible-markdown.html">
+
+<!-- todo: lazy load only if needed? -->
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+
+<dom-module id="card-post-history">
+  <template>
+
+    <style include="shared-styles"></style>
+
+    <style>
+      :host{
+        display: block;
+      }
+      paper-card{
+        min-height: 150px;
+        display: flex;
+      }
+      .side-by-side{
+        flex: 1;
+        display: flex;
+      }
+      .side-by-side > div{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .side-by-side > div:first-child{
+        border-right: 1px solid rgba(0,0,0,.05);
+      }
+      .html h2, .markdown h2{
+        padding: 0px 20px 10px 20px;
+        color: rgba(0,0,0,.15);
+        font-size: 18px;
+        border-bottom: 1px solid rgba(0,0,0,.05);
+        margin-bottom: 0px;
+      }
+      .html h3, .markdown h3{
+        padding: 10px 20px 0px 20px;
+        margin: 0px;
+      }
+      .html bible-markdown, .markdown pre{
+        margin: 0px 20px;
+        display: block;
+        flex: 1;
+      }
+      .markdown pre.title{
+        margin-bottom: 0px;
+        font-weight: bold;
+      }
+      .markdown pre{
+        margin-top: 16px;
+        margin-bottom: 16px;
+      }
+      .html .time, .markdown .time{
+        padding: 0px 20px 15px 20px;
+        color: var(--secondary-text-on-card-dialog-color);
+        font-size: smaller;
+        text-align: right;
+      }
+    </style>
+
+    <paper-card>
+
+      <template is="dom-if" if="{{_equals(mode, 'html')}}">
+        <div class="html side-by-side">
+          <div hidden$="{{newVersionOnly}}">
+            <h2>Old:</h2>
+            <h3 hidden$="{{!_equals(type, 'question')}}">{{old.title}}</h3>
+            <bible-markdown markdown="{{old.text}}"></bible-markdown>
+            <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+          </div>
+          <div>
+            <h2>New:</h2>
+            <h3 hidden$="{{!_equals(type, 'question')}}">{{new.title}}</h3>
+            <bible-markdown markdown="{{new.text}}"></bible-markdown>
+            <template is="dom-if" if="{{newVersionOnly}}">
+              <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
+            </template>
+            <template is="dom-if" if="{{!newVersionOnly}}">
+              <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
+            </template>
+          </div>
+        </div>
+      </template>
+      <template is="dom-if" if="{{_equals(mode, 'markdown')}}">
+        <div class="markdown side-by-side">
+          <div hidden$="{{newVersionOnly}}">
+            <h2>Old:</h2>
+            <pre class="title" hidden$="{{!_equals(type, 'question')}}"># {{old.title}}</pre>
+            <pre class="text">{{old.text}}</pre>
+            <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+          </div>
+          <div>
+            <h2>New:</h2>
+            <pre class="title" hidden$="{{!_equals(type, 'question')}}"># {{new.title}}</pre>
+            <pre>{{new.text}}</pre>
+            <template is="dom-if" if="{{newVersionOnly}}">
+              <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
+            </template>
+            <template is="dom-if" if="{{!newVersionOnly}}">
+              <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
+            </template>
+          </div>
+        </div>
+      </template>
+
+    </paper-card>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          type: String,
+          old: Object,
+          new: {
+            type: Object
+          }
+        },
+        observers: [
+          '_newSet(new)'
+        ],
+        behaviors:[
+          abaBehaviors.logic
+        ],
+        _newSet: function(){
+          console.log('oooold', this.old);
+          if(!this.old){
+            this.newVersionOnly = true;
+          }else{
+            this.newVersionOnly = false;
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

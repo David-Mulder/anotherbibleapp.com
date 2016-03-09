@@ -48,7 +48,12 @@ module.exports = {
             if(err){
               reject(err);
             }else{
-              resolve(result.makePublic(req.user._id));
+              result.populate('originalAuthor', 'displayName _id')
+                .populate('revisionAuthor', 'displayName _id')
+                .execPopulate()
+                .then(function(post){
+                  resolve(result.makePublic(req.user._id));
+                });
             }
           });
         }

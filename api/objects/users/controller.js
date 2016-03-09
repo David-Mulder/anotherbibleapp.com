@@ -16,6 +16,9 @@ var fetch = require('node-fetch');
  */
 
 module.exports = {
+  get: function(req, res){
+    res.json(req.user);
+  },
   register: function(req, res) {
     /*a = new User({
       displayName: 'David Mulder',

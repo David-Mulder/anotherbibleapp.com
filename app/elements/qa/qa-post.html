@@ -81,6 +81,12 @@
       .actions .label{
         display: inline-block;
         padding-left: 4px;
+        position: relative;
+        top: 1px;
+      }
+      .actions .label.edited{
+        text-transform: none;
+        font-style: italic;
       }
       .comment{
         padding: 16px 16px 16px 34px !important;
@@ -132,10 +138,20 @@
               <div class="html"></div>
             </marked-element>
             -->
+
+
             <div class="author">
               By {{post.originalAuthor.displayName}}
-              <relative-time time="{{post.updatedAt}}"></relative-time>
+              <relative-time time="{{post.createdAt}}"></relative-time>
             </div>
+            <!--
+            <template is="dom-if" if="{{post.revisionAuthor}}">
+              <div class="author">
+                (edited by {{post.revisionAuthor.displayName}})
+                <relative-time time="{{post.updatedAt}}"></relative-time>
+              </div>
+            </template>
+            -->
           </div>
         </div>
       </div>
@@ -148,7 +164,11 @@
           <span class="label">Share</span>
         </paper-button>
         <paper-icon-button icon="create" on-tap="goToEdit"></paper-icon-button>
-        <paper-icon-button icon="history" on-tap="goToHistory"></paper-icon-button>
+        <paper-button on-tap="goToHistory">
+          <iron-icon icon="history"></iron-icon>
+          <span class="label edited" hidden="{{!showRevision}}">edited by {{post.revisionAuthor.displayName}}</span>
+        </paper-button>
+        <!--<paper-icon-button icon="history" on-tap="goToHistory"></paper-icon-button>-->
         <!--{{post.version}}-->
         <div class="flex"></div>
         <paper-button on-tap="toggleComments">
@@ -201,6 +221,11 @@
         ],
         postChanged: function(){
           this.commentsVisible = false;
+          if(this.post.revisionAuthor && this.post.revisionAuthor._id !== this.post.originalAuthor._id){
+            this.showRevision = true;
+          }else{
+            this.showRevision = false;
+          }
         },
         upvote: function(){
           this.$.upvoteApi.execute().then(function(post){

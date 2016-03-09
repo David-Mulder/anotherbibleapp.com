@@ -28,6 +28,7 @@
  - DONE add quick navigation functionality
  - forgot my password
  - DONE add comments
+ - set title on relative-time with timestamp
  - DONE reload dashboard
  - empty local and memory settings after login, but not after register
  - DONE fix links to be secondary color everywhere
@@ -48,6 +49,9 @@
  - DONE double verse results with overlapping ranges
  - combine sequential related bible verses
  - discussed text not linkable
+ - show revision authors correctly (in history as well)
+ - voting causes versioning
+ - make title big in new questoin
  - filter topical cards with in operator
  - DONE set custom char range for literal search with new operator
  - DONE write documentation for search
@@ -62,5 +66,8 @@
  - DONE share posts
  - refactor app.toast/ask/etc to a... element or behavior
  - DONE make question links look better
- - notifications (push)
+ - notifications (push) (https://developers.google.com/web/updates/2015/03/push-notifications-on-the-open-web?hl=en)
  - privacy & terms of use
+ - make markdown view in history
+ - DONE clean down and upvotes from revisions
+ - redesign history page and add updatedAt
