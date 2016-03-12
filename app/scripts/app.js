@@ -52,8 +52,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   var lazyFireEvents = function(element){
     if(lazyEventQueue.has(element)){
       var events = lazyEventQueue.get(element);
-      console.log(events , 'for', element);
-      events.forEach(event => console.log(element,event[0], event[1]));
+      console.info(events , 'for', element);
+      events.forEach(event => console.debug(element,event[0], event[1]));
+      console.debug(events.length,'length');
+      //element.fire('page-became-visible', {});
       events.forEach(event => element.fire(event[0], event[1]));
       lazyEventQueue.delete(element);
     }else{
@@ -107,6 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var pages = document.querySelector('iron-pages');
       var page = document.querySelector('iron-pages').selectedItem
       if(oldSelectedPage !== page){
+        console.log('yeah');
         lazyEvent(page, 'page-became-visible', {});
         console.log('page became visible event sent', page);
         oldSelectedPage = page;

@@ -45,6 +45,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.route = 'register';
     });
 
+    page('/settings', function (data) {
+      app.loadDependency('settings/page-settings');
+      app.route = 'settings';
+    });
+
     page('/logout', function (data) {
       delete localStorage.token;
       location.href = '/';

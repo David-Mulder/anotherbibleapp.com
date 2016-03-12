@@ -60,8 +60,8 @@
         --paper-toggle-button-label-color: var(--text-on-primary-color);
         --paper-toggle-button-unchecked-button-color: var(--primary-color-100);
       }
-      #search{
-        margin-right: 10px;
+      #study-tools{
+        margin-left: 10px;
       }
     </style>
 
@@ -76,7 +76,8 @@
         <paper-toolbar>
           <intelligent-title title=""></intelligent-title>
           <paper-icon-button icon="search" id="search" on-tap="goToSearch" hidden="{{!studyTools}}"></paper-icon-button>
-          <paper-toggle-button checked="{{studyTools}}">Study tools</paper-toggle-button>
+          <paper-icon-button icon="settings" on-tap="goToSettings"></paper-icon-button>
+          <paper-toggle-button checked="{{studyTools}}" id="study-tools">Study tools</paper-toggle-button>
         </paper-toolbar>
 
         <div id="textContainer">
@@ -138,8 +139,8 @@
         },
 
         pageBecameVisible: function(){
-
-
+          this.$.text.fire('element-became-visible');
+          this.setMode();
         },
 
         refChanged: function(){
@@ -148,7 +149,8 @@
 
           if(isNaN(this.fullRef.chapter)){
 
-            this.$.settings.getSetting('book-reading-position-'+this.fullRef.book.name).then(function(setting){
+            this.$.settings.getSetting('book-reading-position-'+this.fullRef.book.name.replace(' ', '-')).then(function(setting){
+              console.log('loaded last reading position', setting);
               var lastRead = this.$.bookUtils.parseReference(setting.position);
               if(!(lastRead.verseStart == 1 && lastRead.chapter == 1)){
 
@@ -172,7 +174,7 @@
             }
           }
           app.setTitle(this.fullRef.book.title);
-          this.setMode();
+
         },
 
         verseSelected: function(){
@@ -198,6 +200,8 @@
         },
 
         setMode: function(){
+          console.trace('force narrow');
+
           if(this.studyTools){
             this.mode = 'study';
             app.forceNarrow = false;
@@ -211,12 +215,19 @@
           page('/search/in:'+this.fullRef.book.name.replace(/ /g, '')+' ');
         },
 
+        goToSettings: function(){
+          page('/settings');
+        },
+
         savePosition: function(ev){
           if(!this.disableLocationSaving){
-            this.$.settings.saveSetting('book-reading-position-'+this.fullRef.book.name, {
-              position: ev.detail.verse,
-              date: new Date()
-            });
+            var ref = new BibleReference(ev.detail.verse);
+            if(!(ref.verseStart == 1 && ref.chapter == 1)){
+              this.$.settings.saveSetting('book-reading-position-'+this.fullRef.book.name.replace(' ', '-'), {
+                position: ev.detail.verse,
+                date: new Date()
+              });
+            }
           }
         }
 

@@ -61,7 +61,10 @@
     </style>
     <style>
       :host([mode='read']){
-        background: white;
+        background: var(--reading-background-color);
+        color: var(--reading-text-color);
+        font-size: var(--font-size);
+        line-height: var(--line-height);
       }
       :host([mode='read']) #text{
         padding: 10px;
@@ -163,6 +166,7 @@
     </style>
 
     <utils-books id="utils"></utils-books>
+    <synced-settings id="settings"></synced-settings>
 
     <paper-dialog id="note" entry-animation="scale-up-animation" with-backdrop>
       <div class="content" on-tap="_handleTapOnNote"></div>
@@ -217,11 +221,68 @@
           'resetSizes(mode)'
         ],
 
+        listeners: {
+          'element-became-visible': '_setSettingStyles'
+        },
+
         ready: function() {
           //this.scopeSubtree(this.$.text, true);
           this.selectedVerses = [];
           this.blocks = [];
           this.this = this;
+        },
+
+        _setSettingStyles: function(){
+
+          var readingColor = new Promise(function(resolve){
+            this.$.settings.getSetting('readingColor', 'white').then(function(value){
+              var colorSchemes = {
+                white: {
+                  background: 'white',
+                  color: 'black'
+                },
+                sepia: {
+                  background: '#FBF0D9',
+                  color: 'black'
+                },
+                black: {
+                  background: 'black',
+                  color: 'white'
+                }
+              };
+              this.customStyle['--reading-background-color'] = colorSchemes[value].background;
+              this.customStyle['--reading-text-color'] = colorSchemes[value].color;
+              resolve();
+            }.bind(this));
+          }.bind(this));
+
+          var fontSize = new Promise(function(resolve){
+            this.$.settings.getSetting('fontSize', 'normal').then(function(value){
+              var fontSizes = {
+                small: '14px',
+                normal: '16px',
+                large: '24px',
+                huge: '34px'
+              };
+              this.customStyle['--font-size'] = fontSizes[value];
+              resolve();
+            }.bind(this));
+          }.bind(this));
+
+          var lineHeight = new Promise(function(resolve){
+            this.$.settings.getSetting('lineHeight', '1.5').then(function(value){
+              this.customStyle['--line-height'] = parseFloat(value)+'em';
+              resolve();
+            }.bind(this));
+          }.bind(this));
+
+          Promise.all([readingColor, fontSize, lineHeight]).then(function(){
+            this.updateStyles();
+            this.$.text.fire('iron-resize');
+          }.bind(this));
+
+
+
         },
 
         loadBook: function(){

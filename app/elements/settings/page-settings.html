@@ -1,0 +1,109 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
+
+<dom-module id="page-settings">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <synced-settings id="settings"></synced-settings>
+    <style>
+      .item{
+        display: flex;
+        margin: 20px 0px;
+      }
+      .item > *{
+        flex: 1;
+      }
+      .item label{
+        padding-left: 20px;
+        width: 200px;
+        flex:unset;
+        padding-top: 13px;
+        font-size: smaller;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+      #card paper-radio-button{
+        display: block;
+        padding: 5px;
+      }
+    </style>
+
+    <paper-toolbar>
+      <intelligent-title title="Settings"></intelligent-title>
+    </paper-toolbar>
+
+    <div class="page-content">
+      <paper-card heading="Reading" id="card">
+        <div class="card-content">
+
+          <div class="item">
+            <label>Color scheme</label>
+            <paper-radio-group data-setting="readingColor" data-default="white" on-iron-select="saveSetting">
+              <paper-radio-button name="white">Black on White</paper-radio-button>
+              <paper-radio-button name="sepia">Black on Sepia</paper-radio-button>
+              <paper-radio-button name="black">White on Black</paper-radio-button>
+            </paper-radio-group>
+          </div>
+
+          <div class="item">
+            <label>Font Size</label>
+            <paper-radio-group data-setting="fontSize" data-default="normal" on-iron-select="saveSetting">
+              <paper-radio-button name="small">Small</paper-radio-button>
+              <paper-radio-button name="normal">Normal</paper-radio-button>
+              <paper-radio-button name="large">Large</paper-radio-button>
+              <paper-radio-button name="huge">Huge</paper-radio-button>
+            </paper-radio-group>
+          </div>
+
+          <div class="item">
+            <label>Line Height</label>
+            <paper-radio-group data-setting="lineHeight" data-default="1" on-iron-select="saveSetting">
+              <paper-radio-button name=".8">0.8</paper-radio-button>
+              <paper-radio-button name="1">1.0</paper-radio-button>
+              <paper-radio-button name="1.5">1.5</paper-radio-button>
+              <paper-radio-button name="2">2.0</paper-radio-button>
+            </paper-radio-group>
+          </div>
+
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          settings: Object
+        },
+        listeners: {
+          'page-became-visible': 'loadSettings'
+        },
+        loadSettings: function(){
+          var settingsToFill = this.shadowRoot.querySelectorAll('[data-setting]');
+          for(var i=0;i<settingsToFill.length;i++){
+            (function(item){
+              var settingName = item.dataset.setting;
+              this.$.settings.getSetting(settingName).then(function(value){
+                console.log(item, value);
+                item.selected = value;
+              }).catch(function(){
+                item.selected = item.dataset.default;
+                //no such setting
+              });
+            }.bind(this))(settingsToFill[i])
+          }
+        },
+        saveSetting: function(ev){
+          var item = ev.path[0];
+          var settingName = item.dataset.setting;
+          var value = ev.path[0].selected; //support more types
+          this.$.settings.saveSetting(settingName, value);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

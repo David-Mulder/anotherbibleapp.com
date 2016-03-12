@@ -101,14 +101,18 @@
           this.updatedAt = updatedAt || Date.now();
           this.$.set.execute().catch(function(){});
         },
-        getSetting: function(settingName) {
+        getSetting: function(settingName, defaultValue) {
 
           return new Promise(function (resolve, reject) {
             settings.then(function(settings){
               if(typeof settings[settingName] !== 'undefined'){
                 resolve(settings[settingName].value);
               }else{
-                reject('No such setting ' + settingName);
+                if(typeof defaultValue == 'undefined'){
+                  reject('No such setting ' + settingName);
+                }else{
+                  resolve(defaultValue);
+                }
               }
             });
           });
@@ -123,11 +127,17 @@
           });
         },
         saveSetting: function(settingName, value){
-          this._saveMemory(settingName, value);
-          this._saveLocal(settingName, value);
-          if(this.$.set.loggedIn){
-            this._saveCloud(settingName, value);
-          }
+          settings.then(function(settings) {
+            console.log('saving', settingName, 'to value', value);
+            if (typeof settings[settingName] == 'undefined' || settings[settingName].value !== value) {
+              console.log('actually saving old value:', settings[settingName]);
+              this._saveMemory(settingName, value);
+              this._saveLocal(settingName, value);
+              if (this.$.set.loggedIn) {
+                this._saveCloud(settingName, value);
+              }
+            }
+          }.bind(this));
         },
         getAllSettings: function(){
           return settings;

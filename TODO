@@ -28,11 +28,17 @@
  - DONE add quick navigation functionality
  - forgot my password
  - DONE add comments
- - set title on relative-time with timestamp
+ - DONE set title on relative-time with timestamp
+ - 404
+ - char limit for title and text
+ - DONE fix esttings with a space in them
+ - DONE default in getsetting
+ - DONE trigger resize after setting styles (or postpone loading text till after settings?)
+ - pass text blocks as objects istead of string
  - DONE reload dashboard
  - empty local and memory settings after login, but not after register
  - DONE fix links to be secondary color everywhere
- - add sepia and white on black reading modus
+ - DONE add sepia and white on black reading modus
  - DONE highlighting not implemented or working in topical cards
  - DONE search page before actually searching looks incorrect
  - DONE sync reading positions in db
@@ -44,7 +50,9 @@
  - DONE relative date in qa-post
  - DONE Dashboard list of recent questions
  - verse highlighting
+ - add setting to auto focus quick navigation
  - chat or other discussion forum
+ - DONE open settings and go back causes narrow to be set incorrectly (missing title on wide)
  - DONE open book list on dashboard (??? maybe bible books started reading) (just like google now with different cards)
  - DONE double verse results with overlapping ranges
  - combine sequential related bible verses
