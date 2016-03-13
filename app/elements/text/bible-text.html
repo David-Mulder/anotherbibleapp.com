@@ -42,6 +42,16 @@
       ul li{
         font-style: italic;
       }
+      vn.highlighted, vn.highlighted li{
+        border-bottom: 1px solid var(--accent-color);
+      }
+      @supports (text-decoration-color: black) {
+        vn.highlighted, vn.highlighted li{
+          text-decoration: underline;
+          text-decoration-color: var(--accent-color);
+          border-bottom: 0px;
+        }
+      }
       vn.selected, vn.selected li{
         background: var(--accent-color-100);
         color: var(--text-on-accent-color-100);
@@ -172,9 +182,9 @@
       <div class="content" on-tap="_handleTapOnNote"></div>
     </paper-dialog>
 
-    <iron-list id="text" items="{{blocks}}" as="block" on-tap="_handleTapOnText" on-scroll="savePosition">
+    <iron-list id="text" items="{{blocks}}" as="block" on-tap="_handleTapOnText" on-scroll="_handleScroll">
       <template>
-        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" chapter-number="{{block.chapterNumber}}" class$="{{block.class}}" parent="{{this}}"></block-html>
+        <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" highlighted-verses="{{highlightedVerses}}" chapter-number="{{block.chapterNumber}}" class$="{{block.class}}" parent="{{this}}"></block-html>
       </template>
     </iron-list>
   </template>
@@ -211,7 +221,7 @@
             type: String,
             value: 'single'
           },
-          highlightVerse: {
+          autoSelectReference: {
             type: Boolean,
             value: true
           }
@@ -281,14 +291,16 @@
             this.$.text.fire('iron-resize');
           }.bind(this));
 
+        },
 
-
+        setHighlights: function(highlightedVerses){
+          this.highlightedVerses = highlightedVerses;
         },
 
         loadBook: function(){
           console.info('loading book', this.textRef);
 
-          this.highlightVerse = true;
+          this.autoSelectReference = true;
 
           var onceLoaded = function(){
             this.async(function(){
@@ -299,6 +311,12 @@
           if(this._loadedBook && this._loadedBook == this.textRef.book.name){
             onceLoaded();
           } else {
+
+            if(this._loadedBook){
+              this.$.settings.removeListener('highlights-for-'+this._loadedBook.replace(/ /g, '-'), this.setHighlights.bind(this));
+            }
+            this.$.settings.addListener('highlights-for-'+this.textRef.book.name.replace(/ /g, '-'), this.setHighlights.bind(this), true);
+
             var url = this.resolveUrl('text/' + this.textRef.book.name + '.xml');
 
             var httpRequest = new XMLHttpRequest();
@@ -393,7 +411,7 @@
             }
           }
 
-          if(this.highlightVerse){
+          if(this.autoSelectReference){
             if(this.textRef.verseStart){
               //todo: highlight range?
               this.set('selectedVerses', [this.textRef.start.toString()])
@@ -446,8 +464,8 @@
           }
         },
 
-        savePosition: function(){
-          this.debounce('saveScrollPosition', function(){
+        _handleScroll: function(){
+          this.debounce('scroll', function(){
             var firstIndex = this.$.text.firstVisibleIndex;
             if(this.blocks[firstIndex].verseStart === null){
               firstIndex++;

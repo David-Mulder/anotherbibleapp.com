@@ -18,6 +18,10 @@
         };
       });
 
+      var syncStarted = false;
+
+      var listeners = {};
+
       Polymer({
 
         properties: {
@@ -28,7 +32,10 @@
             localStorage.settings = '{}';
           }
 
-          this.sync();
+          if(!syncStarted){
+            syncStarted = true;
+            this.sync();
+          }
         },
         _dateify: function(obj, prop){
           Object.keys(obj).forEach(function(key){
@@ -85,6 +92,20 @@
             settingResolution(this._getAllLocalSettings());
           }
         },
+        addListener: function(settingName, callback, fireStraightAway){
+          if(typeof listeners[settingName] == 'undefined'){
+            listeners[settingName] = [];
+          }
+          listeners[settingName].push(callback);
+          settings.then(function(settings){
+            if(typeof settings[settingName] !== 'undefined'){
+              callback(settings[settingName].value);
+            }
+          })
+        },
+        removeListener: function(settingName, callback){
+          listeners[settingName].splice(listeners[settingName].indexOf(callback), 1);
+        },
         _saveLocal: function(settingName, value, updatedAt){
           console.info('updating local', settingName);
           var settings = JSON.parse(localStorage.settings);
@@ -106,12 +127,12 @@
           return new Promise(function (resolve, reject) {
             settings.then(function(settings){
               if(typeof settings[settingName] !== 'undefined'){
-                resolve(settings[settingName].value);
+                resolve(JSON.parse(JSON.stringify(settings[settingName].value)));
               }else{
                 if(typeof defaultValue == 'undefined'){
                   reject('No such setting ' + settingName);
                 }else{
-                  resolve(defaultValue);
+                  resolve(JSON.parse(JSON.stringify(defaultValue)));
                 }
               }
             });
@@ -129,8 +150,13 @@
         saveSetting: function(settingName, value){
           settings.then(function(settings) {
             console.log('saving', settingName, 'to value', value);
+            if(typeof listeners[settingName] != 'undefined'){
+              listeners[settingName].forEach(function(listener){
+                listener(value);
+              });
+            }
             if (typeof settings[settingName] == 'undefined' || settings[settingName].value !== value) {
-              console.log('actually saving old value:', settings[settingName]);
+              console.log('actually saving; old value was:', settings[settingName]);
               this._saveMemory(settingName, value);
               this._saveLocal(settingName, value);
               if (this.$.set.loggedIn) {

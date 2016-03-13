@@ -1,0 +1,134 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="./bible-snippet.html">
+<link rel="import" href="../settings/synced-settings.html">
+
+<dom-module id="card-verse-actions">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-card{
+        display: block;
+      }
+      paper-toolbar{
+        background: transparent;
+        color: black;
+        display: flex;
+        --paper-toolbar-content: {
+          width: 100%;
+        };
+      }
+      paper-toolbar > *{
+        flex: 1;
+        width: auto;
+        min-width: 0px;
+        margin: 0px;
+      }
+    </style>
+
+    <synced-settings id="settings"></synced-settings>
+
+    <paper-card hidden$="{{!verse}}">
+      <paper-toolbar>
+        <paper-button on-tap="highlight">
+          <iron-icon icon="star" hidden="{{!isHighlighted}}"></iron-icon>
+          <iron-icon icon="star-border" hidden="{{isHighlighted}}"></iron-icon>
+        </paper-button>
+        <paper-button on-tap="copyVerse"><iron-icon icon="content-copy"></iron-icon></paper-button>
+        <paper-button on-tap="copyLink"><iron-icon icon="link"></iron-icon></paper-button>
+      </paper-toolbar>
+    </paper-card>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          verse: {
+            type: Object
+          }
+        },
+        observers: [
+          'verseChanged(verse)'
+        ],
+        behaviors: [
+          abaBehaviors.text
+        ],
+        ready: function(){
+        },
+        verseChanged: function(){
+          if(this.verse){
+            this._highlightSettingName = 'highlights-for-'+this.verse.book.name.replace(/ /g, '-');
+            this.$.settings.getSetting(this._highlightSettingName, []).then(function(value){
+              this.isHighlighted = value.indexOf(this.verse.toString()) > -1;
+            }.bind(this));
+          }
+        },
+        highlight: function(){
+          this.$.settings.getSetting(this._highlightSettingName, []).then(function(value){
+            var highlighted = value.indexOf(this.verse.toString());
+            if(highlighted > -1){
+              value.splice(highlighted, 1);
+            }else{
+              value.push(this.verse.toString());
+            }
+            this.$.settings.saveSetting(this._highlightSettingName, value);
+            this.isHighlighted = !this.isHighlighted;
+          }.bind(this));
+          //var settingName = 'highlights-for-'+this.verse.book.name.rename(/ /g, '-');
+          //this.$.settings.getSetting(settingName);
+          //console.log(this.verse);
+        },
+        copyLink: function(){
+          if(this._copy(this.verse.toLongString()+' <'+location.href+'>')){
+            app.toast('The page URL has been copied to your clipboard.')
+          }else{
+            app.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
+          }
+        },
+        copyVerse: function(){
+          var bibleSnippet = document.createElement('bible-snippet');
+          bibleSnippet.addEventListener('text-changed', function(){
+            var selection = bibleSnippet.text+' (LEB)'; // <'+location.href+'>
+            if(this._copy(selection)){
+              app.toast('The verse has been copied to your clipboard.')
+            }else{
+              var overlay = document.createElement('div');
+              overlay.style.backgroundColor = 'rgba(255,255,255,.9)';
+              overlay.style.position = 'absolute';
+              overlay.style.left = '0px';
+              overlay.style.right = '0px';
+              overlay.style.bottom = '0px';
+              overlay.style.top = '0px';
+              overlay.style.display = 'flex';
+              overlay.style.alignItems = 'center';
+              overlay.style.justifyContent = 'center';
+              var text = document.createElement('span');
+              text.textContent = 'Please tap anywhere to copy the verse to your clipboard. Sorry for the inconvenience.';
+              text.style.color = 'rgba(0,0,0,.7)';
+              overlay.appendChild(text);
+              document.body.appendChild(overlay);
+              overlay.addEventListener('click', function(){
+                document.body.removeChild(overlay);
+                if(this._copy(selection)){
+                  app.toast('The verse has been copied to your clipboard.')
+                }else{
+                  app.msg('Please share the verse manually: ' + selection, 'Automatic copying unsuccessful')
+                }
+              }.bind(this));
+              //app.msg('Please share the verse manually: ' + bibleSnippet.text, 'Automatic copying unsuccessful')
+            }
+          }.bind(this));
+          bibleSnippet.start = this.verse;
+          bibleSnippet.end = this.verse;
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

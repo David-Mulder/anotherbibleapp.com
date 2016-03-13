@@ -69,7 +69,16 @@
       .stepper .step .content{
         flex: 1;
         margin: 10px;
+        padding-top: 2px;
+        padding-bottom: 10px;
       }
+
+      #title{
+        --paper-input-container-input: {
+          font-size: 22px;
+        };
+      }
+
       paper-input.no-upper-padding{
         --paper-input-container: {
           padding-top: 0px;
@@ -94,7 +103,7 @@
               <div class="step">
                 <div data-step="1"></div>
                 <div class="content">
-                  <paper-input label="Your question in one sentence (title)" class="no-upper-padding" value="{{title}}"></paper-input>
+                  <paper-input id="title" label="Your question in one sentence (title)" class="no-upper-padding" value="{{title}}"></paper-input>
                   regarding
                   <template is="dom-repeat" items="{{verses}}">
                     {{item}}

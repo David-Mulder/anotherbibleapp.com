@@ -86,7 +86,12 @@
           'verseChanged(verse)'
         ],
         newQuestion: function(){
-          this.fire('new-question');
+          this.fire('multi-verse-selection', {
+            label: 'Please tap on all the verses that are relevant to your question.',
+            finishedSelection: function(verses){
+              page('/questions/ask/' + verses);
+            }
+          });
         },
         //newQuestionSelectionFinished: function(){
         //  page('/questions/ask/'+this.verses.toString());

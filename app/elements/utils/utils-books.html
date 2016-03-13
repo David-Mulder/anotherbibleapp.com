@@ -76,6 +76,7 @@
         },
 
         parseReference: function(vs){
+          if(vs instanceof BibleReference) return vs;
           return new BibleReference(vs);
         }
 

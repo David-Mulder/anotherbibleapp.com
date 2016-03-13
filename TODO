@@ -59,7 +59,7 @@
  - discussed text not linkable
  - DONE show revision authors correctly (in history as well)
  - DONE voting causes versioning
- - make title big in new questoin
+ - DONE make title big in new questoin
  - filter topical cards with in operator
  - DONE set custom char range for literal search with new operator
  - DONE write documentation for search
@@ -79,5 +79,12 @@
  - DONE clean down and upvotes from revisions
  - DONE redesign history page and add updatedAt
  - DONE add verses to history
+ - remove JS logic out of JS-only-elements... including maybe even auth-api
  - add diff view in history
  - disable voting on your own posts
+ - bible-markdown-editor jumps when mobile keyboard changes layout from portrait to landscape
+ - make a paper-stepper
+ - switching books in reading modus loses forcenarrow
+ - blur in search (for mobile keyboards)
+ - rename cards to start with card
+ - make verse copying a multi selection thing?

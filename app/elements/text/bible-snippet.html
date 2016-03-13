@@ -45,12 +45,18 @@
           highlight: {
             type: String,
             value: ''
+          },
+          text: {
+            type: String,
+            value: '',
+            notify: true
           }
         },
         observers: [
           'getText(start, end)'
         ],
         getText: function(start, end) {
+          console.info('verse snippet for', start, end);
           //var text = this.getBoundingClientRect();
           //return false;
 
@@ -77,18 +83,12 @@
                 }else{
                   endIndex += 1;
                 }
-                //console.log(verse);
-                //return;
               }
-              //endIndex = text.indexOf('<vn', endIndex + 4);
             }
             if(endIndex === -1){
               endIndex = text.length;
             }
-            this.debug = {
-              startIndex: startIndex,
-              endIndex: endIndex
-            };
+
             var snippet = text.substring(startIndex, endIndex);
             snippet = snippet.replace(/<\/p>.*?<p>/g,'');
             snippet = snippet.replace(/<n.*?>.*?<\/n>/g, '');
@@ -96,24 +96,23 @@
             snippet = snippet.replace(/<caption>.*?<\/caption>/g,'');
             snippet = snippet.replace(/<.*?>/g,'');
 
-            var highlights = this.highlight.split(/\s/g).map(function(word){
-              return smartStemmer(word.toLowerCase().replace(/[^a-z0-9.]+/, ''));
-            });
-            snippet = snippet.split(/\s/g).map(function(word){
-              var stemmed = smartStemmer(word.toLowerCase().replace(/[^a-z0-9]+/, ''));
-              if(highlights.indexOf(stemmed) > -1){
-                return '<strong>'+word+'</strong>';
-              }else{
-                return word;
-              }
-            }).join(' ');
+            if(this.highlight.length){
+              var highlights = this.highlight.split(/\s/g).map(function(word){
+                return smartStemmer(word.toLowerCase().replace(/[^a-z0-9.]+/, ''));
+              });
+              snippet = snippet.split(/\s/g).map(function(word){
+                var stemmed = smartStemmer(word.toLowerCase().replace(/[^a-z0-9]+/, ''));
+                if(highlights.indexOf(stemmed) > -1){
+                  return '<strong>'+word+'</strong>';
+                }else{
+                  return word;
+                }
+              }).join(' ');
+            }
+
+            this.text = snippet;
 
             this.$.snippet.innerHTML = snippet;
-            //this.$.snippet.textContent = snippet;
-            //console.log(startIndex, endIndex, snippet);
-
-            //console.log('verse-number[id="'+start.book.name+' '+start.chapter+':'+start.verseStart+'"]');
-            //console.log(verseStart);
           }.bind(this));
         }
       });

@@ -154,6 +154,7 @@
 
                   }.bind(this)).catch(function(err){
 
+                    console.warn('The database service seems offline', url);
                     if(navigator.onLine){
                       var pt = document.createElement('paper-toast');
                       pt.opened = true;

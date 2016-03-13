@@ -163,9 +163,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     return app.route === 'home';
   };
 
-  app.toast = function(msg, duration){
+  app.toast = function(msg, duration, affector){
     var pt = document.createElement('paper-toast');
     pt.duration = duration || 10000;
+    if(affector){
+      (affector.bind(pt))();
+    }
     pt.opened = true;
     pt.text = msg;
     document.body.appendChild(pt);
@@ -181,13 +184,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     return pt;
   };
 
-  app.askToast = function(msg, options){
+  app.askToast = function(msg, options, affector){
     return new Promise((resolve, reject) => {
-      var pt = app.toast(msg, 25000);
+      var pt = app.toast(msg, 25000, affector);
 
       options.forEach((option, i) => {
         var pb = document.createElement('paper-button');
         pb.textContent = option;
+        pb.style.padding = '5px';
+        pb.style.margin = '-5px 0px';
         pb.addEventListener('tap', function () {
           pt.close();
           resolve(option, i);
