@@ -24,15 +24,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   };
   */
 
-  app.setTitle = function(title){
-    app.title = title;
-    if(title.length > 0){
-      document.title = title + ' - Another Bible App';
-    }else{
-      document.title = 'Another Bible App'
-    }
-  };
-
   var lazyEventQueue = new WeakMap();
 
   var lazyEvent = function(element, event, detail){
@@ -65,21 +56,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   app.loadedDependencies = [];
   app.loadDependency = function(el){
-    if(app.loadedDependencies.indexOf(el) === -1){
-      console.debug('loading', el);
-      app.loadedDependencies.push(el);
-      app.importHref('/elements/' + el + '.html', function(){
+    return new Promise(function(resolve, reject){
+      if(app.loadedDependencies.indexOf(el) === -1){
+        console.debug('loading', el);
+        app.loadedDependencies.push(el);
+        app.importHref('/elements/' + el + '.html', function(){
 
-        document.getElementById('loading').style.opacity = 0;
-        window.dispatchEvent(new Event('resize'));
+          document.getElementById('loading').style.opacity = 0;
+          window.dispatchEvent(new Event('resize'));
 
-        var element = document.querySelector(el.split('/').pop());
-        lazyFireEvents(element);
+          var element = document.querySelector(el.split('/').pop());
+          lazyFireEvents(element);
 
-      }, function(){
-        alert('Failed loading the requested page.');
-      });
-    }
+          resolve();
+
+        }, function(){
+          alert('Failed loading the requested page.');
+        });
+      }else{
+        resolve();
+      }
+    });
   };
 
   // Listen for template bound event to know when bindings

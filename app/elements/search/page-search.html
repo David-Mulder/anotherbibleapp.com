@@ -7,9 +7,7 @@
     <style include="shared-styles"></style>
     <style>
       :host{
-
         background: var(--primary-color-50);
-
         position: absolute;
         top: 0px;
         left: 0px;
@@ -60,10 +58,10 @@
     </style>
 
     <paper-toolbar class="medium-tall">
-      <intelligent-title no-title-if-wide></intelligent-title>
+      <intelligent-title title="{{searchQuery}}" no-title-if-wide></intelligent-title>
       <div class="search-box bottom">
         <iron-icon icon="search"></iron-icon>
-        <input is="iron-input" value="{{searchQuery}}" on-keyup="_setValueIfEnter" x-webkit-speech autofocus></input>
+        <input is="iron-input" value="[[searchQuery]]" on-keyup="_setValueIfEnter" x-webkit-speech autofocus></input>
         <iron-icon icon="av:mic"></iron-icon>
       </div>
     </paper-toolbar>

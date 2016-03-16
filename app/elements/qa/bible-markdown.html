@@ -1,4 +1,6 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 <script src="/bower_components/markdown-js/lib/markdown.js"></script>
 
 <dom-module id="bible-markdown">
@@ -14,6 +16,8 @@
   <script>
     (function() {
       'use strict';
+
+      var BibleReference = require('bible-reference-parser');
 
       Polymer({
         properties: {

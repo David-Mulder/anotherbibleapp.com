@@ -1,0 +1,57 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+
+<dom-module id="card-new-answer">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-card{
+        display: block;
+      }
+    </style>
+    <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{questionId}}" param-text="{{answerText}}"></auth-api>
+
+    <paper-card heading="Know the answer?" hidden$="{{answerPosted}}">
+      <div class="card-content">
+        <bible-markdown-editor value="{{answerText}}"></bible-markdown-editor>
+      </div>
+      <div class="card-actions">
+        <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>
+      </div>
+    </paper-card>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          questionId: Number,
+          answerPosted: Boolean
+        },
+        ready: function(){
+          this.answerPosted = false;
+        },
+        submitAnswer: function(){
+          var valid = true;
+          if(!this.answerText || this.answerText.length < 15){
+            valid = false;
+            app.toast('Please add more detail to your answer.');
+          }
+          if(valid){
+            this.$.newAnswerApi.execute().then(function(){
+              this.answerPosted = true;
+              this.fire('new-answer-posted');
+            }.bind(this));
+          }
+        },
+      });
+    })();
+  </script>
+
+</dom-module>

@@ -1,0 +1,9 @@
+<script>
+  var define = function(val){
+    document._currentScript.ownerDocument.exports = typeof val == 'function' ? val() : val;
+  };
+
+  var require = function(id){
+    return document._currentScript.ownerDocument.getElementById(id).import.exports;
+  };
+</script>

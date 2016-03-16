@@ -2,6 +2,9 @@
 <link rel="import" href="../text/bible-snippet.html">
 <link rel="import" href="qa-post.html">
 <link rel="import" href="bible-markdown-editor.html">
+<link rel="import" href="card-new-answer.html">
+
+<link id="bibleReference" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="page-question">
   <template>
@@ -43,7 +46,8 @@
         color: var(--secondary-text-on-primary-color-50);
       }
       #newAnswer{
-        margin-top: 20px;
+        max-width: 800px;
+        margin: 20px auto;
       }
       #drawerContent{
         overflow: auto;
@@ -51,12 +55,25 @@
       qa-post[type='answer']{
         margin-bottom: 20px;
       }
+      #logInToAnswer{
+        max-width: 800px;
+        margin: auto;
+        text-align: center;
+        margin-top: 40px;
+        color: var(--secondary-text-on-primary-color-50);
+      }
+      .bible-verse:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
     </style>
-    <auth-api id="api" action="qa/:id" param-id="{{id}}" response="{{qas}}"></auth-api>
+
+    <auth-api id="api" action="qa/:id" param-id="{{id}}" response="{{qas}}" logged-in="{{loggedIn}}"></auth-api>
+
     <paper-drawer-panel right-drawer>
       <div main>
         <paper-toolbar>
-          <intelligent-title title="Another Bible App" no-title-if-wide></intelligent-title>
+          <intelligent-title title="{{qas.question.title}}" no-title></intelligent-title>
         </paper-toolbar>
         <div class="page-content">
 
@@ -73,16 +90,12 @@
             <hr class="divider">
           </div>
 
-          <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{id}}" param-text="{{answerText}}"></auth-api>
 
-          <paper-card heading="Your Answer" id="newAnswer">
-            <div class="card-content">
-              <bible-markdown-editor value="{{answerText}}"></bible-markdown-editor>
-            </div>
-            <div class="card-actions">
-              <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>
-            </div>
-          </paper-card>
+          <div id="logInToAnswer" hidden$="{{loggedIn}}">
+            Want to answer this question? <a href="/login">Log in</a> if you have an account or <a href="/register">register now</a>.
+          </div>
+
+          <card-new-answer question-id="{{id}}" id="newAnswer" hidden$="{{!loggedIn}}"></card-new-answer>
 
         </div>
       </div>
@@ -92,9 +105,9 @@
         </paper-toolbar>
         <div id="drawerContent">
           <paper-card heading="Discussed texts">
-            <template is="dom-repeat" items="{{qas.question.verses}}">
-              <div class="card-actions">
-                <bible-snippet start="{{item}}" end="{{item}}"></bible-snippet>
+            <template is="dom-repeat" items="{{relatedVerses}}">
+              <div class="card-actions bible-verse" on-tap="_goToVerse">
+                <bible-snippet start="{{item.start}}" end="{{item.end}}"></bible-snippet>
               </div>
             </template>
           </paper-card>
@@ -107,6 +120,8 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bibleReference');
+
       Polymer({
         is: 'page-question',
 
@@ -114,28 +129,35 @@
 
         },
         listeners: {
-          'page-became-visible': 'retrieveFromApi'
+          'page-became-visible': 'retrieveFromApi',
+          'new-answer-posted': 'retrieveFromApi'
         },
         observers: [
-          'setTitle(qas.question.title)',
-          'setAnyAnswers(qas.answers.splices)'
+          '_setTitle(qas.question.title)',
+          '_setCombinedVerses(qas.question.verses)',
+          '_setAnyAnswers(qas.answers.splices)'
         ],
         ready: function(){
         },
         retrieveFromApi: function(){
           this.$.api.execute();
         },
-        submitAnswer: function(){
-          this.$.newAnswerApi.execute().then(() => {
-            this.retrieveFromApi();
-          });
-        },
-        setTitle: function(title){
+        _setTitle: function(title){
           page.replace('/question/'+this.id+'/'+title.toLowerCase().replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));
-          app.setTitle(title);
         },
-        setAnyAnswers: function(){
+        _setAnyAnswers: function(){
           this.set('anyAnswers', this.qas.answers.length > 0);
+        },
+        _setCombinedVerses: function(){
+          var verses = this.qas.question.verses;
+          verses = verses.map(function(verse){
+            return new BibleReference(verse);
+          });
+          verses = BibleReference.combine(verses);
+          this.relatedVerses = verses;
+        },
+        _goToVerse: function(ev){
+          page('/book/'+ev.model.item.start.toString());
         }
       });
     })();

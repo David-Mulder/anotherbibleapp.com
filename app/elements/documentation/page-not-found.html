@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-not-found">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      #n404{
+        font-size: 300px;
+        color: rgba(0,0,0,.2);
+        text-align: center;
+        text-shadow: 1px 4px 6px var(--primary-color), 0 0 0 #000, 1px 4px 6px var(--accent-color);
+        opacity: .3;
+      }
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Page not found"></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <div id="n404">
+        404
+      </div>
+      <paper-card heading="Our apologies,">
+        <div class="card-content">
+          But no matter how hard we looked, we were not able to find this page. Check the URL whether it looks right and
+          otherwise just try to find the page again by hand.
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

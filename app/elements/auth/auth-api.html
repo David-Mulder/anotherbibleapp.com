@@ -148,6 +148,7 @@
 
                     }else{
 
+                      console.warn('rejecting response', url);
                       reject(response);
 
                     }
@@ -181,8 +182,10 @@
 
         login: function(){
           return new Promise(function(resolve, reject){
-            this.set('action', 'authenticate/:username/:password');
+            this.set('method', 'post');
+            this.set('action', 'authenticate');
             this.set('unauthorized', true);
+
             this.execute().then(function(){
               if(this.status === 401){
                 reject(this.response);
@@ -192,7 +195,7 @@
                 resolve();
               }
             }.bind(this)).catch(function(err){
-              reject('Please enter both a username and password');
+              reject(err);
             }.bind(this));
           }.bind(this));
         },

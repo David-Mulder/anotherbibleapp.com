@@ -28,29 +28,38 @@
         margin-top: 40px;
       }
     </style>
+
     <paper-toolbar>
       <intelligent-title title="Register"></intelligent-title>
     </paper-toolbar>
+
     <div id="register" class="page-content">
+
       <auth-api id="api" method="put" action="user" param-display-name="{{displayName}}" param-email="{{username}}" param-password="{{password}}" logged-in="{{loggedIn}}" param-captcha-response="{{captchaResponse}}"></auth-api>
+
       <form is="iron-form" id="form" method="post" action="/form/handler" on-submit="test" hidden="{{loggedIn}}">
         <paper-card id="login" heading="Register">
           <div class="card-content">
-            <paper-input type="text" value="{{displayName}}" autofocus label="Display Name"></paper-input>
-            <paper-input label="E-mail" value="{{username}}"></paper-input>
-            <gold-password-input label="Password" value="{{password}}" strength-meter></gold-password-input>
+
+            <paper-input type="text" value="{{displayName}}" autofocus label="Display Name" on-keyup="_checkForEnter"></paper-input>
+            <paper-input id="email" label="E-mail" value="{{username}}" on-keyup="_checkForEnter"></paper-input>
+            <gold-password-input label="Password" value="{{password}}" strength-meter on-keyup="_checkForEnter"></gold-password-input>
             <google-recaptcha sitekey="6LdkoBYTAAAAABH1QTVoIqDvzZTsC0aTHwVAbWlv" response="{{captchaResponse}}"></google-recaptcha>
+
             <div class="actions">
               <paper-button class="primary" on-tap="register">Register</paper-button>
             </div>
+
           </div>
         </paper-card>
       </form>
+
       <paper-card id="login" heading="Log in" hidden="{{!loggedIn}}">
         <div class="card-content">
           You are already registered.
         </div>
       </paper-card>
+
     </div>
   </template>
   <script>
@@ -69,12 +78,20 @@
         ready: function(){
 
         },
-        arePasswordsTheSame: function(ev){
-          var input = ev.path.find(el => el.nodeName.toLowerCase() === 'paper-input');
-          if(this.password !== this.passwordRepeat && this.passwordRepeat.length >= this.password){
-            input.set('invalid', true);
+        _checkForEnter: function(ev){
+          if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
+            if(ev.target.value.length){
+              this._tabNext(ev.target);
+            }
+          }
+        },
+        _tabNext: function(curElement){
+          var tabbable = [].slice.call(this.shadowRoot.querySelectorAll('[tabindex]'));
+          var next = tabbable[tabbable.indexOf(curElement)+1];
+          if(next.classList.contains('primary')){
+            next.fire('tap');
           }else{
-            input.set('invalid', false);
+            next.focus();
           }
         },
         register: function(){

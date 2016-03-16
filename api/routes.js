@@ -26,7 +26,7 @@ module.exports = {
       next();
     });
 
-    app.get('/authenticate/:email/:password', strongLimit, authenticator.authenticate);
+    app.post('/authenticate', strongLimit, authenticator.authenticate);
 
     app.get('/qa/:id', weakLimit, questionController.getWithAnswers);
 

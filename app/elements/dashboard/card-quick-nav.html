@@ -1,6 +1,8 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/paper-input/paper-input.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="card-quick-nav">
   <template>
     <style include="shared-styles"></style>
@@ -29,10 +31,22 @@
     (function() {
       'use strict';
 
+      //var BibleReferencePromise = new Promise(function(resolve, reject) {
+        //require(['/elements/utils/bible-reference-parser.js'], resolve, reject);
+      //});
+
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
+        is: 'card-quick-nav',
+        ready: function(){
+
+        },
         checkForEnter: function(ev){
           this.invalid = false;
           if(ev.keyCode == 13){
+            //BibleReferencePromise.then(function(BibleReference){
+            //  alert(BibleReference);
             var reference = new BibleReference(ev.target.value);
             if(reference.book){
               ev.target.blur();
@@ -40,9 +54,11 @@
             }else{
               this.invalid = true;
             }
+            //}.bind(this));
           }
         }
       });
+
     })();
   </script>
 

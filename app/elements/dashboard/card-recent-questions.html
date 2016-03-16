@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="card-recent-questions">
   <template>
     <style include="shared-styles"></style>
@@ -64,6 +66,8 @@
   <script>
     (function() {
       'use strict';
+
+      var BibleReference = require('bible-reference-parser');
 
       Polymer({
         properties: {

@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../utils/utils-books.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <script src="../search/lib/lancaster.js"></script>
 <script src="../search/lib/smartStemmer.js"></script>
 
@@ -32,6 +34,8 @@
 
       var parser = new DOMParser();
 
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
         is: 'bible-snippet',
 
@@ -60,8 +64,8 @@
           //var text = this.getBoundingClientRect();
           //return false;
 
-          this.endReference = this.$.utils.parseReference(end);
-          this.startReference = this.$.utils.parseReference(start);
+          this.endReference = new BibleReference(end);
+          this.startReference = new BibleReference(start);
           var xmlFile = this.resolveUrl('text/'+this.startReference.book.name+'.xml');
           fetch(xmlFile).then(function(response){
             return response.text();

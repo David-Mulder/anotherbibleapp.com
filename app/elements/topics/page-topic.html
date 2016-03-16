@@ -9,7 +9,7 @@
 
     </style>
     <paper-toolbar>
-      <intelligent-title no-title-if-wide></intelligent-title>
+      <intelligent-title title="{{beautifulTitle}}"></intelligent-title>
       <span class="flex"></span>
     </paper-toolbar>
     <div class="page-content">
@@ -39,8 +39,8 @@
 
         },
         topicChanged: function(topicName){
-          var beautifulTitle = this._smartCaps(topicName);
-          app.setTitle(beautifulTitle);
+          this.beautifulTitle = this._smartCaps(topicName);
+
           fetch(this.resolveUrl('./data/topical.js')).then(function(response){
             return response.text();
           }).then(function(text){
@@ -56,7 +56,7 @@
               };
             });
             this.set('topic', {
-              title: beautifulTitle,
+              title: this.beautifulTitle,
               verses: verses
             });
           }.bind(this));

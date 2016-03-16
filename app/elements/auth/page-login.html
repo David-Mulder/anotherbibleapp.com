@@ -31,16 +31,20 @@
         color: var(--text-on-primary-color);
       }
     </style>
+
+    <synced-settings id="settings"></synced-settings>
+
     <paper-toolbar>
       <intelligent-title title="Log in"></intelligent-title>
     </paper-toolbar>
+
     <div>
       <auth-api id="api" param-username="{{username}}" param-password="{{password}}" logged-in="{{loggedIn}}"></auth-api>
-      <form is="iron-form" id="form" method="post" action="/form/handler" on-submit="test" hidden="{{loggedIn}}">
+      <form is="iron-form" id="form" method="post" action="/form/handler" hidden="{{loggedIn}}">
         <paper-card id="login" heading="Log in">
           <div class="card-content">
-            <paper-input label="E-mail" value="{{username}}" autofocus></paper-input>
-            <paper-input type="password" value="{{password}}" label="Password"></paper-input>
+            <paper-input id="username" label="E-mail" value="{{username}}" on-keyup="_checkForSubmit" autofocus></paper-input>
+            <paper-input id="password" type="password" value="{{password}}" on-keyup="_checkForSubmit" label="Password"></paper-input>
             <div class="actions">
               <paper-button class="blue" on-tap="login">Log In</paper-button>
               <paper-button class="blue">Forgot your password</paper-button>
@@ -69,10 +73,52 @@
         },
         ready: function(){
         },
+        _checkForSubmit: function(ev){
+          if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
+            if(this.password.length == 0){
+              this.$.password.focus();
+            }else{
+              this.login();
+            }
+          }
+        },
         login: function(){
+          var valid = true;
+          if(this.username.length == 0){
+            valid = false;
+            this.$.username.invalid = true;
+            this.$.username.errorMessage = 'Please enter the e-mail with which you registered';
+            this.$.username.focus();
+          }else{
+            this.$.username.invalid = false;
+
+            if(this.password.length == 0){
+              valid = false;
+              this.$.password.invalid = true;
+              this.$.password.errorMessage = 'Please enter your password';
+              this.$.password.focus();
+            }else{
+              this.$.password.invalid = false;
+            }
+          }
           this.$.api.login().then(function(){
             if(this.loggedIn){
-              page('/');
+              this.$.settings.reset().then(function(){
+                page.back();
+                //page('/');
+              });
+            }
+          }.bind(this)).catch(function(err){
+            if(err == 'invalid email'){
+              this.$.username.invalid = true;
+              this.$.username.errorMessage = 'No user has registered with this email';
+              this.$.username.focus();
+            }else if(err == 'invalid password'){
+              this.$.password.invalid = true;
+              this.$.password.errorMessage = 'Invalid password, please try again';
+              this.$.password.focus();
+            }else{
+              alert(err);
             }
           }.bind(this));
         }

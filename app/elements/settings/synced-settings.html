@@ -10,13 +10,16 @@
     (function() {
       'use strict';
 
-      var settingResolution;
-      var settings = new Promise(function(resolve){
-        settingResolution = function(settings){
-          console.log('SETTINGS LOADED');
-          resolve(settings);
-        };
-      });
+      var settingResolution, settings;
+      var reset = function(){
+        settings = new Promise(function(resolve){
+          settingResolution = function(settings){
+            console.log('SETTINGS LOADED');
+            resolve(settings);
+          };
+        });
+      };
+      reset();
 
       var syncStarted = false;
 
@@ -122,6 +125,18 @@
           this.updatedAt = updatedAt || Date.now();
           this.$.set.execute().catch(function(){});
         },
+
+        reset: function(){
+          localStorage.settings = '{}';
+          reset();
+          this.sync();
+          return new Promise(function (resolve, reject) {
+            settings.then(function(){
+              resolve();
+            });
+          });
+        },
+
         getSetting: function(settingName, defaultValue) {
 
           return new Promise(function (resolve, reject) {

@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="block-html.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="bible-text">
   <template>
     <style include="shared-styles"></style>
@@ -193,6 +195,8 @@
     (function () {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
 
         is: 'bible-text',
@@ -353,7 +357,7 @@
             chapterBlocks.forEach((block, i) => {
               var firstVerse = block.querySelector('vn');
               if(firstVerse){
-                var reference = this.$.utils.parseReference(firstVerse.id);
+                var reference = new BibleReference(firstVerse.id);
               }
 
               //todo: consider switching to simply passing the raw xml object instead of stringifying

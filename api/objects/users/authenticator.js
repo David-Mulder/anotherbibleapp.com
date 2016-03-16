@@ -15,11 +15,11 @@ a = new User({
 
 module.exports = {
   authenticate: function(req, res){
-    User.findOne({email: req.params.email}, function(err, user){
+    User.findOne({email: req.body.username}, function(err, user){
       if(user === null){
-        res.status(401).json('Invalid email');
+        res.status(401).json('invalid email');
       }else{
-        user.comparePassword(req.params.password, function(err, okay){
+        user.comparePassword(req.body.password, function(err, okay){
           if(okay){
             lt = new LoginToken({
               userId: user.id
@@ -28,7 +28,7 @@ module.exports = {
               res.json(lt.token);
             });
           }else{
-            res.status(401).json('Invalid password');
+            res.status(401).json('invalid password');
           }
         });
       }

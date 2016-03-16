@@ -2,8 +2,7 @@
 <link rel="import" href="../utils/relative-time.html">
 <link rel="import" href="./bible-markdown.html">
 
-<!-- todo: lazy load only if needed? -->
-<link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="card-post-history">
   <template>
@@ -153,6 +152,7 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
       Polymer({
         properties: {
           type: String,

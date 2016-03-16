@@ -41,11 +41,11 @@
         cursor: pointer;
       }
     </style>
-    <auth-api id="api" action="questions/list/:verse" param-verse="{{verseId}}" response="{{questions}}"></auth-api>
+    <auth-api id="api" action="questions/list/:verse" param-verse="{{verseId}}" logged-in="{{loggedIn}}" response="{{questions}}"></auth-api>
 
     <div id="content">
       <div id="noResult" hidden$="{{!noResults}}">
-        No questions have been asked about {{verse}}. Got a question? <a href="#" on-tap="newQuestion">Tap here to ask yours</a>.
+        No questions have been asked about {{verse}}. Got a question? <a on-tap="newQuestion" hidden$="{{!loggedIn}}">Tap here to ask yours</a><a href="#" on-tap="goToLogin" hidden$="{{loggedIn}}">Log in to ask yours</a>.
       </div>
 
       <paper-card heading="Related Questions" hidden$="{{!relatedQuestions}}">
@@ -85,13 +85,21 @@
         observers: [
           'verseChanged(verse)'
         ],
+        goToLogin: function(){
+
+          page('/login');
+        },
         newQuestion: function(){
-          this.fire('multi-verse-selection', {
-            label: 'Please tap on all the verses that are relevant to your question.',
-            finishedSelection: function(verses){
-              page('/questions/ask/' + verses);
-            }
-          });
+          if(this.loggedIn){
+            this.fire('multi-verse-selection', {
+              label: 'Please tap on all the verses that are relevant to your question.',
+              finishedSelection: function(verses){
+                page('/questions/ask/' + verses);
+              }
+            });
+          }else{
+            page('/login');
+          }
         },
         //newQuestionSelectionFinished: function(){
         //  page('/questions/ask/'+this.verses.toString());

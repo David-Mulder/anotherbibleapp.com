@@ -1,10 +1,18 @@
+importScripts('../import/require.js');
+
 importScripts('../../bower_components/whenever.js/whenever.js');
 importScripts('lib/lancaster.js');
 importScripts('lib/smartStemmer.js');
 importScripts('lib/stringDistance.js');
 importScripts('data/stopWords.js');
 
-importScripts('../utils/utils-books/books.js');
+//importScripts('../utils/bible-reference-parser.lib.js');
+//var BibleReference = require('bible-reference-parser');
+
+importScripts('../utils/books.lib.js');
+var bibleBooks = require('books');
+
+//importScripts('../utils/utils-books/books.js');
 /*importScripts('../utils/utils-books/bibleReferenceParser.js');*/
 
 onmessage = function(ev){

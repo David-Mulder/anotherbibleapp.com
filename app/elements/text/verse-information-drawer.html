@@ -2,6 +2,8 @@
 <link rel="import" href="../topics/related-topics-card.html">
 <link rel="import" href="./card-verse-actions.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="verse-information-drawer">
   <template>
     <style include="shared-styles"></style>
@@ -57,6 +59,8 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
         is: 'verse-information-drawer',
 
@@ -72,7 +76,7 @@
         verseChanged: function(){
           if(this.verses.length > 0){
             this.selection = true;
-            this.verse = this.$.utils.parseReference(this.verses[0]);
+            this.verse = new BibleReference(this.verses[0]);
           }else{
             this.verse = null;
             this.selection = false;

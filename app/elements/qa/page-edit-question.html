@@ -4,6 +4,8 @@
 <link rel="import" href="../utils/utils-books.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="page-edit-question">
   <template>
     <style include="shared-styles"></style>
@@ -66,16 +68,17 @@
         };
       }
     </style>
+
     <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{question}}"></auth-api>
     <auth-api id="save" action="question/:id" param-id="{{id}}" method="POST" param-title="{{title}}" todo-param-category="{{category}}" param-text="{{text}}" param-verses="{{versesAsNumbers}}"></auth-api>
-    <utils-books id="utils"></utils-books>
 
     <paper-toolbar>
       <intelligent-title title="Edit question"></intelligent-title>
     </paper-toolbar>
-    <div class="page-content">
 
+    <div class="page-content">
       <paper-card>
+
         <div class="card-content">
           <paper-input id="title" label="Question title" value="{{title}}"></paper-input>
           <bible-markdown-editor label="Question in detail" value="{{text}}" rows="7"></bible-markdown-editor>
@@ -83,11 +86,12 @@
             <paper-input label="Verses" value="{{verseString}}" error-message="One of the verses can not be parsed" invalid="{{invalidVerseFound}}"></paper-input>
           </div>
         </div>
+
         <div class="card-actions">
           <paper-button on-tap="save">Save</paper-button>
         </div>
-      </paper-card>
 
+      </paper-card>
     </div>
 
   </template>
@@ -96,6 +100,8 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
         properties: {
           title: String,
@@ -103,7 +109,6 @@
         },
         observers: [
           'retrieveFromApi(id)',
-          'setTitle(question.title)',
           'setQuestion(question)',
           'setVersesFromString(verseString)'
         ],
@@ -111,12 +116,6 @@
         },
         retrieveFromApi: function(){
           this.$.api.execute();
-        },
-        submitAnswer: function(){
-          this.$.newAnswerApi.execute();
-        },
-        setTitle: function(title){
-          app.setTitle(title);
         },
         setQuestion: function(){
           this.title = this.question.title;

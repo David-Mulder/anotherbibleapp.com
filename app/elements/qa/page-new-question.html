@@ -8,6 +8,8 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="bible-markdown-editor.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="page-new-question">
   <template>
     <style include="shared-styles"></style>
@@ -93,17 +95,20 @@
       <span class="flex"></span>
     </paper-toolbar>
     <div class="new-question-page">
-      <utils-books id="bookUtils"></utils-books>
+
       <auth-api logged-in="{{loggedIn}}"></auth-api>
       <auth-api id="api" method="PUT" action="question" param-title="{{title}}" param-category="{{category}}" param-text="{{questionText}}" param-verses="{{versesAsNumbers}}"></auth-api>
+
       <div hidden="{{!loggedIn}}">
         <paper-card>
+
           <div class="card-content">
+
             <div class="stepper">
               <div class="step">
                 <div data-step="1"></div>
                 <div class="content">
-                  <paper-input id="title" label="Your question in one sentence (title)" class="no-upper-padding" value="{{title}}"></paper-input>
+                  <paper-input id="title" label="Your question in one sentence (title)" class="no-upper-padding" value="{{title}}" char-counter maxlength="200" minlength="15"></paper-input>
                   regarding
                   <template is="dom-repeat" items="{{verses}}">
                     {{item}}
@@ -138,10 +143,13 @@
                 </div>
               </div>
             </div>
+
           </div>
+
           <div class="card-actions">
             <paper-button on-tap="submit">Ask your Question</paper-button>
           </div>
+
         </paper-card>
       </div>
       <!--
@@ -173,6 +181,8 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
         is: 'page-new-question',
 
@@ -183,23 +193,50 @@
         observers: [
           'parseVerses(versesString)'
         ],
+        listeners: {
+          'page-became-visible': '_checkLoggedInOrRedirect'
+        },
         ready: function(){
 
           //this.set('loggedIn', false);
         },
+        _checkLoggedInOrRedirect: function(){
+          if(!this.loggedIn){
+            redirect('/login');
+          }
+        },
         parseVerses: function(){
           var verses = this.versesString.split(',');
-          verses = verses.map(verse => this.$.bookUtils.parseReference(verse));
+          verses = verses.map(verse => new BibleReference(verse));
           this.set('verses', verses);
           this.set('versesAsNumbers', verses.map(verse => verse.toNumeric()))
         },
         submit: function(){
-          this.$.api.execute().then(function(id){
-            page('/question/'+id)
-          }).catch(function(errs){
-            alert('Some validation error occurred');
-            console.info('validation', errs);
-          });
+          var valid = true;
+          if(!this.agreeReadRules){
+            app.toast('Please read the rules before asking your question');
+            valid = false;
+          }
+          if(this.title.length < 15){
+            app.toast('Please make your title more descriptive');
+            valid = false;
+          }
+          if(!this.questionText || this.questionText.length < 30){
+            app.toast('Please describe your question in more terms');
+            valid = false;
+          }
+          if(!this.category){
+            app.toast('Please pick one of the categories');
+            valid = false;
+          }
+          if(valid){
+            this.$.api.execute().then(function(id){
+              page('/question/'+id)
+            }).catch(function(errs){
+              alert('Some validation error occurred');
+              console.info('validation', errs);
+            });
+          }
         }
       });
     })();

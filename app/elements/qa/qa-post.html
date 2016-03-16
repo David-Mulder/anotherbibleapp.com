@@ -113,6 +113,10 @@
           background-color: rgba(0,0,0,.2);
         };
       }
+      paper-icon-button[disabled]{
+        /* hate using `!important` here, but Firefox is bugging out, so I can't inspect exactly what's happening*/
+        color: rgba(0,0,0,.2) !important;
+      }
       paper-button{
         --paper-button-disabled: {
           background: transparent;
@@ -121,13 +125,18 @@
       paper-button[disabled] iron-icon{
         color: rgba(0,0,0,.2);
       }
+      .login-to-comment{
+        display: block;
+        text-align: center;
+        padding: 10px !important;
+      }
     </style>
 
     <paper-card>
 
       <auth-api id="upvoteApi" method="POST" action="upvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
       <auth-api id="downvoteApi" method="POST" action="downvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
-      <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}"></auth-api>
+      <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}" logged-in="{{loggedIn}}"></auth-api>
 
       <div class="card-content">
         <div class="post">
@@ -165,19 +174,19 @@
       </div>
 
       <div class="card-actions actions" hidden$="{{noActions}}">
-        <!-- <paper-button>Share</paper-button> -->
-        <!-- <paper-icon-button icon="social:share" on-tap="share"></paper-icon-button>-->
+
         <paper-button on-tap="share">
           <iron-icon icon="social:share"></iron-icon>
           <span class="label">Share</span>
         </paper-button>
-        <paper-icon-button icon="create" on-tap="goToEdit"></paper-icon-button>
+
+        <paper-icon-button icon="create" on-tap="goToEdit" disabled$="{{!loggedIn}}"></paper-icon-button>
+
         <paper-button on-tap="goToHistory" disabled$="{{!hasHistory}}">
           <iron-icon icon="history"></iron-icon>
           <span class="label edited" hidden="{{!showRevision}}">edited by {{post.revisionAuthor.displayName}}</span>
         </paper-button>
-        <!--<paper-icon-button icon="history" on-tap="goToHistory"></paper-icon-button>-->
-        <!--{{post.version}}-->
+
         <div class="flex"></div>
         <paper-button on-tap="toggleComments">
           <iron-icon icon="editor:mode-comment"></iron-icon>
@@ -197,9 +206,13 @@
           </div>
         </template>
 
-        <div class="card-actions add-comment">
+        <div class="card-actions add-comment" hidden$="{{!loggedIn}}">
           <paper-input label="Add a comment" no-label-float on-keyup="_checkForCommentSubmit" value="{{commentText}}"></paper-input>
           <paper-icon-button icon="send" on-tap="addComment"></paper-icon-button>
+        </div>
+
+        <div class="card-actions add-comment login-to-comment" hidden$="{{loggedIn}}">
+          Log in to comment.
         </div>
 
       </template>
@@ -266,11 +279,15 @@
           }
         },
         addComment: function(){
-          this.$.addCommentApi.execute().then(function(comment){
-            this.push('post.comments', comment);
-            this.commentsVisible = true;
-            this.commentText = '';
-          }.bind(this));
+          if(this.commentText.length < 15){
+            app.toast('Your comment should be at least 15 characters long.');
+          }else {
+            this.$.addCommentApi.execute().then(function (comment) {
+              this.push('post.comments', comment);
+              this.commentsVisible = true;
+              this.commentText = '';
+            }.bind(this));
+          }
         },
         share: function(){
           var el = document.createElement('span');

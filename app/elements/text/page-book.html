@@ -8,6 +8,8 @@
 <link rel="import" href="../qa/qa-related-questions-card.html">
 <link rel="import" href="../settings/synced-settings.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="page-book">
   <template>
     <style include="shared-styles"></style>
@@ -74,7 +76,7 @@
 
         <paper-toolbar>
 
-          <intelligent-title title=""></intelligent-title>
+          <intelligent-title title="{{title}}"></intelligent-title>
 
           <paper-toggle-button checked="{{studyTools}}" id="study-tools">Study tools</paper-toggle-button>
 
@@ -107,6 +109,8 @@
   <script>
     (function() {
       'use strict';
+
+      var BibleReference = require('bible-reference-parser');
 
       Polymer({
 
@@ -148,13 +152,13 @@
         refChanged: function(){
           console.info('ref changed', this.ref);
 
-          this.set('fullRef', this.$.bookUtils.parseReference(this.ref));
+          this.set('fullRef', new BibleReference(this.ref));
 
           if(isNaN(this.fullRef.chapter)){
 
             this.$.settings.getSetting('book-reading-position-'+this.fullRef.book.name.replace(' ', '-')).then(function(setting){
               console.log('loaded last reading position', setting);
-              var lastRead = this.$.bookUtils.parseReference(setting.position);
+              var lastRead = new BibleReference(setting.position);
               if(!(lastRead.verseStart == 1 && lastRead.chapter == 1)){
 
                 app.askToast('Do you wish to continue reading from your last position?', ['Continue from '+lastRead.toString()]).then(function(answer, i){
@@ -176,7 +180,9 @@
               this.disableLocationSaving = true;
             }
           }
-          app.setTitle(this.fullRef.book.title);
+
+          this.title = this.fullRef.book.title;
+          //app.setTitle(this.fullRef.book.title);
 
         },
 

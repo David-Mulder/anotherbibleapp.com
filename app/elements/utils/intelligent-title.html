@@ -19,6 +19,9 @@
       :host([no-title-if-wide]:not([narrow])){
         display: none;
       }
+      :host([no-title]){
+        display: none;
+      }
       :host([narrow]) .title{
         margin-left: 15px;
       }
@@ -37,7 +40,8 @@
         properties: {
           title: {
             type: String,
-            value: 'Another\xa0Bible\xa0App'
+            value: 'Another\xa0Bible\xa0App',
+            observer: 'setWindowTitle'
           },
           narrow: {
             type: Boolean,
@@ -48,6 +52,9 @@
             }
           },
           noTitleIfWide: {
+            reflectToAttribute: true
+          },
+          noTitle: {
             reflectToAttribute: true
           }
         },
@@ -63,6 +70,14 @@
         },
         openDrawer: function(){
           document.getElementById('mainDrawer').openDrawer();
+        },
+        setWindowTitle: function(title){
+          app.title = title; //todo
+          if(title.length > 0){
+            document.title = title + ' - Another Bible App';
+          }else{
+            document.title = 'Another Bible App'
+          }
         }
       });
     })();

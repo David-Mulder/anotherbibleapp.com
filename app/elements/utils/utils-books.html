@@ -1,11 +1,13 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<script src="utils-books/books.js"></script>
-<script src="utils-books/bibleReferenceParser.js"></script>
+<link id="books" rel="import" href="books.html">
+<!--<script src="bible-reference-parser.lib.js"></script>-->
 
 <dom-module id="utils-books">
   <script>
     (function() {
       'use strict';
+
+      var bibleBooks = require('books');
 
       Polymer({
         is: 'utils-books',
@@ -73,11 +75,6 @@
             var index = this.groupedBooks.length-1;
             this.push('groupedBooks.'+index+'.books', book);
           }.bind(this));
-        },
-
-        parseReference: function(vs){
-          if(vs instanceof BibleReference) return vs;
-          return new BibleReference(vs);
         }
 
       });

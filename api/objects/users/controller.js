@@ -47,7 +47,7 @@ module.exports = {
             }else{
               res.status(500).json({
                 humanError: 'Something went wrong',
-                err: err.errmsg
+                err: err
               });
             }
           }else{

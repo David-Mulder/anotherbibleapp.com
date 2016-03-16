@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
 
 var UserSchema = new Schema({
   displayName: { type: String, required: true },
-  email: {type: String, required: true, unique: true},
+  email: {type: String, required: true, unique: true, validate: {validator: val => /^\S+@\S+$/.test(val), message: 'Invalid email'}},
   password: {type: String, required: true},
   info: String,
   reputation: Number,

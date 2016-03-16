@@ -1,90 +1,114 @@
+High Priority
+ - DONE Check logged out views
+ - DONE link related texts on qa page
+ - forgot my password
+ - privacy & terms of use
+ - solve toast being too big on mobile
+ - DONE make 'i have read rules' required
+ - DONE char limit for title and text of questions and answers
+ - user profile pages
+ - DONE empty comments can be submitted
+ - disable voting on your own posts
+
+Normal priority
+ - delete stuff admin function (comments for everyone)
+ - Offline
+   - Installation notification
+   - Hide features when offline
+ - DONE 404
+ - show vote counts on question cards
+ - add sync option to dashboard more menu
+ - clicking the same verse should not deselect it
+ - support ranges in edit question form
+ - add more stuff to logged out dashboard
+
+Low Priority
+ - scroll happens after 'ask question' flow started (???)
+ - DONE remove setTitle calls from routing
+ - pass text blocks as objects instead of string
+ - change 'recent questions' to 'recent activity'
+ - add browsing option of recent activity rather than just top 10
+ - reapply firstIndex better after read -> study modus
+ - Refactor: search for 13 enter and fix to `code` enter (qa-post:264 or page-login)
+ - refactor app.toast/ask/etc to a... element or behavior
+ - bible-markdown-editor jumps when mobile keyboard changes layout from portrait to landscape
+ - switching books in reading modus loses forcenarrow
+ - blur in search (for mobile keyboards)
+ - on mobile dashboard more menu touches top border
+ - refactor to use private properties and functions everywhere properly (`_` start)
+ - Bible Snippet with just 'mt' (in markdown)
+
+Optional
+ - remove JS logic out of JS-only-elements... including maybe even auth-api
+ - add questions to search
+ - chat or other discussion forum
+ - filter topical cards with in operator
+ - use online service to load greek/hebrew original
+ - use online service to do synonym search
+ - notifications (push) (https://developers.google.com/web/updates/2015/03/push-notifications-on-the-open-web?hl=en)
+ - add diff view in history
+ - make a paper-stepper
+ - refactor cards to start with `card-`
+ - make verse copying a multi selection thing?
+
+External Dependency
+ - When dashboard fits fully on screen, background is visible under it
+ - refactor form validation once new paper-input validation is finished
+
+DONE
  - DONE split chapters in paragraphs...
    - DONE chapter numbers
    - DONE bible reference needs to resolve to `<pa>`... so... some kind of index
    - DONE increase margin of last one and add license notice
  - DONE check jn 9:39
- - When dashboard fits fully on screen, background is visible under it
  - DONE increase padding on text in reading modus
  - DONE Bible markdown extension
- - max-height bible-snippet maybe with scroll?
  - DONE hide home button on home
  - DONE lazy loading
  - DONE on tap verse set URL
  - DONE add license
  - DONE NOTE hover gets cut off
- - Check logged out views
  - DONE Support/fix citations in notes
  - DONE disable saving of reading position when referenced verse
  - DONE Fix smartcaps to use the same function in all 3 places and capitalize first word regardless of which it is
  - DONE Continue reading
  - DONE Count topical bible references and add as weight in search
- - Offline
-   - Installation notification
-   - Hide features when offline
  - DONE Edit questions and answers
  - DONE write documentation about asking questions
- - remove setTitle calls from routing
- - make 'i have read rules' required
  - DONE add quick navigation functionality
- - forgot my password
  - DONE add comments
  - DONE set title on relative-time with timestamp
- - 404
- - char limit for title and text
  - DONE fix esttings with a space in them
  - DONE default in getsetting
  - DONE trigger resize after setting styles (or postpone loading text till after settings?)
- - pass text blocks as objects istead of string
  - DONE reload dashboard
- - empty local and memory settings after login, but not after register
+ - DONE empty local and memory settings after login, but not after register
  - DONE fix links to be secondary color everywhere
  - DONE add sepia and white on black reading modus
  - DONE highlighting not implemented or working in topical cards
  - DONE search page before actually searching looks incorrect
  - DONE sync reading positions in db
- - add questions to search
- - when no recent books add message
- - change 'recent questions' to 'recent activity'
- - add browsing option of recent activity rather than just top 10
  - DONE add date to questions and answers
  - DONE relative date in qa-post
  - DONE Dashboard list of recent questions
- - verse highlighting
- - add setting to auto focus quick navigation
- - chat or other discussion forum
+ - DONE verse highlighting
  - DONE open settings and go back causes narrow to be set incorrectly (missing title on wide)
  - DONE open book list on dashboard (??? maybe bible books started reading) (just like google now with different cards)
  - DONE double verse results with overlapping ranges
- - combine sequential related bible verses
- - discussed text not linkable
  - DONE show revision authors correctly (in history as well)
  - DONE voting causes versioning
  - DONE make title big in new questoin
- - filter topical cards with in operator
  - DONE set custom char range for literal search with new operator
  - DONE write documentation for search
- - reapply firstIndex better after read -> study modus
  - DONE menu button not appearing on small screen load
- - scroll happens after 'ask question' flow started (???)
- - user profile pages
- - show vote counts on question cards
- - use online service to load greek/hebrew original
- - use online service to do synonym search
  - DONE share posts
- - refactor app.toast/ask/etc to a... element or behavior
- - DONE make question links look better
- - notifications (push) (https://developers.google.com/web/updates/2015/03/push-notifications-on-the-open-web?hl=en)
- - privacy & terms of use
  - DONE make markdown view in history
  - DONE clean down and upvotes from revisions
  - DONE redesign history page and add updatedAt
  - DONE add verses to history
- - remove JS logic out of JS-only-elements... including maybe even auth-api
- - add diff view in history
- - disable voting on your own posts
- - bible-markdown-editor jumps when mobile keyboard changes layout from portrait to landscape
- - make a paper-stepper
- - switching books in reading modus loses forcenarrow
- - blur in search (for mobile keyboards)
- - rename cards to start with card
- - make verse copying a multi selection thing?
+ - DONE when no recent books add message
+ - DONE make question links look better
+ - DONE combine sequential related bible verses
+
+
+

@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../utils/relative-time.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="card-recent-books">
   <template>
     <style include="shared-styles"></style>
@@ -24,7 +26,7 @@
       }
     </style>
     <synced-settings id="settings"></synced-settings>
-    <paper-card id="card" heading="Recent Books">
+    <paper-card id="card" heading="Recent Books" hidden$="{{noResults}}">
       <template is="dom-repeat" items="{{books}}" as="book">
         <div class="card-actions book" on-tap="goToBook">
           {{book.title}}
@@ -39,6 +41,8 @@
   <script>
     (function() {
       'use strict';
+
+      var BibleReference = require('bible-reference-parser');
 
       Polymer({
         properties: {
@@ -80,10 +84,13 @@
               });
             }.bind(this));
 
+            this.noResults = this.books.length == 0;
+
           }.bind(this));
         },
 
         goToBook: function(ev){
+          //piercing the router consciously
           window.doSavePosition = true;
 
           page('/book/'+ev.model.book.reference);

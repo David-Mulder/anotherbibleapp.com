@@ -94,24 +94,12 @@
           title: String
         },
         observers: [
-          'retrieveFromApi(id)',
-          'setTitle(question.title)',
-          'setQuestion(question)',
+          'retrieveFromApi(id)'
         ],
         ready: function(){
         },
         retrieveFromApi: function(){
           this.$.api.execute();
-        },
-        submitAnswer: function(){
-          this.$.newAnswerApi.execute();
-        },
-        setTitle: function(title){
-          app.setTitle(title);
-        },
-        setQuestion: function(){
-          this.title = this.question.title;
-          this.text = this.question.text;
         },
         save: function(){
           this.$.save.execute().then(function(answer){
