@@ -36,7 +36,8 @@ var schema = new Schema({
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment'
-  }]
+  }],
+  deleted: Boolean
 });
 
 schema.methods.makePublic = function(userId){
@@ -57,9 +58,9 @@ schema.plugin(version, {
   get model(){
     return Question;
   },
-  ignore: ['upvotes', 'downvotes', 'comments']
+  ignore: ['upvotes', 'downvotes', 'comments', 'deleted']
 });
 
-Question = mongoose.model('questions', schema);
+Question = mongoose.model('Question', schema);
 
 module.exports = Question;

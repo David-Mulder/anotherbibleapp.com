@@ -25,7 +25,10 @@ module.exports = {
               userId: user.id
             });
             lt.save(function(err, lt){
-              res.json(lt.token);
+              res.json({
+                token:lt.token,
+                user: user.makePublic()
+              });
             });
           }else{
             res.status(401).json('invalid password');

@@ -1165,6 +1165,10 @@ Object.defineProperty(bibleBooks, 'findBook', {
           if(book.title.replace(/ /g, '').toLowerCase().substr(0,i) === bookname.replace(/ /g, '').toLowerCase().substr(0,i)){
             quality = 20;
           }
+          console.log('comparing',book.name.replace(/ /g, '').toLowerCase().substr(0,i), 'to', bookname.replace(/ /g, '').toLowerCase().substr(0,i));
+          if(book.name.replace(/ /g, '').toLowerCase().substr(0,i) === bookname.replace(/ /g, '').toLowerCase().substr(0,i)){
+            quality = 15;
+          }
           if(quality > bestBook.quality){
             bestBook.quality = quality;
             bestBook.book = book;

@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="books-list.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+
+<dom-module id="page-books">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      books-list{
+        max-width: 800px;
+        margin: auto;
+      }
+    </style>
+    <paper-toolbar class="medium-tall">
+      <intelligent-title title="Books & Letters of the Bible"></intelligent-title>
+      <paper-tabs class="fit bottom" selected="{{sortBooksBy}}" scrollable attr-for-selected="data-value">
+        <paper-tab data-value="tradition">Sorted Traditionally</paper-tab>
+        <paper-tab data-value="date">Sorted by Date</paper-tab>
+        <paper-tab data-value="name">Sorted Alphabetically</paper-tab>
+      </paper-tabs>
+    </paper-toolbar>
+    <div class="page-content">
+      <books-list sort-category="{{sortBooksBy}}"></books-list>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          sortBooksBy: {
+            type: String,
+            value: 'tradition'
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

@@ -76,6 +76,11 @@
           }else{
             this.float.style.display = 'none';
           }
+        },
+        reset: function(){
+          recaptcha.then(function(Recaptcha){
+            Recaptcha.reset();
+          })
         }
       });
     })();

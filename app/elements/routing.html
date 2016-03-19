@@ -29,6 +29,22 @@
       });
     });
 
+    page('/user/:id/:title?', function (data) {
+      app.loadDependency('auth/page-user').then(function(){
+        app.route = 'user';
+        app.set('params.userId', data.params.id);
+      });
+    });
+
+    page('/forgot-my-password/:token?', function (data) {
+      app.loadDependency('auth/page-forgotten-password').then(function(){
+        if(data.params.token){
+          app.set('params.passwordResetToken', data.params.token);
+        }
+        app.route = 'forgotten-password';
+      });
+    });
+
     page('/register', function (data) {
       app.loadDependency('auth/page-register').then(function() {
         app.route = 'register';
@@ -44,6 +60,12 @@
     page('/logout', function (data) {
       delete localStorage.token;
       location.href = '/';
+    });
+
+    page('/books', function (data) {
+      app.loadDependency('books/page-books').then(function() {
+        app.route = 'books';
+      });
     });
 
     page('/book/:ref', function (data) {

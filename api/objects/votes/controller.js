@@ -3,22 +3,18 @@ var Question = require('../questions/model');
 
 module.exports = {
   upvote: function(req, res){
-
     module.exports.vote('up', req).then(function(post){
       res.json(post);
     }).catch(function(){
       res.status(500).json('noooz');
     });
-
   },
   downvote: function(req, res){
-    console.log('so far so well');
     module.exports.vote('down', req).then(function(post){
       res.json(post);
     }).catch(function(){
       res.status(500).json('noooz');
     });
-
   },
   vote: function(direction, req){
     return new Promise(function(resolve, reject){
@@ -27,6 +23,9 @@ module.exports = {
         if(err){
           reject(err);
         }else{
+          if(req.user && req.user._id.equals(post.originalAuthor._id)){
+            return resolve(post.makePublic());
+          }
           if(typeof post.upvotes === 'undefined'){
             post.upvotes = [];
           }

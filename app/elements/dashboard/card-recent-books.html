@@ -83,10 +83,11 @@
                 date: setting.value.date
               });
             }.bind(this));
-
             this.noResults = this.books.length == 0;
 
-          }.bind(this));
+          }.bind(this)).catch(function(err){
+            alert(err);
+          });
         },
 
         goToBook: function(ev){

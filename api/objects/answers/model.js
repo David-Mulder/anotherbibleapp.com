@@ -27,6 +27,7 @@ var schema = new Schema({
     required: true,
     ref: 'Question'
   },
+  deleted: Boolean,
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment'
@@ -36,8 +37,8 @@ var schema = new Schema({
 //schema.plugin(version);
 
 schema.methods.makePublic = function(userId){
-  console.log('make answer public', userId);
-  console.log(this);
+  //console.log('make answer public', userId);
+  //console.log(this);
   var obj = this.toObject();
 
   obj.upvoted = obj.upvotes.some(uID => uID.equals(userId));
@@ -56,7 +57,7 @@ schema.plugin(version, {
   get model(){
     return Answer;
   },
-  ignore: ['upvotes', 'downvotes', 'comments']
+  ignore: ['upvotes', 'downvotes', 'comments', 'deleted']
 });
 
 Answer = mongoose.model('answers', schema);

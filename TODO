@@ -1,26 +1,38 @@
 High Priority
  - DONE Check logged out views
  - DONE link related texts on qa page
- - forgot my password
+ - DONE forgot my password
  - privacy & terms of use
  - solve toast being too big on mobile
  - DONE make 'i have read rules' required
  - DONE char limit for title and text of questions and answers
- - user profile pages
+ - DONE user profile pages
  - DONE empty comments can be submitted
- - disable voting on your own posts
+ - DONE disable voting on your own posts
+ - DONE incorrect scroll for chapters missing title thingy
+ - DONE 3Jn1:5 seems not to be parsed
 
 Normal priority
- - delete stuff admin function (comments for everyone)
+ - DONE delete stuff admin function (comments for everyone)
  - Offline
    - Installation notification
    - Hide features when offline
  - DONE 404
  - show vote counts on question cards
- - add sync option to dashboard more menu
+ - user page, recent activity, verses
+ - add sync option to app menu
+ - add change displayName option to my account menu
  - clicking the same verse should not deselect it
  - support ranges in edit question form
  - add more stuff to logged out dashboard
+ - password token expiration logic
+ - add a contact us page
+ - keep title centered far longer (after going narrow)
+ - improve error reporting in api to prevent crashes
+ - decard 'post answer' form
+ - remember sort on book list
+ - close info drawer after action
+ - NOTE's showing weird for timo :/
 
 Low Priority
  - scroll happens after 'ask question' flow started (???)
@@ -36,7 +48,20 @@ Low Priority
  - blur in search (for mobile keyboards)
  - on mobile dashboard more menu touches top border
  - refactor to use private properties and functions everywhere properly (`_` start)
- - Bible Snippet with just 'mt' (in markdown)
+ - bible Snippet with just 'mt' (in markdown)
+ - figure out a way to apply consistent styling everywhere... and maybe run polylint or something
+ - deleted post page
+ - animated lazy router pages
+ - add paper dropdown menu icon item on dashboard where you can config which cards you want to see
+ - pierce navigation when triggering search from bible book to cause focus
+ - add arrow back on settings or something along those lines~
+ - clarify settings for reading mode being only for reading mode
+ - scrollbar not visible on white on black
+ - add [title] to bible-snippet
+ - consider reworking bible list to look like BibleGateway on desktop :/
+ - add register link to log in
+ - invalidate all sessionTokesn after forgotten password
+ - hash forgotten password tokens
 
 Optional
  - remove JS logic out of JS-only-elements... including maybe even auth-api
@@ -50,6 +75,7 @@ Optional
  - make a paper-stepper
  - refactor cards to start with `card-`
  - make verse copying a multi selection thing?
+ - timeline
 
 External Dependency
  - When dashboard fits fully on screen, background is visible under it

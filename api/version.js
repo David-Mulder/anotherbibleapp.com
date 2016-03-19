@@ -36,7 +36,7 @@ module.exports = exports = function(schema, options) {
         }
       }
     });
-    console.log('MOD',modified);
+    console.info('Post modified for new revision:',modified);
 
     if(this._original){
 

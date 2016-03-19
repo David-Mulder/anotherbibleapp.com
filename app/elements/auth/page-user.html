@@ -1,0 +1,138 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../utils/relative-time.html">
+
+<dom-module id="page-user">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      .display-name{
+        width: 100%;
+      }
+      .display-name div{
+        text-align: center;
+        font-size: 36px;
+        padding-bottom: 20px;
+      }
+      .user-info{
+        white-space: pre-wrap;
+      }
+      .user-info .no-info{
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+      .user-info-edit{
+        margin-top: -15px;
+      }
+      .activity-item{
+        padding: 20px 20px !important;
+      }
+      .activity-item:hover{
+        cursor: pointer;
+        background: rgba(0,0,0,.04);
+      }
+      .activity-item .info{
+        color: var(--secondary-text-on-card-dialog-color);
+        font-size: smaller;
+        padding-left: 10px;
+      }
+      paper-toolbar{
+        background-image: url('/images/top-header.png');
+        background-size: cover !important;
+        background-position: 0px 0px !important;
+      }
+    </style>
+
+    <auth-api id="api" method="get" action="user/:id" param-id="{{userId}}"></auth-api>
+    <auth-api id="editSelfApi" method="post" action="user" param-user="{{user}}"></auth-api>
+
+    <paper-toolbar class="tall">
+      <intelligent-title title="Profile" no-title-if-wide></intelligent-title>
+      <div class="bottom display-name">
+        <div>{{_smartCaps(user.displayName)}}</div>
+      </div>
+    </paper-toolbar>
+
+    <div class="page-content">
+
+      <paper-card heading="Bio">
+        <div class="card-content user-info" hidden$="{{admin}}">{{user.info}}<span hidden$="{{!_equals(user.info.length, 0)}}" class="no-info">This user prefers to keep an air of mystery about them.</span></div>
+        <template is="dom-if" if="{{admin}}">
+          <div class="card-content user-info-edit">
+            <paper-textarea label="A short bit about yourself" value="{{user.info}}" char-counter maxlength="500"></paper-textarea>
+          </div>
+        </template>
+      </paper-card>
+
+      <paper-card heading="Activity">
+        <template is="dom-repeat" items="{{activity}}">
+          <template is="dom-if" if="{{_equals(item.type, 'answer')}}">
+            <div class="card-actions activity-item answer" on-tap="_goToQuestion">
+              <div class="title">{{item.question.title}}</div>
+              <div class="info">Answered by {{user.displayName}} <relative-time time="{{item.createdAt}}"></relative-time></div>
+            </div>
+          </template>
+          <template is="dom-if" if="{{_equals(item.type, 'question')}}">
+            <div class="card-actions activity-item question" on-tap="_goToQuestion">
+              {{item.title}}
+              <div class="info">Asked by {{user.displayName}} <relative-time time="{{item.createdAt}}"></relative-time></div>
+            </div>
+          </template>
+        </template>
+      </paper-card>
+
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          userId: String
+        },
+        behaviors: [
+          abaBehaviors.logic,
+          abaBehaviors.text
+        ],
+        listeners: {
+          'page-became-visible': '_retrieveFromApi'
+        },
+        observers: [
+          '_userChanged(user.info)'
+        ],
+        _retrieveFromApi: function(){
+          this._saveChanges = false;
+          this.$.api.execute().then(function(result){
+            console.debug(result);
+            page.replace('/user/'+result.user._id+'/'+result.user.displayName.replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));
+            this.activity = result.activity;
+            this.user = result.user;
+            this._saveChanges = true;
+            this.admin = result.me;
+          }.bind(this));
+        },
+        _userChanged: function(){
+          if(this._saveChanges){
+            this.debounce('save', function(){
+              this.$.editSelfApi.execute().then(function(){
+                app.toast('Saved')
+              });
+            }, 5000);
+          }
+        },
+        _goToQuestion: function(ev){
+          var id = ev.model.item.question ? ev.model.item.question._id : ev.model.item._id;
+          page('/question/'+id);
+        },
+        _goToSettings: function(){
+          page('/settings');
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

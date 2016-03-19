@@ -9,7 +9,9 @@ var UserSchema = new Schema({
   password: {type: String, required: true},
   info: String,
   reputation: Number,
-  settings: {type: Object, default: {}}
+  settings: {type: Object, default: {}},
+  recoveryToken: String,
+  admin: Boolean
 });
 
 UserSchema.pre('save', function(next) {
@@ -38,6 +40,14 @@ UserSchema.methods.comparePassword = function(candidatePassword, cb) {
     if (err) return cb(err);
     cb(null, isMatch);
   });
+};
+
+UserSchema.methods.makePublic = function(userId){
+  var obj = this.toObject();
+  delete obj.password;
+  delete obj.recoveryToken;
+  delete obj.settings;
+  return obj;
 };
 
 var User = mongoose.model('User', UserSchema);

@@ -1,4 +1,7 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="books-list">
   <template>
@@ -6,7 +9,7 @@
     <style>
       :host {
         display: block;
-        padding: 10px;
+        padding-top: 5px;
       }
 
       paper-card{
@@ -25,8 +28,56 @@
         text-align: left;
         font-size: 14px;
       }
+      .block{
+
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(0,0,0,.1);
+      }
+      .block .heading{
+        font-size: 12px;
+        color: var(--secondary-text-on-primary-color-50);
+        padding-top: 0px;
+        padding-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-left: 10px;
+      }
+      .block .item{
+        line-height: 48px;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-left: 15px;
+      }
+      .block .item .prefix, .block .item .suffix{
+
+        font-size: 13px;
+        font-variant: small-caps;
+
+      }
+      .block .item iron-icon{
+        width: 21px;
+        height: 21px;
+        padding-bottom: 3px;
+
+      }
+      .block .item .title{
+      }
+      .block .item[data-selected]{
+        font-weight: bold;
+        background: rgba(0,0,0,.05);
+        color: var(--accent-color-700);
+      }
+      .block .item iron-icon{
+        color: rgba(0,0,0,.2);
+        margin-right: 10px;
+      }
     </style>
-    <utils-books grouped-books="{{books}}" sort-category="tradition"></utils-books>
+    <utils-books grouped-books="{{books}}" sort-category="{{sortCategory}}"></utils-books>
     <template is="dom-repeat" items="{{books}}" as="group">
       <paper-card heading="{{group.label}}">
         <template is="dom-repeat" items="{{group.books}}" as="book">
@@ -35,6 +86,16 @@
           </div>
         </template>
       </paper-card>
+      <!--
+      <div class="block">
+        <div class="heading">{{group.label}}</div>
+        <template is="dom-repeat" items="{{group.books}}" as="book">
+          <div class="item" on-tap="goToBook" data-selected$="{{_equals(book.name, _selectedBook)}}">
+            <iron-icon icon="book" hidden="{{!_equals(book.icon, 'book')}}"></iron-icon><iron-icon icon="mail" hidden="{{!_equals(book.icon, 'letters')}}"></iron-icon> <span class="prefix">{{book.long_title.prefix}}</span> <span class="title">{{book.long_title.title}}</span> <span class="suffix">{{book.long_title.suffix}}</span>
+          </div>
+        </template>
+      </div>
+      -->
     </template>
   </template>
 
@@ -42,11 +103,28 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
+      window.a = BibleReference;
       Polymer({
         is: 'books-list',
 
         properties: {
-          books: Array
+          books: Array,
+          currentRef: {
+            type: String,
+            observer: '_setSelectedBook'
+          },
+          sortCategory: {
+            type: String,
+            value: 'tradition'
+          }
+        },
+        behaviors: [
+          abaBehaviors.logic
+        ],
+        _setSelectedBook: function(ref){
+          var reference = new BibleReference(ref);
+          this._selectedBook = reference.book.name;
         },
         goToBook: function(ev){
           page('/book/'+ev.model.book.name);

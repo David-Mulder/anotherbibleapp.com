@@ -9,10 +9,21 @@
 
       var apiElements = [];
 
-      var registerToken = function(token){
-        apiElements.forEach(function(el){
-          el.set('token', token);
-        });
+      var sharedData = {};
+
+      var registerSharedDataIfSet = function(el){
+        if(Object.keys(sharedData).length > 0){
+          Object.keys(sharedData).forEach(function(item){
+            el.set(item, sharedData[item]);
+          });
+          return true;
+        }else{
+          return false;
+        }
+      };
+      var registerSharedDataForAll = function(data){
+        sharedData = data;
+        apiElements.forEach(registerSharedDataIfSet);
       };
 
       Polymer({
@@ -26,6 +37,8 @@
           },
           unauthorized: Boolean,
           token: String,
+          user: {type:Object, notify: true},
+          admin: {type:Boolean, notify: true},
           apiUrl: {
             type: String,
             value: function(){
@@ -54,10 +67,28 @@
         ready: function(){
           apiElements.push(this);
 
+          /*alert(typeof this.token);
           if('token' in localStorage){
-            registerToken(localStorage.token);
+            registerToken(localStorage.token, JSON.parse(localStorage.user));
           }else{
             this.set('token', '');
+            this.set('user', {});
+          }*/
+          if(registerSharedDataIfSet(this)){
+
+          } else {
+            if('token' in localStorage){
+              var user = JSON.parse(localStorage.user);
+              registerSharedDataForAll({
+                token: localStorage.token,
+                user: user,
+                admin: user.admin
+              });
+            }else{
+              this.set('token', '');
+              this.set('user', {});
+              this.set('admin', false);
+            }
           }
         },
 
@@ -190,8 +221,14 @@
               if(this.status === 401){
                 reject(this.response);
               }else{
-                localStorage.token = this.response;
-                registerToken(localStorage.token);
+                localStorage.token = this.response.token;
+
+                localStorage.user = JSON.stringify(this.response.user);
+                registerSharedDataForAll({
+                  token: localStorage.token,
+                  user: this.response.user,
+                  admin: this.response.user.admin
+                });
                 resolve();
               }
             }.bind(this)).catch(function(err){
@@ -209,7 +246,7 @@
           var attributes = Array.prototype.slice.call(this.attributes).filter(function(a){
             return a.nodeName.substring(0,6) == 'param-'
           }).map(function(a){
-            //todo: properly capitalize multi - params
+            //todo: properly capitalize multi `-` params
             return {
               value: a.nodeValue === '' ? true : a.nodeValue,
               name: a.nodeName.split('-')[1]

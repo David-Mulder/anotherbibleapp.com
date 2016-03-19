@@ -30,14 +30,19 @@ module.exports = {
 
     app.get('/qa/:id', weakLimit, questionController.getWithAnswers);
 
-    app.get('/user', authenticator.isAuthenticated, userController.get);
+    app.get('/user', authenticator.isAuthenticated, userController.getCurrentlyLoggedInUser);
     app.put('/user', userController.register);
+    app.post('/user', authenticator.isAuthenticated, userController.updateCurrentlyLoggedInUser);
     app.get('/user/settings', authenticator.isAuthenticated, userController.getAllSettings);
     app.get('/user/settings/reset', authenticator.isAuthenticated, userController.resetSettings);
     app.get('/user/settings/:setting', authenticator.isAuthenticated, userController.getSetting);
     app.post('/user/settings/:setting', authenticator.isAuthenticated, userController.saveSetting);
+    app.post('/user/recovery', strongLimit, userController.recovery);
+    app.post('/user/reset-password', strongLimit, userController.resetPassword);
+    app.get('/user/:id', userController.get);
 
     app.get('/question/:id', weakLimit, questionController.get);
+    app.delete('/question/:id', authenticator.isAuthenticated, questionController.delete);
     app.put('/question', authenticator.isAuthenticated, questionController.create);
     app.post('/question/:id', authenticator.isAuthenticated, questionController.update);
     app.get('/questions/list/recent', questionController.listRecent);
@@ -46,8 +51,10 @@ module.exports = {
     app.get('/answer/:id', weakLimit, answerController.get);
     app.put('/answer', authenticator.isAuthenticated, answerController.create);
     app.post('/answer/:id', authenticator.isAuthenticated, answerController.update);
+    app.delete('/answer/:id', authenticator.isAuthenticated, answerController.delete);
 
     app.put('/comment/:type/:id', authenticator.isAuthenticated, commentController.create);
+    app.delete('/comment/:id', authenticator.isAuthenticated, commentController.delete);
 
     app.post('/upvote/:type/:id', authenticator.isAuthenticated, votingController.upvote);
     app.post('/downvote/:type/:id', authenticator.isAuthenticated, votingController.downvote);

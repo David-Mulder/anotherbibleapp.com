@@ -32,6 +32,7 @@
       }
     </style>
 
+    <auth-api id="api" param-username="{{username}}" param-password="{{password}}" logged-in="{{loggedIn}}"></auth-api>
     <synced-settings id="settings"></synced-settings>
 
     <paper-toolbar>
@@ -39,7 +40,7 @@
     </paper-toolbar>
 
     <div>
-      <auth-api id="api" param-username="{{username}}" param-password="{{password}}" logged-in="{{loggedIn}}"></auth-api>
+
       <form is="iron-form" id="form" method="post" action="/form/handler" hidden="{{loggedIn}}">
         <paper-card id="login" heading="Log in">
           <div class="card-content">
@@ -47,16 +48,18 @@
             <paper-input id="password" type="password" value="{{password}}" on-keyup="_checkForSubmit" label="Password"></paper-input>
             <div class="actions">
               <paper-button class="blue" on-tap="login">Log In</paper-button>
-              <paper-button class="blue">Forgot your password</paper-button>
+              <paper-button class="blue" on-tap="goToForgotPassword">Forgot your password</paper-button>
             </div>
           </div>
         </paper-card>
       </form>
+
       <paper-card id="login" heading="Log in" hidden="{{!loggedIn}}">
         <div class="card-content">
           You are already logged in. Please Log Out first.
         </div>
       </paper-card>
+
     </div>
   </template>
 
@@ -121,6 +124,9 @@
               alert(err);
             }
           }.bind(this));
+        },
+        goToForgotPassword: function(){
+          page('/forgot-my-password');
         }
       });
     })();

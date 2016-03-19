@@ -65,6 +65,7 @@
 
         <span class="flex"></span>
 
+        <!--
         <paper-icon-button icon="search" on-tap="goToSearch"></paper-icon-button>
 
         <paper-menu-button horizontal-align="right">
@@ -74,6 +75,7 @@
             <paper-item hidden="{{!loggedIn}}" on-tap="goToLogout">Log&nbsp;out</paper-item>
           </paper-menu>
         </paper-menu-button>
+        -->
 
       </paper-toolbar>
 
@@ -83,7 +85,7 @@
 
         <template is="dom-if" if="{{loggedIn}}">
           <card-welcome-back narrow="{{narrow}}"></card-welcome-back>
-          <card-quick-nav></card-quick-nav>
+          <!--<card-quick-nav></card-quick-nav>-->
           <card-recent-books></card-recent-books>
           <card-recent-questions></card-recent-questions>
         </template>

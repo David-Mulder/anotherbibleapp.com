@@ -41,10 +41,10 @@
         <paper-card id="login" heading="Register">
           <div class="card-content">
 
-            <paper-input type="text" value="{{displayName}}" autofocus label="Display Name" on-keyup="_checkForEnter"></paper-input>
+            <paper-input type="text" value="{{displayName}}" autofocus label="Display Name" on-keyup="_checkForEnter" maxlength="25" char-counter></paper-input>
             <paper-input id="email" label="E-mail" value="{{username}}" on-keyup="_checkForEnter"></paper-input>
             <gold-password-input label="Password" value="{{password}}" strength-meter on-keyup="_checkForEnter"></gold-password-input>
-            <google-recaptcha sitekey="6LdkoBYTAAAAABH1QTVoIqDvzZTsC0aTHwVAbWlv" response="{{captchaResponse}}"></google-recaptcha>
+            <google-recaptcha id="recaptcha" sitekey="6LdkoBYTAAAAABH1QTVoIqDvzZTsC0aTHwVAbWlv" response="{{captchaResponse}}"></google-recaptcha>
 
             <div class="actions">
               <paper-button class="primary" on-tap="register">Register</paper-button>
@@ -75,8 +75,13 @@
             value: ''
           }
         },
+        listeners: {
+          'page-became-visible': 'ready'
+        },
         ready: function(){
-
+          if(this.loggedIn){
+            page('/');
+          }
         },
         _checkForEnter: function(ev){
           if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
@@ -100,8 +105,9 @@
             app.set('params.password', this.password);
             page('/login');
           }.bind(this)).catch(function(err){
+            this.$.recaptcha.reset();
             app.toast(err.humanError);
-          });
+          }.bind(this));
         }
       });
     })();

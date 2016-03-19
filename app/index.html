@@ -67,19 +67,21 @@
     <span id="browser-sync-binding"></span>
     <template is="dom-bind" id="app">
 
-      <paper-drawer-panel id="mainDrawer" responsive-width="1300px" force-narrow="{{forceNarrow}}">
+      <paper-drawer-panel id="mainDrawer" responsive-width="1275px" force-narrow="{{forceNarrow}}">
         <!-- Drawer Scroll Header Panel -->
         <paper-scroll-header-panel drawer fixed>
 
-          <!-- Drawer Toolbar -->
+          <!--
           <paper-toolbar id="drawerToolbar">
             <span class="title" style="margin-left:0px;">Books & Letters</span>
             <paper-icon-button icon="home" on-tap="goToHome" hidden$="{{isHome(route)}}"></paper-icon-button>
           </paper-toolbar>
           <div style="position:absolute;left:0px;top:0px;bottom:0px;right:0px;overflow: auto;">
-            <books-list></books-list>
+            <books-list current-ref="{{params.bookRef}}"></books-list>
           </div>
+          -->
 
+          <app-menu></app-menu>
 
         </paper-scroll-header-panel>
 
@@ -107,6 +109,9 @@
               <page-license data-route="license"></page-license>
               <page-settings data-route="settings"></page-settings>
               <page-not-found data-route="not-found"></page-not-found>
+              <page-user data-route="user" user-id$="{{params.userId}}"></page-user>
+              <page-forgotten-password data-route="forgotten-password" reset-token$="{{params.passwordResetToken}}"></page-forgotten-password>
+              <page-books data-route="books"></page-books>
               <!--<section data-route="home">
 
 				<paper-material elevation="1" class="paper-font-body2">

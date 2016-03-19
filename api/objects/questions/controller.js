@@ -1,6 +1,15 @@
 var Question = require('./model');
 var Answer = require('../answers/model');
 
+var deletionCheck = function(req, selector){
+  if(req.user && req.user.admin){
+    return selector;
+  }else{
+    selector.deleted = {$ne: true};
+    return selector;
+  }
+};
+
 module.exports = {
   get: function(req, res){
     var userId;
@@ -8,7 +17,7 @@ module.exports = {
       userId = req.user._id;
     }
     Question
-      .findOne({_id: req.params.id})
+      .findOne(deletionCheck(req, {_id: req.params.id}))
       .populate('originalAuthor', 'displayName _id')
       .populate('revisionAuthor', 'displayName _id')
       .exec(function(err, question){
@@ -27,6 +36,7 @@ module.exports = {
                 res.json(obj);
               });
             });
+
           }else{
             console.log('here');
             res.json(question.makePublic(userId));
@@ -41,28 +51,32 @@ module.exports = {
       userId = req.user._id;
     }
     Question
-      .findOne({_id: req.params.id})
+      .findOne(deletionCheck(req, {_id: req.params.id}))
       .populate('originalAuthor', 'displayName _id')
       .populate('revisionAuthor', 'displayName _id')
       .populate({
         path: 'comments',
+        match: req.user && req.user.admin ? {} : {deleted: {$ne: 1}},
         populate: {
           path: 'user',
           select: 'displayName _id'
         }
       })
       .exec(function(err, question){
-        if(err){
+        if(err) {
           res.status(500).json(err);
+        }else if(question === null){
+          res.status(404).json('Not found');
         }else{
           Answer
-            .find({
+            .find(deletionCheck(req, {
               question: req.params.id
-            })
+            }))
             .populate('originalAuthor', 'displayName _id')
             .populate('revisionAuthor', 'displayName _id')
             .populate({
               path: 'comments',
+              match: req.user && req.user.admin ? {} : {deleted: {$ne: 1}},
               populate: {
                 path: 'user',
                 select: 'displayName _id'
@@ -125,7 +139,7 @@ module.exports = {
 
   listRecent: function(req, res){
     Question
-      .find({'downvotes.0': {$exists: false}})
+      .find(deletionCheck(req, {'downvotes.0': {$exists: false}}))
       .sort('-updatedAt')
       .limit(5)
       .populate('originalAuthor', 'displayName _id')
@@ -139,14 +153,31 @@ module.exports = {
   },
 
   listForVerse: function(req, res){
-    Question.find({
+    Question.find(deletionCheck(req, {
       verses: parseInt(req.params.verse)
-    }).exec(function(err, result){
+    })).exec(function(err, result){
       if(err){
         res.status(500).json(err);
       }else{
         res.json(result.map(question => question.makePublic()));
       }
     });
+  },
+
+  delete: function(req, res){
+    if(req.user.admin){
+      Question.findOne({
+        _id: req.params.id
+      })
+        .populate('originalAuthor', 'displayName _id')
+        .populate('revisionAuthor', 'displayName _id')
+        .exec()
+        .then(function(question){
+          question.deleted = !question.deleted;
+          question.save().then(function(question){
+            res.json(question.makePublic());
+          });
+        });
+    }
   }
 };

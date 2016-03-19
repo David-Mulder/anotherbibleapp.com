@@ -1,0 +1,207 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="/bower_components/paper-item/paper-item.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
+<link rel="import" href="../utils/gravatar-icon.html">
+
+<dom-module id="app-menu">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+        background: white;
+      }
+      paper-toolbar{
+        background: transparent;
+      }
+      paper-scroll-header-panel{
+        height: 100%;
+
+        background-color: white;
+
+        /* background for toolbar when it is at its full size */
+        --paper-scroll-header-panel-full-header: {
+          background-color: var(--primary-color);
+        };
+
+        /* background for toolbar when it is condensed */
+        --paper-scroll-header-panel-condensed-header: {
+          background-color: transparent;
+        };
+      }
+
+      .search-box {
+        background-color: #fff;
+        border: 1px solid #eee;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        height: 30px;
+      }
+
+      .search-box iron-icon {
+        color: var(--google-grey-700);
+        fill: var(--google-grey-700);
+        margin: 0 8px;
+      }
+
+      .search-box input {
+        font-size: 15px;
+        outline: 0;
+        border: none;
+        margin-left: 10px;
+      }
+
+      .content {
+      }
+
+      .search-box {
+        @apply(--layout-flex);
+        @apply(--layout-center);
+        @apply(--layout-horizontal);
+      }
+
+      .search-box input {
+        @apply(--layout-flex);
+      }
+
+      .top{
+        position: relative;
+        width: 100%;
+      }
+      .top .icons{
+        position: absolute;
+        top: -20px;
+        right: 0px;
+      }
+      .user-menu{
+        position: absolute;
+        left: 0px;
+        top: -10px;
+      }
+      .user-menu .icon{
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: white;
+      }
+      .user-menu .name{
+        margin-top: 40px;
+      }
+      paper-menu, paper-submenu{
+        --paper-menu-selected-item: {
+          font-weight: normal !important;
+        };
+        --paper-menu-focused-item: {
+          font-weight: normal !important;
+        };
+      }
+      paper-submenu paper-menu{
+        padding-left: 10px;
+      }
+      paper-toolbar{
+        --paper-toolbar-sm-height: 64px;
+      }
+      paper-menu{
+        border-bottom: 1px solid rgba(0,0,0,.1);
+      }
+      paper-menu:last-of-type{
+        border-bottom: 0px;
+      }
+    </style>
+
+    <auth-api user="{{user}}" logged-in="{{loggedIn}}"></auth-api>
+
+    <paper-scroll-header-panel condenses condensed-header-height="64" scroll-away-topbar keep-condensed-header>
+
+      <paper-toolbar class="tall">
+        <div class="top">
+          <div class="icons">
+            <paper-menu-button horizontal-align="right">
+              <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+              <paper-menu class="dropdown-content" on-tap="_goToPageFromMenuEvent">
+                <paper-item data-page$="user/{{user._id}}" hidden="{{!loggedIn}}">My&nbsp;Account</paper-item>
+                <paper-item data-page="logout" hidden="{{!loggedIn}}">Sync</paper-item>
+                <paper-item data-page="logout" hidden="{{!loggedIn}}">Log&nbsp;out</paper-item>
+                <paper-item data-page="login" hidden="{{loggedIn}}">Log&nbsp;in</paper-item>
+                <paper-item data-page="register" hidden="{{loggedIn}}">Register</paper-item>
+              </paper-menu>
+            </paper-menu-button>
+          </div>
+
+          <div class="user-menu">
+            <gravatar-icon class="icon" email="{{user.email}}" default="https://anotherbibleapp.com/images/mm.png"></gravatar-icon>
+            <div class="name" hidden$="{{!loggedIn}}">{{user.displayName}}</div>
+            <div class="name" hidden$="{{loggedIn}}">Guest</div>
+          </div>
+        </div>
+        <div class="search-box bottom">
+          <input placeholder="Quick navigation (e.g. Mt 1:1)..." on-keyup="_checkForSubmit">
+        </div>
+      </paper-toolbar>
+
+      <div class="content">
+
+        <paper-menu on-tap="_goToPageFromMenuEvent">
+          <paper-item data-page="">Dashboard</paper-item>
+        </paper-menu>
+
+        <paper-menu on-tap="_goToPageFromMenuEvent">
+          <paper-item data-page="">Continue from John 3:3</paper-item>
+        </paper-menu>
+
+        <paper-menu on-tap="_goToPageFromMenuEvent">
+          <paper-item data-page="books">Books & Letters of the Bible</paper-item>
+          <paper-item data-page="search">Search</paper-item>
+          <paper-item data-page="recent-questions">Recent Questions</paper-item>
+        </paper-menu>
+
+        <paper-menu on-tap="_goToPageFromMenuEvent">
+          <paper-item data-page="settings">Settings</paper-item>
+          <paper-item data-page="bible/license">License Info</paper-item>
+        </paper-menu>
+
+      </div>
+
+    </paper-scroll-header-panel>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var BibleReference = require('bible-reference-parser');
+
+      Polymer({
+        properties: {
+
+        },
+        _goToPageFromMenuEvent: function(ev){
+          var tappedPage = Polymer.dom(ev).localTarget.dataset.page;
+          if(typeof tappedPage !== 'undefined'){
+            page('/' + tappedPage);
+          }
+        },
+        _checkForSubmit: function(ev){
+          if(ev.code == 'Enter' || ev.code == 'NumpadEnter'){
+            var value = ev.target.value;
+            var reference = new BibleReference(value);
+            ev.target.blur();
+            ev.target.value = '';
+            if(reference.book){
+              page('/book/'+reference.toString());
+            }else{
+              page('/search/'+encodeURIComponent(value));
+            }
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

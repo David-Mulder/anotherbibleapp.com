@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<script src="/scripts/md5.js"></script>
+
+<dom-module id="gravatar-icon">
+
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        overflow: hidden;
+      }
+      img{
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <img src$="{{imageUrl}}">
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          email: {
+            type: String,
+          },
+          size: {
+            type: Number
+          },
+          default: {
+            type: String,
+            value: 'identicon'
+          }
+        },
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+        listeners: {
+          'iron-resize': '_setSize'
+        },
+        observers: [
+          '_setImageUrl(email, size, default)'
+        ],
+        ready: function(){
+          this.async(function(){
+            this._setImageUrl();
+          });
+        },
+        _setSize: function(){
+          var rect = this.getBoundingClientRect();
+          this.set('size', Math.max(rect.width, rect.height));
+        },
+        _setImageUrl: function(){
+          var start = 'https://www.gravatar.com/avatar/';
+          var params = [];
+          if(this.email && this.email.length > 0){
+            var hash = md5(this.email.toLowerCase().trim());
+          }else{
+            var hash = md5(Math.random().toString());
+            params.push('forcedefault=y')
+          }
+          params.push('s='+this.size);
+          params.push('d='+this.default);
+          this.set('imageUrl', start + hash + '?' + params.join('&'));
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

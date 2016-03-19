@@ -14,9 +14,9 @@ if(config.disabled){
   self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
   self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
 
-  toolbox.options.cacheName = config.cacheId
+  toolbox.options.cacheName = config.cacheId;
 
-  toolbox.precache(config.precache);
+  //toolbox.precache(config.precache);
 
   toolbox.router.get('*', toolbox.fastest);
   toolbox.router.get('*', toolbox.fastest, {origin: 'https://fonts.googleapis.com'});

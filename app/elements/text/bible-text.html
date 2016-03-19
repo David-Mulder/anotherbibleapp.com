@@ -260,8 +260,8 @@
                   color: 'black'
                 },
                 black: {
-                  background: 'black',
-                  color: 'white'
+                  background: '#212121',
+                  color: 'rgba(255,255,255,.8)'
                 }
               };
               this.customStyle['--reading-background-color'] = colorSchemes[value].background;
@@ -408,7 +408,7 @@
               }
             }
             if (lastValidIndex) {
-              if(isNaN(this.textRef.verseStart)){
+              if(isNaN(this.textRef.verseStart) && this.blocks[lastValidIndex-1].verseStart == null){
                 lastValidIndex--;
               }
               this.$.text.scrollToIndex(lastValidIndex);
@@ -458,7 +458,7 @@
                 }
               }
             }else{
-              if(!verseNumberElement || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)){
+              if(!verseNumberElement){ // || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)
                 this.set('selectedVerses', []);
               }else{
                 this.set('selectedVerses', verseNumberElement ? [verseNumberElement.id] : []);
@@ -469,6 +469,7 @@
         },
 
         _handleScroll: function(){
+          console.log('current', this.blocks[this.$.text.firstVisibleIndex].verseStart);
           this.debounce('scroll', function(){
             var firstIndex = this.$.text.firstVisibleIndex;
             if(this.blocks[firstIndex].verseStart === null){

@@ -9,7 +9,8 @@ var schema = new Schema({
   text: String,
   date: {
     type: Date
-  }
+  },
+  deleted: Boolean
 });
 
 var Comment = mongoose.model('Comment', schema);

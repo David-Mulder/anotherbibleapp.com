@@ -17,6 +17,9 @@
       paper-card{
         display: block;
       }
+      paper-card[deleted]{
+        opacity: .5;
+      }
       .author{
         text-align: right;
         color: var(--secondary-text-on-card-dialog-color);
@@ -67,6 +70,11 @@
       }
       .post .text{
         flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .post bible-markdown{
+        flex: 1;
       }
       .card-actions paper-icon-button, .card-actions paper-button{
         color: var(--secondary-text-on-card-dialog-color);
@@ -92,13 +100,25 @@
         padding: 16px 16px 16px 34px !important;
         background: rgba(0,0,0,.017);
       }
+      .comment[deleted]{
+        background: rgba(0,0,0,.047);
+        color: rgba(0,0,0,.2);
+      }
       .comment .user{
         font-weight: bold;
       }
-      .comment .date{
+      .comment .user span{
+        cursor: pointer;
+      }
+      .comment .meta{
         float: right;
         font-size: smaller;
         color: var(--secondary-text-on-card-dialog-color);
+      }
+      .comment .meta .delete{
+        height: 16px;
+        width: 16px;
+        cursor: pointer;
       }
       .add-comment{
         display: flex;
@@ -132,11 +152,14 @@
       }
     </style>
 
-    <paper-card>
+    <auth-api logged-in="{{loggedIn}}" user="{{loggedInUser}}"></auth-api>
+    <auth-api id="deletePostApi" method="DELETE" action=":type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
+    <auth-api id="upvoteApi" method="POST" action="upvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
+    <auth-api id="downvoteApi" method="POST" action="downvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
+    <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}"></auth-api>
+    <auth-api id="deleteCommentApi" method="DELETE" action="comment/:id" param-id="{{commentId}}"></auth-api>
 
-      <auth-api id="upvoteApi" method="POST" action="upvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
-      <auth-api id="downvoteApi" method="POST" action="downvote/:type/:id" param-type="{{type}}" param-id="{{post._id}}"></auth-api>
-      <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}" logged-in="{{loggedIn}}"></auth-api>
+    <paper-card deleted$="{{post.deleted}}">
 
       <div class="card-content">
         <div class="post">
@@ -158,7 +181,7 @@
 
 
             <div class="author">
-              By {{post.originalAuthor.displayName}}
+              By <a on-tap="_goToUser">{{post.originalAuthor.displayName}}</a>
               <relative-time time="{{post.createdAt}}"></relative-time>
             </div>
             <!--
@@ -182,6 +205,8 @@
 
         <paper-icon-button icon="create" on-tap="goToEdit" disabled$="{{!loggedIn}}"></paper-icon-button>
 
+        <paper-icon-button icon="delete" on-tap="deletePost" hidden$="{{!_canUserDeletePost(loggedInUser, post)}}"></paper-icon-button>
+
         <paper-button on-tap="goToHistory" disabled$="{{!hasHistory}}">
           <iron-icon icon="history"></iron-icon>
           <span class="label edited" hidden="{{!showRevision}}">edited by {{post.revisionAuthor.displayName}}</span>
@@ -196,10 +221,13 @@
 
       <template is="dom-if" if="{{commentsVisible}}">
 
-        <template is="dom-repeat" items="{{post.comments}}" as="comment">
-          <div class="card-actions comment">
-            <div class="date"><relative-time time="{{comment.date}}"></relative-time></div>
-            <div class="user">{{comment.user.displayName}}</div>
+        <template is="dom-repeat" items="{{post.comments}}" as="comment" index-as="i">
+          <div class="card-actions comment" deleted$="{{comment.deleted}}">
+            <div class="meta">
+              <relative-time time="{{comment.date}}"></relative-time>
+              <iron-icon icon="delete" class="delete" on-tap="_deleteComment" hidden$="{{!_canUserDeleteComment(loggedInUser, comment)}}"></iron-icon>
+            </div>
+            <div class="user"><span on-tap="_goToCommentUser">{{comment.user.displayName}}</span></div>
             <div class="text">
               {{comment.text}}
             </div>
@@ -212,7 +240,7 @@
         </div>
 
         <div class="card-actions add-comment login-to-comment" hidden$="{{loggedIn}}">
-          Log in to comment.
+          <a on-tap="_goToLogin">Log in</a> to comment.
         </div>
 
       </template>
@@ -236,7 +264,7 @@
           hasHistory: Boolean
         },
         observers: [
-          'postChanged(post.*)'
+          'postChanged(post)'
         ],
         behaviors:[
           abaBehaviors.logic
@@ -279,8 +307,8 @@
           }
         },
         addComment: function(){
-          if(this.commentText.length < 15){
-            app.toast('Your comment should be at least 15 characters long.');
+          if(this.commentText.length < 10){
+            app.toast('Your comment should be at least 10 characters long.');
           }else {
             this.$.addCommentApi.execute().then(function (comment) {
               this.push('post.comments', comment);
@@ -303,6 +331,44 @@
             app.toast('The page URL has been copied to your clipboard.')
           }else{
             app.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
+          }
+        },
+        _goToUser: function(ev){
+          page('/user/' + this.post.originalAuthor._id);
+        },
+        _goToCommentUser: function(ev){
+          page('/user/' + ev.model.comment.user._id);
+        },
+        _goToLogin: function(ev){
+          page('/login');
+        },
+        _deleteComment: function(ev){
+          this.commentId = ev.model.comment._id;
+          this.$.deleteCommentApi.execute().then(function(comment){
+            this.set(['post','comments', ev.model.i], comment);
+          }.bind(this));
+        },
+        deletePost: function(ev, mouseEv, doNotToast){
+          this.$.deletePostApi.execute().then(function(post){
+            //alert('do set');
+            this.set('post', post);
+            console.log(arguments, doNotToast);
+            if(typeof doNotToast == 'undefined'){
+              app.askToast('The post was deleted', ['Undo']).then(function(){
+                this.deletePost(ev, mouseEv, true);
+              }.bind(this));
+            }
+            //this.set(['post','comments', ev.model.i], comment);
+          }.bind(this));
+        },
+        _canUserDeleteComment: function(user, comment){
+          return user._id == comment.user._id || user.admin;
+        },
+        _canUserDeletePost: function(user, post){
+          if(this.type == 'question'){
+            return user.admin;
+          }else if(this.type == 'answer'){
+            return user._id == post.originalAuthor._id || user.admin;
           }
         }
       });

@@ -60,6 +60,24 @@ module.exports = {
           res.json(answer);
         });
       });
+  },
+
+  delete: function(req, res){
+
+    Answer.findOne({
+        _id: req.params.id
+      })
+      .populate('originalAuthor', 'displayName _id')
+      .populate('revisionAuthor', 'displayName _id')
+      .exec()
+      .then(function(answer){
+        if(answer.originalAuthor._id.equals(req.user._id) || req.user.admin){
+          answer.deleted = !answer.deleted;
+          answer.save().then(function(answer){
+            res.json(answer.makePublic());
+          });
+        }
+      });
   }
 
 };
