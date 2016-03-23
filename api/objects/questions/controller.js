@@ -141,7 +141,7 @@ module.exports = {
     Question
       .find(deletionCheck(req, {'downvotes.0': {$exists: false}}))
       .sort('-updatedAt')
-      .limit(5)
+      .limit(Math.min(req.query.count, 25))
       .populate('originalAuthor', 'displayName _id')
       .exec(function(err, result){
       if(err){
@@ -159,7 +159,9 @@ module.exports = {
       if(err){
         res.status(500).json(err);
       }else{
-        res.json(result.map(question => question.makePublic()));
+        result = result.map(question => question.makePublic());
+        result.sort((a,b) => b.score - a.score);
+        res.json(result);
       }
     });
   },

@@ -52,48 +52,54 @@
         },
         sync: function(){
 
-          var localSettings = this._getAllLocalSettings();
+          return new Promise(function(resolve, reject) {
 
-          if(this.$.getAll.loggedIn){
-            this.$.getAll.execute().then(function(cloudSettings){
+            var localSettings = this._getAllLocalSettings();
 
-              //cloudSetting values in JSON still
+            if (this.$.getAll.loggedIn) {
+              this.$.getAll.execute().then(function (cloudSettings) {
 
-              this._dateify(cloudSettings, 'updatedAt');
+                //cloudSetting values in JSON still
 
-              Object.keys(cloudSettings).forEach(function(settingName){
-                if(typeof localSettings[settingName] !== 'undefined'){
-                  var diff = Math.abs(localSettings[settingName].updatedAt - cloudSettings[settingName].updatedAt);
-                  if(diff > 30000) {
-                    if (localSettings[settingName].updatedAt > cloudSettings[settingName].updatedAt) {
-                      this._saveCloud(settingName, localSettings[settingName].value, localSettings[settingName].updatedAt);
+                this._dateify(cloudSettings, 'updatedAt');
+
+                Object.keys(cloudSettings).forEach(function (settingName) {
+                  if (typeof localSettings[settingName] !== 'undefined') {
+                    var diff = Math.abs(localSettings[settingName].updatedAt - cloudSettings[settingName].updatedAt);
+                    if (diff > 30000) {
+                      if (localSettings[settingName].updatedAt > cloudSettings[settingName].updatedAt) {
+                        this._saveCloud(settingName, localSettings[settingName].value, localSettings[settingName].updatedAt);
+                      } else {
+                        this._saveLocal(settingName, JSON.parse(cloudSettings[settingName].value), cloudSettings[settingName].updatedAt);
+                      }
                     } else {
-                      this._saveLocal(settingName, JSON.parse(cloudSettings[settingName].value), cloudSettings[settingName].updatedAt);
+                      console.log('diff (', diff, ') so small, not updating', settingName);
                     }
-                  }else{
-                    console.log('diff (', diff, ') so small, not updating', settingName);
+                  } else {
+                    this._saveLocal(settingName, JSON.parse(cloudSettings[settingName].value), cloudSettings[settingName].updatedAt);
                   }
-                }else{
-                  this._saveLocal(settingName, JSON.parse(cloudSettings[settingName].value), cloudSettings[settingName].updatedAt);
-                }
 
+                }.bind(this));
+
+                Object.keys(localSettings).forEach(function (settingName) {
+                  if (typeof cloudSettings[settingName] == 'undefined') {
+                    this._saveCloud(settingName, localSettings[settingName].value, localSettings[settingName].updatedAt);
+                  }
+                }.bind(this));
+
+                settingResolution(this._getAllLocalSettings());
+                resolve();
+
+              }.bind(this)).catch(function () {
+                //no internet
+                settingResolution(this._getAllLocalSettings());
+                reject('No internet');
               }.bind(this));
-
-              Object.keys(localSettings).forEach(function(settingName){
-                if(typeof cloudSettings[settingName] == 'undefined'){
-                  this._saveCloud(settingName, localSettings[settingName].value, localSettings[settingName].updatedAt);
-                }
-              }.bind(this));
-
+            } else {
               settingResolution(this._getAllLocalSettings());
-
-            }.bind(this)).catch(function(){
-              //no internet
-              settingResolution(this._getAllLocalSettings());
-            }.bind(this));
-          }else{
-            settingResolution(this._getAllLocalSettings());
-          }
+              reject('Not logged in');
+            }
+          }.bind(this));
         },
         addListener: function(settingName, callback, fireStraightAway){
           if(typeof listeners[settingName] == 'undefined'){

@@ -48,6 +48,8 @@ define(function(){
     this.verseEnd = verseEnd || verseStart;
   };
 
+  window.BR = BibleReference;
+
   Object.defineProperty(BibleReference.prototype, 'valid', {
     enumerable: false,
     configurable: false,
@@ -98,6 +100,7 @@ define(function(){
     }
     return str;
   };
+
   BibleReference.prototype.toLongString = function(){
     var str = this.book.title;
     if(this.chapter){
@@ -111,9 +114,24 @@ define(function(){
     }
     return str;
   };
+
   BibleReference.prototype.toNumeric = function(){
     var verse = this.verseStart || 1;
     return (('00' + (bibleBooks.indexOf(this.book)+1)).slice(-2) + ('000' + this.chapter).slice(-3) + ('000' + verse).slice(-3)) * 1;
+  };
+
+  BibleReference.prototype.split = function() {
+    var result = [];
+    var originalStart = this.verseStart;
+    var originalEnd = this.verseEnd;
+    for(var v=originalStart;v<=originalEnd;v++){
+      this.verseStart = v;
+      this.verseEnd = v;
+      result.push(new BibleReference(this.toNumeric()));
+    }
+    this.verseEnd = originalEnd;
+    this.verseStart = originalStart;
+    return result;
   };
 
   BibleReference.combine = function(arr){
@@ -148,6 +166,7 @@ define(function(){
         newArr.push(br);
       }
     });
+
     if(initialLength == newArr.length){
       return newArr;
     }else{

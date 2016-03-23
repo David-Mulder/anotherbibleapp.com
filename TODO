@@ -1,67 +1,49 @@
 High Priority
- - DONE Check logged out views
- - DONE link related texts on qa page
- - DONE forgot my password
- - privacy & terms of use
  - solve toast being too big on mobile
- - DONE make 'i have read rules' required
- - DONE char limit for title and text of questions and answers
- - DONE user profile pages
- - DONE empty comments can be submitted
- - DONE disable voting on your own posts
- - DONE incorrect scroll for chapters missing title thingy
- - DONE 3Jn1:5 seems not to be parsed
+ - ev.code enter does not work on mobile
+ - scrolling with arrow keys doesnt work
+ - paper-menu-button-icon doesn't work in narrow drawer
 
 Normal priority
- - DONE delete stuff admin function (comments for everyone)
  - Offline
    - Installation notification
    - Hide features when offline
- - DONE 404
- - show vote counts on question cards
- - user page, recent activity, verses
- - add sync option to app menu
- - add change displayName option to my account menu
- - clicking the same verse should not deselect it
- - support ranges in edit question form
- - add more stuff to logged out dashboard
  - password token expiration logic
- - add a contact us page
- - keep title centered far longer (after going narrow)
  - improve error reporting in api to prevent crashes
- - decard 'post answer' form
- - remember sort on book list
- - close info drawer after action
  - NOTE's showing weird for timo :/
+ - validation in edit post forms
+ - dyslexic font
 
 Low Priority
- - scroll happens after 'ask question' flow started (???)
- - DONE remove setTitle calls from routing
  - pass text blocks as objects instead of string
  - change 'recent questions' to 'recent activity'
  - add browsing option of recent activity rather than just top 10
- - reapply firstIndex better after read -> study modus
  - Refactor: search for 13 enter and fix to `code` enter (qa-post:264 or page-login)
  - refactor app.toast/ask/etc to a... element or behavior
- - bible-markdown-editor jumps when mobile keyboard changes layout from portrait to landscape
- - switching books in reading modus loses forcenarrow
  - blur in search (for mobile keyboards)
- - on mobile dashboard more menu touches top border
- - refactor to use private properties and functions everywhere properly (`_` start)
- - bible Snippet with just 'mt' (in markdown)
  - figure out a way to apply consistent styling everywhere... and maybe run polylint or something
- - deleted post page
+ - DONE deleted post page
  - animated lazy router pages
  - add paper dropdown menu icon item on dashboard where you can config which cards you want to see
- - pierce navigation when triggering search from bible book to cause focus
  - add arrow back on settings or something along those lines~
  - clarify settings for reading mode being only for reading mode
- - scrollbar not visible on white on black
- - add [title] to bible-snippet
  - consider reworking bible list to look like BibleGateway on desktop :/
- - add register link to log in
  - invalidate all sessionTokesn after forgotten password
+ - add explicit save button to user page
+ - add to menu continue reading button
+ - Google analtyics (http://www.outfox.com/do-not-track-for-google-analytics/)
+ - move scrollbar in text to side
+
+Very Low Priority
+ - add a contact us page
  - hash forgotten password tokens
+ - scrollbar not visible on white on black
+ - pierce navigation when triggering search from bible book to cause focus
+ - bible Snippet with just 'mt' (in markdown)
+ - refactor to use private properties and functions everywhere properly (`_` start)
+ - on mobile, dashboard 'more menu' touches top border
+ - reapply firstIndex better after read -> study modus
+
 
 Optional
  - remove JS logic out of JS-only-elements... including maybe even auth-api
@@ -76,9 +58,10 @@ Optional
  - refactor cards to start with `card-`
  - make verse copying a multi selection thing?
  - timeline
+ - introduction helper
 
 External Dependency
- - When dashboard fits fully on screen, background is visible under it
+ - PARTLY-DONE When dashboard fits fully on screen, background is visible under it
  - refactor form validation once new paper-input validation is finished
 
 DONE
@@ -135,6 +118,34 @@ DONE
  - DONE when no recent books add message
  - DONE make question links look better
  - DONE combine sequential related bible verses
-
-
-
+ - DONE make 'i have read rules' required
+ - DONE char limit for title and text of questions and answers
+ - DONE user profile pages
+ - DONE empty comments can be submitted
+ - DONE disable voting on your own posts
+ - DONE incorrect scroll for chapters missing title thingy
+ - DONE 3Jn1:5 seems not to be parsed
+ - DONE Check logged out views
+ - DONE link related texts on qa page
+ - DONE forgot my password
+ - DONE delete stuff admin function (comments for everyone)
+ - DONE 404
+ - DONE show vote counts on question cards
+ - DONE user page, recent activity, verses
+ - DONE add question and answer scores in more places
+ - DONE add sync option to app menu
+ - DONE add change displayName option to my account menu
+ - DONE limit display name length to 30 chars
+ - DONE clicking the same verse should not deselect it
+ - DONE remove setTitle calls from routing
+ - DONE support ranges in edit question form
+ - DONE keep title centered far longer (after going narrow)
+ - DONE de-card 'post answer' form
+ - DONE remember sort on book list
+ - DONE close info drawer after action
+ - DONE loading indicators
+ - DONE bible-markdown-editor jumps when mobile keyboard changes layout from portrait to landscape
+ - DONE add more stuff to logged out dashboard
+ - DONE add [title] to bible-snippet
+ - DONE add register link to log in
+ - DONE privacy & terms of use

@@ -27,6 +27,7 @@
     </style>
     <style>
       :host{
+        font-family: Roboto Slab;
       }
       paper-card{
       }
@@ -54,7 +55,11 @@
           border-bottom: 0px;
         }
       }
-      vn.selected, vn.selected li{
+      /*vn.selected, vn.selected li{
+        background: var(--accent-color-100);
+        color: var(--text-on-accent-color-100);
+      }*/
+      vn[class='selected'], vn[class='selected'] li{
         background: var(--accent-color-100);
         color: var(--text-on-accent-color-100);
       }
@@ -89,6 +94,9 @@
       }
     </style>
     <style>
+      :host([mode='study']) {
+        font-size: 15px;
+      }
       :host([mode='study']) block-html[chapter-start] > div{
         margin-top: 10px;
         padding-top: 20px;
@@ -131,6 +139,9 @@
       }
       :host([mode='study']) n{
         position: relative;
+      }
+      :host([mode='study']) n[tag='NFP']{
+        display: var(--print-only-display);
       }
       /*
       :host([mode='study']) n:hover io{
@@ -274,7 +285,7 @@
             this.$.settings.getSetting('fontSize', 'normal').then(function(value){
               var fontSizes = {
                 small: '14px',
-                normal: '16px',
+                normal: '15px',
                 large: '24px',
                 huge: '34px'
               };
@@ -290,7 +301,14 @@
             }.bind(this));
           }.bind(this));
 
-          Promise.all([readingColor, fontSize, lineHeight]).then(function(){
+          var printOnlyNotes = new Promise(function(resolve){
+            this.$.settings.getSetting('printOnlyNotes', 'no').then(function(value){
+              this.customStyle['--print-only-display'] = value == 'no' ? 'none' : 'display';
+              resolve();
+            }.bind(this));
+          }.bind(this));
+
+          Promise.all([readingColor, fontSize, lineHeight, printOnlyNotes]).then(function(){
             this.updateStyles();
             this.$.text.fire('iron-resize');
           }.bind(this));
@@ -304,11 +322,15 @@
         loadBook: function(){
           console.info('loading book', this.textRef);
 
+          app.loading('book')
+
           this.autoSelectReference = true;
 
           var onceLoaded = function(){
             this.async(function(){
               this.scrollToReference();
+              app.finishedLoading('book');
+              this.$.text.fire('iron-resize');
             }, 500);
           }.bind(this);
 
@@ -366,17 +388,19 @@
                 start: i == 0,
                 end: i == chapterBlocks.length - 1,
                 debug: i+'/'+(chapterBlocks.length -1),
-                html: block.outerHTML || s.serializeToString(block),
+                html: block,
                 chapterNumber: chapterI + 1,
                 verseStart: firstVerse ? reference.toNumeric() : null
               });
             });
           });
 
+          var p = document.createElement('p');
+          p.textContent = 'Scripture quotations marked (LEB) are from the Lexham English Bible. Copyright 2012 Logos Bible Software. Lexham is a registered trademark of Logos Bible Software.';
           this.push('blocks', {
             start: true,
             end: true,
-            html: '<p>Scripture quotations marked (LEB) are from the Lexham English Bible. Copyright 2012 Logos Bible Software. Lexham is a registered trademark of Logos Bible Software.</p>',
+            html: p,
             class: 'license'
           });
 

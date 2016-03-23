@@ -27,7 +27,7 @@
       }
     </style>
     <paper-icon-button icon="menu" on-tap="openDrawer"></paper-icon-button>
-    <span class="title">{{title}}</span>
+    <span class="title">{{_toolbarTitle}}</span>
   </template>
 
   <script>
@@ -56,6 +56,14 @@
           },
           noTitle: {
             reflectToAttribute: true
+          },
+          toolbarTitle: {
+            type: String,
+            value: ''
+          },
+          _toolbarTitle: {
+            type: String,
+            computed: '_getToolbarTitle(title, toolbarTitle)'
           }
         },
         observers: [
@@ -67,6 +75,9 @@
           document.body.addEventListener('narrow-changed', function(ev){
             this.set('narrow', ev.detail.narrow);
           }.bind(this));
+        },
+        _getToolbarTitle: function(title, toolbarTitle){
+          return toolbarTitle && toolbarTitle.length > 0 ? toolbarTitle : title;
         },
         openDrawer: function(){
           document.getElementById('mainDrawer').openDrawer();

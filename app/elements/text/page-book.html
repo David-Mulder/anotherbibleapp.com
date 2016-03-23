@@ -5,7 +5,6 @@
 
 <link rel="import" href="./bible-text.html">
 <link rel="import" href="./verse-information-drawer.html">
-<link rel="import" href="../qa/qa-related-questions-card.html">
 <link rel="import" href="../settings/synced-settings.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
@@ -100,7 +99,7 @@
 
       <div drawer>
 
-        <verse-information-drawer verses="{{selectedVerses}}" on-multi-verse-selection="_multiSelectionMode"></verse-information-drawer>
+        <verse-information-drawer verses="{{selectedVerses}}" on-multi-verse-selection="_multiSelectionMode" on-finished-with-information-drawer="_closeDrawer"></verse-information-drawer>
 
       </div>
 
@@ -152,7 +151,7 @@
         refChanged: function(){
           console.info('ref changed', this.ref);
 
-          this.set('fullRef', new BibleReference(this.ref));
+          this.set('fullRef', new BibleReference(this.ref));;
 
           if(isNaN(this.fullRef.chapter)){
 
@@ -239,6 +238,10 @@
               });
             }
           }
+        },
+
+        _closeDrawer: function(){
+          this.$.qaDrawerPanel.closeDrawer();
         }
 
       });

@@ -72,7 +72,7 @@
         To learn more about search, <a href="/help/search">tap here</a>.
       </div>
       <div hidden$="{{!searchStarted}}">
-        <topical-search search-query="{{searchQuery}}" on-no-results="triggerBibleSearch"></topical-search>
+        <topical-search search-query="{{searchQuery}}" on-results="_finishedTopicalSearch" on-no-results="triggerBibleSearch"></topical-search>
         <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>
       </div>
     </div>
@@ -113,6 +113,12 @@
         _setSearchStarted: function(){
           this.searchStarted = this.searchQuery.length > 0;
           this.title = this.searchStarted ? this.searchQuery : 'Search'
+          if(this.searchStarted)
+            app.loading('search');
+        },
+
+        _finishedTopicalSearch: function(){
+          app.finishedLoading('search');
         },
 
         _setValueIfEnter: function(ev){

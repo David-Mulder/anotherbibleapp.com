@@ -26,7 +26,7 @@
       }
     </style>
     <synced-settings id="settings"></synced-settings>
-    <paper-card id="card" heading="Recent Books" hidden$="{{noResults}}">
+    <paper-card id="card" heading="Recently read Books & Letters" hidden$="{{noResults}}">
       <template is="dom-repeat" items="{{books}}" as="book">
         <div class="card-actions book" on-tap="goToBook">
           {{book.title}}
@@ -78,7 +78,7 @@
             settings.forEach(function(setting){
               var reference = new BibleReference(setting.value.position);
               this.push('books', {
-                title: reference.book.title,
+                title: reference.book.plainLongTitle,
                 reference: reference.toString(),
                 date: setting.value.date
               });

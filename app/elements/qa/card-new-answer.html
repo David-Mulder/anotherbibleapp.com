@@ -11,12 +11,23 @@
       paper-card{
         display: block;
       }
+      .card-actions.markdown{
+        padding: 0px !important;
+      }
+      bible-markdown-editor{
+        --bible-markdown-preview: {
+          margin: 0px 0px 0px 0px;
+        };
+        --bible-markdown-input-container: {
+          padding: 10px;
+        }
+      }
     </style>
     <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{questionId}}" param-text="{{answerText}}"></auth-api>
 
     <paper-card heading="Know the answer?" hidden$="{{answerPosted}}">
-      <div class="card-content">
-        <bible-markdown-editor value="{{answerText}}"></bible-markdown-editor>
+      <div class="card-actions markdown">
+        <bible-markdown-editor value="{{answerText}}" placeholder="Your answer..." rows="7"></bible-markdown-editor>
       </div>
       <div class="card-actions">
         <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>

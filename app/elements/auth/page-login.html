@@ -11,7 +11,7 @@
       paper-card{
         display: block;
         width: 400px;
-        margin: 10px auto;
+        margin: 30px auto;
         padding: 20px;
         background: var(--card-dialog-color);
       }
@@ -29,6 +29,13 @@
       paper-button.blue{
         background: var(--primary-color);
         color: var(--text-on-primary-color);
+      }
+      #register {
+        padding-top: 10px;
+        max-width: 700px;
+        width: 100%;
+        margin: auto;
+        text-align: center;
       }
     </style>
 
@@ -52,6 +59,9 @@
             </div>
           </div>
         </paper-card>
+        <div id="register">
+          Don't have an account yet? <a on-tap="_goToRegister">Register now within 30 seconds here</a>.
+        </div>
       </form>
 
       <paper-card id="login" heading="Log in" hidden="{{!loggedIn}}">
@@ -127,6 +137,9 @@
         },
         goToForgotPassword: function(){
           page('/forgot-my-password');
+        },
+        _goToRegister: function(){
+          page('/register');
         }
       });
     })();

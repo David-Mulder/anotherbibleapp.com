@@ -80,7 +80,7 @@
       <paper-card>
 
         <div class="card-content">
-          <paper-input id="title" label="Question title" value="{{title}}"></paper-input>
+          <paper-input id="title" label="Question title" value="{{title}}" char-counter maxlength="200" minlength="15"></paper-input>
           <bible-markdown-editor label="Question in detail" value="{{text}}" rows="7"></bible-markdown-editor>
           <div id="verseContainer">
             <paper-input label="Verses" value="{{verseString}}" error-message="One of the verses can not be parsed" invalid="{{invalidVerseFound}}"></paper-input>
@@ -120,12 +120,19 @@
         setQuestion: function(){
           this.title = this.question.title;
           this.text = this.question.text;
-          this.verseString = this.question.verses.map((v) => new BibleReference(v)).join(', ');
+          this.verseString = BibleReference.combine(this.question.verses.map((v) => new BibleReference(v))).join(', ');
         },
         setVersesFromString: function(){
-          var verses = this.verseString.split(',').map(v => v.trim()).map(v => new BibleReference(v).toNumeric());
-          this.versesAsNumbers = verses.filter(vid => !isNaN(vid));
-          this.invalidVerseFound = verses.some(vid => isNaN(vid));
+          var verses = this.verseString
+              .split(',')
+              .map(v => v.trim())
+              .map(v => new BibleReference(v));
+
+          this.versesAsNumbers = verses
+              .reduce((prevValue, currentValue) => prevValue.concat(currentValue.split()), [])
+              .map(br => br.toNumeric());
+          this.invalidVerseFound = verses.some(vid => !vid.valid);
+          console.log(this.invalidVerseFound);
         },
         save: function(){
           this.$.save.execute().then(function(question){

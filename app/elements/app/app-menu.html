@@ -4,6 +4,9 @@
 <link rel="import" href="/bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/iron-icons/av-icons.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -84,6 +87,9 @@
         left: 0px;
         top: -10px;
       }
+      paper-item{
+        cursor: pointer;
+      }
       .user-menu .icon{
         width: 52px;
         height: 52px;
@@ -95,38 +101,45 @@
       }
       paper-menu, paper-submenu{
         --paper-menu-selected-item: {
-          font-weight: normal !important;
+          font-weight: 500 !important;
         };
         --paper-menu-focused-item: {
-          font-weight: normal !important;
+          font-weight: 500 !important;
         };
       }
-      paper-submenu paper-menu{
+      paper-submenu paper-menu {
         padding-left: 10px;
       }
-      paper-toolbar{
+      paper-toolbar {
         --paper-toolbar-sm-height: 64px;
       }
-      paper-menu{
+      paper-menu {
         border-bottom: 1px solid rgba(0,0,0,.1);
       }
-      paper-menu:last-of-type{
+      paper-menu:last-of-type {
         border-bottom: 0px;
+      }
+      paper-icon-item {
+        font-weight: 500;
+      }
+      paper-menu iron-icon {
+        color: var(--secondary-text-on-primary-color-50);
       }
     </style>
 
     <auth-api user="{{user}}" logged-in="{{loggedIn}}"></auth-api>
+    <synced-settings id="settings"></synced-settings>
 
     <paper-scroll-header-panel condenses condensed-header-height="64" scroll-away-topbar keep-condensed-header>
 
-      <paper-toolbar class="tall">
+      <paper-toolbar class="tall scrolling">
         <div class="top">
           <div class="icons">
             <paper-menu-button horizontal-align="right">
               <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
               <paper-menu class="dropdown-content" on-tap="_goToPageFromMenuEvent">
                 <paper-item data-page$="user/{{user._id}}" hidden="{{!loggedIn}}">My&nbsp;Account</paper-item>
-                <paper-item data-page="logout" hidden="{{!loggedIn}}">Sync</paper-item>
+                <paper-item on-tap="_doSync" hidden="{{!loggedIn}}">Sync</paper-item>
                 <paper-item data-page="logout" hidden="{{!loggedIn}}">Log&nbsp;out</paper-item>
                 <paper-item data-page="login" hidden="{{loggedIn}}">Log&nbsp;in</paper-item>
                 <paper-item data-page="register" hidden="{{loggedIn}}">Register</paper-item>
@@ -148,22 +161,48 @@
       <div class="content">
 
         <paper-menu on-tap="_goToPageFromMenuEvent">
-          <paper-item data-page="">Dashboard</paper-item>
+          <paper-icon-item data-page="">
+            <iron-icon icon="dashboard" item-icon></iron-icon>
+            Dashboard
+          </paper-icon-item>
         </paper-menu>
-
+        <!--
         <paper-menu on-tap="_goToPageFromMenuEvent">
           <paper-item data-page="">Continue from John 3:3</paper-item>
         </paper-menu>
+        -->
 
         <paper-menu on-tap="_goToPageFromMenuEvent">
-          <paper-item data-page="books">Books & Letters of the Bible</paper-item>
-          <paper-item data-page="search">Search</paper-item>
-          <paper-item data-page="recent-questions">Recent Questions</paper-item>
+          <paper-icon-item data-page="books">
+            <iron-icon icon="av:library-books" item-icon></iron-icon>
+            Books of the Bible
+          </paper-icon-item>
+          <paper-icon-item data-page="search">
+            <iron-icon icon="search" item-icon></iron-icon>
+            Search
+          </paper-icon-item>
         </paper-menu>
 
         <paper-menu on-tap="_goToPageFromMenuEvent">
-          <paper-item data-page="settings">Settings</paper-item>
-          <paper-item data-page="bible/license">License Info</paper-item>
+          <paper-icon-item data-page="recent/questions">
+            <iron-icon icon="explore" item-icon></iron-icon>
+            Recent Questions
+          </paper-icon-item>
+        </paper-menu>
+
+        <paper-menu on-tap="_goToPageFromMenuEvent">
+          <paper-icon-item data-page="settings">
+            <iron-icon icon="settings" item-icon></iron-icon>
+            Settings
+          </paper-icon-item>
+          <paper-icon-item data-page="help/faq">
+            <iron-icon icon="help" item-icon></iron-icon>
+            FAQ
+          </paper-icon-item>
+          <paper-icon-item data-page="legal">
+            <iron-icon icon="copyright" item-icon></iron-icon>
+            Legal
+          </paper-icon-item>
         </paper-menu>
 
       </div>
@@ -199,6 +238,13 @@
               page('/search/'+encodeURIComponent(value));
             }
           }
+        },
+        _doSync: function(ev){
+          this.$.settings.sync().then(function(){
+            app.toast('Done syncing')
+          }).catch(function(){
+            app.toast('Could not sync');
+          });
         }
       });
     })();

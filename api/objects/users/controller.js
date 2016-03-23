@@ -61,6 +61,7 @@ module.exports = {
   },
   updateCurrentlyLoggedInUser: function(req, res){
     req.user.info = req.body.user.info;
+    req.user.displayName = req.body.user.displayName;
     req.user.save().then(function(user){
       res.json(user.makePublic());
     });

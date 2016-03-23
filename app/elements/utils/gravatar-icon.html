@@ -54,18 +54,20 @@
           this.set('size', Math.max(rect.width, rect.height));
         },
         _setImageUrl: function(){
-          var start = 'https://www.gravatar.com/avatar/';
-          var params = [];
-          if(this.email && this.email.length > 0){
-            var hash = md5(this.email.toLowerCase().trim());
-          }else{
-            var hash = md5(Math.random().toString());
-            params.push('forcedefault=y')
-          }
-          params.push('s='+this.size);
-          params.push('d='+this.default);
-          this.set('imageUrl', start + hash + '?' + params.join('&'));
+          this.debounce('waitForAllVars', function(){
+            var start = 'https://www.gravatar.com/avatar/';
+            var params = [];
+            if(this.email && this.email.length > 0){
+              var hash = md5(this.email.toLowerCase().trim());
+            }else{
+              var hash = md5(Math.random().toString());
+              params.push('forcedefault=y')
+            }
+            params.push('s='+this.size);
+            params.push('d='+this.default);
 
+            this.set('imageUrl', start + hash + '?' + params.join('&'));
+          }, 0);
         }
       });
     })();

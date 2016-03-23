@@ -25,6 +25,11 @@
         sharedData = data;
         apiElements.forEach(registerSharedDataIfSet);
       };
+      var setForAll = function(path, value){
+        apiElements.forEach(function(el){
+          el.set(path, value);
+        });
+      };
 
       Polymer({
         is: 'auth-api',
@@ -92,11 +97,18 @@
           }
         },
 
+        saveLocalUserProperty: function(property, value){
+          setForAll(['user', property], value);
+          localStorage.user = JSON.stringify(this.user);
+        },
+
         isLoggedIn: function(){
           return this.token.length > 0;
         },
 
         execute: function(cb){
+
+          app.loading('api.'+this.action);
 
           return new Promise(function(resolve, reject){
 
@@ -184,6 +196,8 @@
 
                     }
 
+                    app.finishedLoading('api.'+this.action);
+
                   }.bind(this)).catch(function(err){
 
                     console.warn('The database service seems offline', url);
@@ -195,8 +209,9 @@
                       document.body.appendChild(pt);
                     }
                     reject(err);
+                    app.finishedLoading('api.'+this.action);
 
-                  });
+                  }.bind(this));
                 }else{
                   console.group('Not all parameters are set');
                   console.log('Required', this._requiredParams);

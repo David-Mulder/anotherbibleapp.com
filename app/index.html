@@ -66,10 +66,11 @@
   <div>
     <span id="browser-sync-binding"></span>
     <template is="dom-bind" id="app">
+      <paper-progress indeterminate hidden="{{!isLoading}}" id="pageProgress"></paper-progress>
 
       <paper-drawer-panel id="mainDrawer" responsive-width="1275px" force-narrow="{{forceNarrow}}">
         <!-- Drawer Scroll Header Panel -->
-        <paper-scroll-header-panel drawer fixed>
+        <div drawer fixed>
 
           <!--
           <paper-toolbar id="drawerToolbar">
@@ -83,7 +84,7 @@
 
           <app-menu></app-menu>
 
-        </paper-scroll-header-panel>
+        </div>
 
         <!-- Main Area -->
         <paper-scroll-header-panel main condenses keep-condensed-header>
@@ -106,12 +107,15 @@
               <page-rules-answers data-route="rules-answers"></page-rules-answers>
               <page-search-docs data-route="search-docs"></page-search-docs>
               <page-topic data-route="topic" topic-name$="{{params.topicName}}"></page-topic>
-              <page-license data-route="license"></page-license>
               <page-settings data-route="settings"></page-settings>
               <page-not-found data-route="not-found"></page-not-found>
               <page-user data-route="user" user-id$="{{params.userId}}"></page-user>
               <page-forgotten-password data-route="forgotten-password" reset-token$="{{params.passwordResetToken}}"></page-forgotten-password>
               <page-books data-route="books"></page-books>
+              <page-recent-qa data-route="recent-qa"></page-recent-qa>
+              <page-legal data-route="legal"></page-legal>
+              <page-faq data-route="faq"></page-faq>
+              <page-philosophy data-route="philosophy"></page-philosophy>
               <!--<section data-route="home">
 
 				<paper-material elevation="1" class="paper-font-body2">

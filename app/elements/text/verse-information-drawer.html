@@ -1,6 +1,7 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="../topics/related-topics-card.html">
 <link rel="import" href="./card-verse-actions.html">
+<link rel="import" href="../qa/card-related-questions.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -31,7 +32,7 @@
       card-verse-actions{
         margin: 10px;
       }
-      qa-related-questions-card{
+      card-related-questions{
         margin: 10px;
       }
       related-topics-card{
@@ -49,7 +50,7 @@
       <div id="noSelection" hidden$="{{selection}}">Tap a verse to see related Q&A's and topics</div>
 
       <card-verse-actions verse="{{verse}}"></card-verse-actions>
-      <qa-related-questions-card verse="{{verse}}"></qa-related-questions-card>
+      <card-related-questions verse="{{verse}}"></card-related-questions>
       <related-topics-card verse="{{verse}}"></related-topics-card>
     </div>
 

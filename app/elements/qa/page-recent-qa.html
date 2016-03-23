@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="card-recent-questions.html">
+
+<dom-module id="page-recent-qa">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      card-recent-questions{
+        max-width: 800px;
+        margin: auto;
+      }
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Recent Questions"></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <card-recent-questions count="10"></card-recent-questions>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        },
+        listeners: {
+          'page-became-visible': '_fireReloads'
+        },
+        ready: function(){
+
+        },
+        _fireReloads: function(){
+          if(this.$$('card-recent-books')) this.$$('card-recent-books').reload();
+          if(this.$$('card-recent-questions')) this.$$('card-recent-questions').reload();
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

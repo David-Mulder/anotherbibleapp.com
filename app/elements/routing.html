@@ -6,6 +6,7 @@
 
     page(function(ctx, next){
       app.forceNarrow = false;
+      app.closeDrawer();
       next();
     });
 
@@ -65,6 +66,12 @@
     page('/books', function (data) {
       app.loadDependency('books/page-books').then(function() {
         app.route = 'books';
+      });
+    });
+
+    page('/recent/questions', function (data) {
+      app.loadDependency('qa/page-recent-qa').then(function() {
+        app.route = 'recent-qa';
       });
     });
 
@@ -143,6 +150,19 @@
       });
     });
 
+    page('/help/faq', function (data) {
+      app.loadDependency('documentation/page-faq').then(function(){
+        app.route = 'faq';
+      });
+    });
+
+
+    page('/philosophy', function (data) {
+      app.loadDependency('documentation/page-philosophy').then(function(){
+        app.route = 'philosophy';
+      });
+    });
+
     page('/topic/:name', function (data) {
       app.loadDependency('topics/page-topic').then(function(){
         app.route = 'topic';
@@ -150,9 +170,9 @@
       });
     });
 
-    page('/bible/license', function (data) {
-      app.loadDependency('documentation/page-license').then(function(){
-        app.route = 'license';
+    page('/legal', function (data) {
+      app.loadDependency('documentation/page-legal').then(function(){
+        app.route = 'legal';
       });
     });
 

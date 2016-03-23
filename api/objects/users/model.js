@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
   SALT_WORK_FACTOR = 10;
 
 var UserSchema = new Schema({
-  displayName: { type: String, required: true },
+  displayName: { type: String, required: true, maxlength: 25 },
   email: {type: String, required: true, unique: true, validate: {validator: val => /^\S+@\S+$/.test(val), message: 'Invalid email'}},
   password: {type: String, required: true},
   info: String,

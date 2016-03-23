@@ -1,7 +1,10 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
 <link rel="import" href="../utils/relative-time.html">
+<link rel="import" href="../utils/gravatar-icon.html">
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="page-user">
   <template>
@@ -14,7 +17,25 @@
       .display-name div{
         text-align: center;
         font-size: 36px;
-        padding-bottom: 20px;
+        padding-bottom: 10px;
+      }
+      :host([admin]) .display-name div{
+        padding-bottom: 50px;
+      }
+      .display-name paper-input{
+        max-width: 400px;
+        margin: auto;
+        --paper-input-container-input: {
+          font-size: 36px;
+          color: white;
+        };
+        --paper-input-container-underline: {
+          background: white;
+        };
+        --paper-input-container-underline-focus: {
+          background: var(--accent-color);
+        };
+        --paper-input-container-focus-color: white;
       }
       .user-info{
         white-space: pre-wrap;
@@ -42,6 +63,38 @@
         background-size: cover !important;
         background-position: 0px 0px !important;
       }
+      .icon{
+        width: 100%;
+      }
+      gravatar-icon{
+        width: 90px;
+        height: 90px;
+        margin: 20px auto;
+        border-radius: 100%;
+        position: relative;
+        bottom: 20px;
+      }
+      @media all and (max-width: 600px){
+        .display-name paper-input {
+          --paper-input-container-input: {
+            font-size: 24px;
+            color: white;
+          }
+        }
+        .display-name div{
+          font-size: 24px;
+          padding-bottom: 0px;
+          margin-bottom: -5px;
+        }
+        :host([admin]) .display-name div{
+          margin-bottom: -15px;
+        }
+        gravatar-icon{
+          width: 70px;
+          height: 70px;
+          bottom: 0px;
+        }
+      }
     </style>
 
     <auth-api id="api" method="get" action="user/:id" param-id="{{userId}}"></auth-api>
@@ -49,15 +102,24 @@
 
     <paper-toolbar class="tall">
       <intelligent-title title="Profile" no-title-if-wide></intelligent-title>
+      <div class="middle icon">
+        <gravatar-icon email="{{user.email}}" default="https://anotherbibleapp.com/images/mm.png"></gravatar-icon>
+      </div>
       <div class="bottom display-name">
-        <div>{{_smartCaps(user.displayName)}}</div>
+        <div>
+          <template is="dom-if" if="{{admin}}">
+            <paper-input value="{{user.displayName}}" maxlength="25" char-counter></paper-input>
+          </template>
+          <span hidden="{{admin}}">{{_smartCaps(user.displayName)}}</span>
+        </div>
+        <!--<div></div>-->
       </div>
     </paper-toolbar>
 
     <div class="page-content">
 
-      <paper-card heading="Bio">
-        <div class="card-content user-info" hidden$="{{admin}}">{{user.info}}<span hidden$="{{!_equals(user.info.length, 0)}}" class="no-info">This user prefers to keep an air of mystery about them.</span></div>
+      <paper-card heading="About me">
+        <div class="card-content user-info" hidden$="{{admin}}">{{user.info}}<span hidden$="{{!_isEmpty(user.info)}}" class="no-info">This user prefers to keep an air of mystery about them.</span></div>
         <template is="dom-if" if="{{admin}}">
           <div class="card-content user-info-edit">
             <paper-textarea label="A short bit about yourself" value="{{user.info}}" char-counter maxlength="500"></paper-textarea>
@@ -70,13 +132,13 @@
           <template is="dom-if" if="{{_equals(item.type, 'answer')}}">
             <div class="card-actions activity-item answer" on-tap="_goToQuestion">
               <div class="title">{{item.question.title}}</div>
-              <div class="info">Answered by {{user.displayName}} <relative-time time="{{item.createdAt}}"></relative-time></div>
+              <div class="info">Answered by {{user.displayName}} about {{item.verses}} <relative-time time="{{item.createdAt}}"></relative-time></div>
             </div>
           </template>
           <template is="dom-if" if="{{_equals(item.type, 'question')}}">
             <div class="card-actions activity-item question" on-tap="_goToQuestion">
               {{item.title}}
-              <div class="info">Asked by {{user.displayName}} <relative-time time="{{item.createdAt}}"></relative-time></div>
+              <div class="info">Asked by {{user.displayName}} about {{item.verses}} <relative-time time="{{item.createdAt}}"></relative-time></div>
             </div>
           </template>
         </template>
@@ -90,9 +152,14 @@
     (function() {
       'use strict';
 
+      var BibleReference = require('bible-reference-parser');
+
       Polymer({
         properties: {
-          userId: String
+          userId: String,
+          admin: {
+            reflectToAttribute: true
+          }
         },
         behaviors: [
           abaBehaviors.logic,
@@ -102,21 +169,36 @@
           'page-became-visible': '_retrieveFromApi'
         },
         observers: [
-          '_userChanged(user.info)'
+          '_userChanged(\'info\', user.info)',
+          '_userChanged(\'name\', user.displayName)'
         ],
         _retrieveFromApi: function(){
           this._saveChanges = false;
           this.$.api.execute().then(function(result){
-            console.debug(result);
             page.replace('/user/'+result.user._id+'/'+result.user.displayName.replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));
             this.activity = result.activity;
+            this.activity.map(function(item){
+              if(item.type === 'question'){
+                var verses = item.verses;
+              }else{
+                var verses = item.question.verses;
+              }
+
+              verses = verses.map(function(verse){return new BibleReference(verse)});
+              verses = BibleReference.combine(verses);
+
+              item.verses = verses;
+            });
             this.user = result.user;
             this._saveChanges = true;
             this.admin = result.me;
           }.bind(this));
         },
-        _userChanged: function(){
+        _userChanged: function(prop, value){
           if(this._saveChanges){
+            if(this.admin && prop == 'name'){
+              this.$.api.saveLocalUserProperty('displayName', value);
+            }
             this.debounce('save', function(){
               this.$.editSelfApi.execute().then(function(){
                 app.toast('Saved')

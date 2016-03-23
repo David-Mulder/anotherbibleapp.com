@@ -15,6 +15,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
 
+  app._currentlyLoading = [];
+  app.loading = function(name){
+    app._currentlyLoading.push(name);
+    app.isLoading = true;
+  };
+  app.finishedLoading = function(name){
+    app._currentlyLoading.splice(app._currentlyLoading.indexOf(name), 1);
+    app.isLoading = app._currentlyLoading.length > 0;
+  };
+
   /*
   app.displayInstalledToast = function() {
     // Check to make sure caching is actually enabled—it won't be in the dev environment.
@@ -56,6 +66,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   app.loadedDependencies = [];
   app.loadDependency = function(el){
+
+    app.loading(el);
+
     return new Promise(function(resolve, reject){
       if(app.loadedDependencies.indexOf(el) === -1){
         console.debug('loading', el);
@@ -68,12 +81,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var element = document.querySelector(el.split('/').pop());
           lazyFireEvents(element);
 
+          setTimeout(function(){
+            app.finishedLoading(el);
+          }, 0);
+
           resolve();
 
         }, function(){
           alert('Failed loading the requested page.');
         });
       }else{
+        app.finishedLoading(el);
         resolve();
       }
     });
@@ -117,6 +135,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   });
 
+  document.querySelector('body').addEventListener('click', function(ev){
+    var el = ev.path[0];
+    if(el.nodeName.toLowerCase() == 'a'){
+      var href = el.getAttribute('href');
+      if(href && href.replace(location.origin, '').substr(0,1) == '/'){
+        page(href.replace(location.origin, ''));
+        ev.preventDefault();
+      }
+    }
+  });
+
   // Main area's paper-scroll-header-panel custom condensing transformation of
   // the appName in the middle-container and the bottom title in the bottom-container.
   // The appName is moved to top and shrunk on condensing. The bottom sub title
@@ -145,8 +174,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   */
 
   // Close drawer after menu item is selected if drawerPanel is narrow
-  app.onDataRouteClick = function() {
-    var drawerPanel = document.querySelector('#paperDrawerPanel');
+  app.closeDrawer = function() {
+    var drawerPanel = document.querySelector('#mainDrawer');
     if (drawerPanel.narrow) {
       drawerPanel.closeDrawer();
     }
@@ -237,6 +266,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
     });
-  }
+  };
 
 })(document);

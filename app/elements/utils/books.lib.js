@@ -1062,7 +1062,7 @@ define(function(){
   bibleBooks.forEach(function(bibleBook){
     bibleBook.long_title = bibleBook.long_title || {prefix: 'Book of', title: bibleBook.title};
     bibleBook.icon = bibleBook.icon || 'book';
-    bibleBook.plainLongTitle = (bibleBook.long_title.prefix + ' ' + bibleBook.long_title.title + ' ' + bibleBook.long_title.suffix);
+    bibleBook.plainLongTitle = (bibleBook.long_title.prefix || '') + ' ' + bibleBook.long_title.title + ' ' + (bibleBook.long_title.suffix || '');
 
   });
 

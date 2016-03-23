@@ -150,6 +150,19 @@
         text-align: center;
         padding: 10px !important;
       }
+      .card-title{
+        background: var(--primary-color-400);
+        color: var(--text-on-primary-color-400);
+        padding: 25px 30px;
+      }
+      .card-title h1{
+        margin: 0px;
+        font-size: 20px;
+        font-weight: normal;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     </style>
 
     <auth-api logged-in="{{loggedIn}}" user="{{loggedInUser}}"></auth-api>
@@ -160,7 +173,9 @@
     <auth-api id="deleteCommentApi" method="DELETE" action="comment/:id" param-id="{{commentId}}"></auth-api>
 
     <paper-card deleted$="{{post.deleted}}">
-
+      <div class="card-title" hidden$="{{!_equals(type, 'question')}}">
+        <h1>{{post.title}}</h1>
+      </div>
       <div class="card-content">
         <div class="post">
           <div class="score" hidden$="{{noVoting}}">
@@ -169,9 +184,11 @@
             <div class="downvote" data-voted$="{{post.downvoted}}" on-tap="downvote"></div>
           </div>
           <div class="text">
+            <!--
             <template is="dom-if" if="{{_equals(type, 'question')}}">
               <h1>{{post.title}}</h1>
             </template>
+            -->
             <bible-markdown markdown="{{post.text}}"></bible-markdown>
             <!--
             <marked-element markdown="{{post.text}}">

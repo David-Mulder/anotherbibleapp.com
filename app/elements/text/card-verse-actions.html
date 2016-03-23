@@ -79,6 +79,7 @@
             }
             this.$.settings.saveSetting(this._highlightSettingName, value);
             this.isHighlighted = !this.isHighlighted;
+            this.fire('finished-with-information-drawer');
           }.bind(this));
           //var settingName = 'highlights-for-'+this.verse.book.name.rename(/ /g, '-');
           //this.$.settings.getSetting(settingName);
@@ -90,6 +91,7 @@
           }else{
             app.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
           }
+          this.fire('finished-with-information-drawer');
         },
         copyVerse: function(){
           var bibleSnippet = document.createElement('bible-snippet');
@@ -120,6 +122,7 @@
                 }else{
                   app.msg('Please share the verse manually: ' + selection, 'Automatic copying unsuccessful')
                 }
+                this.fire('finished-with-information-drawer');
               }.bind(this));
               //app.msg('Please share the verse manually: ' + bibleSnippet.text, 'Automatic copying unsuccessful')
             }

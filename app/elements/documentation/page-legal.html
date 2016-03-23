@@ -1,0 +1,355 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="page-legal">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      h2{
+        font-size: 17px;
+        font-weight: normal;
+        border-bottom:1px solid var(--accent-color-100);
+        margin-top: 20px;
+      }
+    </style>
+    <paper-toolbar class="medium-tall">
+      <intelligent-title title="Legal"></intelligent-title>
+      <paper-tabs class="bottom fit" selected="{{currentPage}}" attr-for-selected="data-page" scrollable attr-for-selected="data-value">
+        <paper-tab data-page="generic">Generic</paper-tab>
+        <paper-tab data-page="privacy">Privacy Policy</paper-tab>
+        <paper-tab data-page="tos">Terms of Use</paper-tab>
+        <paper-tab data-page="cc">Creative Commons</paper-tab>
+        <paper-tab data-page="lexham">Lexham English Bible</paper-tab>
+      </paper-tabs>
+    </paper-toolbar>
+    <div class="page-content">
+      <iron-pages selected="{{currentPage}}" attr-for-selected="data-page">
+        <iron-page data-page="generic">
+          <paper-card heading="Before Reading">
+            <div class="card-content">
+              This application has been built as a private project in free time. This means paying professional lawyers to write a proper privacy policy and terms of use isn't an option. The result of this is that I had to put these together myself and I hope everybody will be forgiving if there are any mistakes in there.
+            </div>
+          </paper-card>
+          <paper-card heading="Privacy">
+            <div class="card-content">
+              <p>
+                As far as privacy goes I have specifically attempted to be as privacy friendly as possible. This is for the
+                simple reason that I think WWII taught us that the government and all the big companies don't need to know
+                about our faith. Of course that doesn't mean we should hide in a dark corner and not speak openly about our
+                faith, but it does mean that additional care is warranted.
+              </p>
+              <p>
+                The only 'pain point' right now is that I <em>am</em> using Google Analytics. This is for the simple reason
+                that setting up a good privacy friendly alternative is a lot of trouble, but I did set up Google Analytics
+                to respect DNT headers for those who are concerned with these kind of things.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Content Licensing">
+            <div class="card-content">
+              <p>
+                User content on this site is licensed under a free creative commons license, read more in the 'Creative
+                Commons' tab. The Bible translation that we're using is licensed by Logos Software under a relatively
+                free license, read more about this in the 'Lexham English Bible' tab.
+              </p>
+            </div>
+          </paper-card>
+
+        </iron-page>
+        <iron-page data-page="privacy">
+          <paper-card heading="Introduction">
+            <div class="card-content">
+              This privacy policy has been compiled to better serve those who are concerned with how their 'Personally identifiable information' (PII) is being used online. PII is information that can be used on its own or with other information to identify, contact, or locate a single person, or to identify an individual in context. Please read our privacy policy carefully to get a clear understanding of how we collect, use, protect or otherwise handle your Personally Identifiable Information in accordance with our website.
+            </div>
+          </paper-card>
+          <paper-card heading="Your information">
+            <div class="card-content">
+              <h2>What personal information do we collect from the people that visit our website/app?</h2>
+              <p>
+                When ordering or registering on our site, as appropriate, you may be asked to enter your name, email address or other details to help you with your experience. Additionally you can decide to disclose personal information yourself in any posts you publish.
+              </p>
+              <h2>When do we collect information?</h2>
+              <p>
+                We collect information from you when you register on our site or enter information on our site.
+              </p>
+              <h2>How do we use your information?</h2>
+              <p>
+                We may use the information we collect from you when you register, surf the website, or use certain other site features in the following ways:
+              </p>
+              <ul>
+                <li>To improve our website in order to better serve you.</li>
+                <li>To attribute your content to you per the CC-BY license</li>
+              </ul>
+              <h2>How do we protect visitor information?</h2>
+              <p>
+                Your personal information is contained behind secured networks and is only accessible by a limited number of persons who have special access rights to such systems, and are required to keep the information confidential. In addition, all information you supply is encrypted via Secure Socket Layer (SSL) technology. We implement a variety of security measures when a user enters, submits, or accesses their information to maintain the safety of your personal information.
+              </p>
+              <h2>Do we use 'cookies'?</h2>
+              <p>
+                No, but we do use other client storage mechanisms to recognize your computer when you come back at a later point. This is used for the following three things
+              </p>
+              <ul>
+                <li>Keep you logged in if you decide to log in</li>
+                <li>Save user's preferences for future visits.</li>
+                <li>Compile aggregate data about site traffic and site interactions in order to offer better site experiences and tools in the future. We may also use trusted third-party services that track this information on our behalf.</li>
+              </ul>
+              <p>
+                Disabling cookies will not affect the site experience as we don't use cookies, however disabling the "localStorage" will cause the above features to stop working. The rest of the site should keep working, although it depends on the specific of how you disabled the "localStorage".
+              </p>
+              <h2>Do we respect DNT?</h2>
+              <p>
+                Yes.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Third Parties">
+            <div class="card-content">
+              <h2>Do we share your data with third parties?</h2>
+              <p>
+                We do not sell, trade, or otherwise transfer to outside parties your personally identifiable information. We do however use Google Analytics which will be able to determine your IP and get an approximate location based on it.
+              </p>
+              <h2>Third-party links</h2>
+              <p>
+                We do not include or offer third-party products or services on our website.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Data breaches">
+            <div class="card-content">
+              <h2>What do we do in the case of a data breach?</h2>
+              <p>
+                We will try to make sure to write an email to all registered users within a business day of finding out about this.
+              </p>
+            </div>
+          </paper-card>
+        </iron-page>
+        <iron-page data-page="tos">
+          <paper-card heading="Introduction">
+            <div class="card-content">
+              <p>
+                If you require any more information or have any questions about our Terms of Service, please feel free to contact us by email at anotherbibleapp.com/contact.
+              </p>
+              <p>
+                These terms and conditions govern your use of this app/website; by using this app/website, you accept these terms and conditions in full and without reservation. If you disagree with these terms and conditions or any part of these terms and conditions, you must not use this website.
+              </p>
+              <p>
+                The user certifies to Another Bible App that the user is an individual (i.e., not a corporate entity) at least 13 years of age. No one under the age of 13 may provide any personal information to or on Another Bible App.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="License to use this website">
+            <div class="card-content">
+              <h2>What do we do in the case of a data breach?</h2>
+              <p>
+                Unless otherwise stated, anotherbibleapp.com and/or its licensors own the intellectual property rights published on this website and materials used on anotherbibleapp.com. Subject to the license below, all these intellectual property rights are reserved.
+              </p>
+              <p>
+                Another Bible App can be split up in three areas:
+              </p>
+              <ul>
+                <li>The user-submitted content.</li>
+                <li>The Lexham English Bible translation.</li>
+                <li>The application itself.</li>
+              </ul>
+              <h2>The Lexham English Bible</h2>
+              <p>
+                For information about the restrictions on the license on the Lexham English Bible please view the Lexham English Bible document.
+              </p>
+              <h2>The user-submitted content</h2>
+              <p>
+                When you upload, submit, store, send or receive content to or through our Services, you give Another Bible App a license to use, host, store, reproduce, modify, create derivative works (such as those resulting from translations, adaptations or other changes we make so that your content works better with our Services), communicate, publish, publicly perform, publicly display and distribute such content. This right is used to publish the content under a CC BY-NC-ND license, see the menu for what this means.
+              </p>
+              <p>
+                Your user content must not be illegal or unlawful, must not infringe any third party's legal rights, and must not be capable of giving rise to legal action whether against you or anotherbibleapp.com or a third party (in each case under any applicable law).
+              </p>
+              <p>
+                You must not submit any user content to the website that is or has ever been the subject of any threatened or actual legal proceedings or other similar complaint.
+              </p>
+              <h2>The application itself</h2>
+              <p>
+                At the moment the application itself is fully copyrighted (though it might be open sourced in the future).
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Acceptable Use">
+            <div class="card-content">
+              <p>
+                You must not use this website in any way that causes, or may cause, damage to the website or impairment of the availability or accessibility of anotherbibleapp.com or in any way which is unlawful, illegal, fraudulent or harmful, or in connection with any unlawful, illegal, fraudulent or harmful purpose or activity.
+              </p>
+              <p>
+                You must not use this website to copy, store, host, transmit, send, use, publish or distribute any material which consists of (or is linked to) any spyware, computer virus, Trojan horse, worm, keystroke logger, rootkit or other malicious computer software.
+              </p>
+              <p>
+                You must not conduct any systematic or automated data collection activities on or in relation to this website without anotherbibleapp.com's express written consent.
+              </p>
+              <p>
+                You must not use this website or any part of it to transmit or send unsolicited commercial communications.
+              </p>
+              <p>
+                You must not use this website for any purposes related to marketing without the express written consent of anotherbibleapp.com.
+              </p>
+            </div>
+          </paper-card>
+
+          <paper-card heading="Restricted access">
+            <div class="card-content">
+              <p>
+                Access to certain areas of this website is restricted. anotherbibleapp.com reserves the right to restrict access to certain areas of this website, or at our discretion, this entire website. anotherbibleapp.com may change or modify this policy without notice.
+              </p>
+              <p>
+                If anotherbibleapp.com provides you with a user ID and password to enable you to access restricted areas of this website or other content or services, you must ensure that the user ID and password are kept confidential. You alone are responsible for your password and user ID security.
+              </p>
+              <p>
+                anotherbibleapp.com may disable your user ID and password at anotherbibleapp.com's sole discretion without notice or explanation.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Warranties & Liability">
+            <div class="card-content">
+              <h2>No warranties</h2>
+              <p>
+                This website is provided “as is” without any representations or warranties, express or implied. anotherbibleapp.com makes no representations or warranties in relation to this website or the information and materials provided on this website.
+              </p>
+              <p>
+                Without prejudice to the generality of the foregoing paragraph, anotherbibleapp.com does not warrant that:
+              </p>
+              <ul>
+                <li>this website will be constantly available, or available at all; or</li>
+                <li>the information on this website is complete, true, accurate or non-misleading.</li>
+              </ul>
+              <p>
+                Nothing on this website constitutes, or is meant to constitute, advice of any legally restricted kind. If you require advice in relation to any legal, financial or medical matter you should consult an appropriate professional.
+              </p>
+              <h2>Limitations of liability</h2>
+              <p>
+                anotherbibleapp.com will not be liable to you (whether under the law of contact, the law of torts or otherwise) in relation to the contents of, or use of, or otherwise in connection with, this website:
+              </p>
+              <ul>
+                <li>to the extent that the website is provided free-of-charge, for any direct loss;</li>
+                <li>for any indirect, special or consequential loss; or</li>
+                <li>for any business losses, loss of revenue, income, profits or anticipated savings, loss of contracts or business relationships, loss of reputation or goodwill, or loss or corruption of information or data.</li>
+              </ul>
+              <p>
+                These limitations of liability apply even if anotherbibleapp.com has been expressly advised of the potential loss.
+              </p>
+              <h2>Exceptions</h2>
+              <p>
+                Nothing in this website disclaimer will exclude or limit any warranty implied by law that it would be unlawful to exclude or limit; and nothing in this website disclaimer will exclude or limit the liability of Another Bible App in respect of any:
+              </p>
+              <ul>
+                <li>death or personal injury caused by the negligence of anotherbibleapp.com or its agents, employees or shareholders/owners;</li>
+                <li>fraud or fraudulent misrepresentation on the part of anotherbibleapp.com; or</li>
+                <li>matter which it would be illegal or unlawful for anotherbibleapp.com to exclude or limit, or to attempt or purport to exclude or limit, its liability.</li>
+              </ul>
+              <h2>Reasonableness</h2>
+              <p>
+                By using this website, you agree that the exclusions and limitations of liability set out in this website disclaimer are reasonable. If you do not think they are reasonable, you must not use this website.
+              </p>
+              <h2>Unenforceable provisions</h2>
+              <p>
+                If any provision of this website disclaimer is, or is found to be, unenforceable under applicable law, that will not affect the enforceability of the other provisions of this website disclaimer.
+              </p>
+              <h2>Indemnity</h2>
+              <p>
+                You hereby indemnify anotherbibleapp.com and undertake to keep anotherbibleapp.com indemnified against any losses, damages, costs, liabilities and expenses (including without limitation legal expenses and any amounts paid by anotherbibleapp.com to a third party in settlement of a claim or dispute on the advice of anotherbibleapp.com's legal advisers) incurred or suffered by anotherbibleapp.com arising out of any breach by you of any provision of these terms and conditions, or arising out of any claim that you have breached any provision of these terms and conditions.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Breaches of these terms and conditions">
+            <div class="card-content">
+              <p>
+                Without prejudice to anotherbibleapp.com's other rights under these terms and conditions, if you breach these terms and conditions in any way, anotherbibleapp.com may take such action as anotherbibleapp.com deems appropriate to deal with the breach, including suspending your access to the website, prohibiting you from accessing the website, blocking computers using your IP address from accessing the website, contacting your internet service provider to request that they block your access to the website and/or bringing court proceedings against you.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Variation">
+            <div class="card-content">
+              <p>
+                anotherbibleapp.com may revise these terms and conditions from time-to-time. Revised terms and conditions will apply to the use of this website from the date of the publication of the revised terms and conditions on this website. Please check this page regularly to ensure you are familiar with the current version.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Assignment">
+            <div class="card-content">
+              <p>
+                anotherbibleapp.com may transfer, sub-contract or otherwise deal with anotherbibleapp.com's rights and/or obligations under these terms and conditions without notifying you or obtaining your consent.
+                You may not transfer, sub-contract or otherwise deal with your rights and/or obligations under these terms and conditions.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Severability">
+            <div class="card-content">
+              <p>
+                If a provision of these terms and conditions is determined by any court or other competent authority to be unlawful and/or unenforceable, the other provisions will continue in effect. If any unlawful and/or unenforceable provision would be lawful or enforceable if part of it were deleted, that part will be deemed to be deleted, and the rest of the provision will continue in effect.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Entire agreement">
+            <div class="card-content">
+              <p>
+                These terms and conditions, together with the referenced licenses in this document and anotherbibleapp.com's Privacy Policy constitute the entire agreement between you and anotherbibleapp.com in relation to your use of this website, and supersede all previous agreements in respect of your use of this website.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Law and jurisdiction">
+            <div class="card-content">
+              <p>
+                These terms and conditions will be governed by and construed in accordance with the laws of the Netherlands, and any disputes relating to these terms and conditions will be subject to the exclusive jurisdiction of the courts of the Netherlands.
+              </p>
+            </div>
+          </paper-card>
+        </iron-page>
+        <iron-page data-page="cc">
+          <paper-card heading="User submitted content">
+            <div class="card-content">
+              <p>
+                User submitted content on this site is published under a <a href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">Attribution-NonCommercial-NoDerivatives 4.0 International</a> license. This means that copy and redistribute the material in any medium or format, however you may not sell it or change it. If you copy and/or redistribute the material you will need to attribute it with the name of the user that submitted the content and a link to the original website.
+              </p>
+              <h2>Why this license?</h2>
+              <p>
+                Just like how I believe that the Bible and Bible translations are supposed to be freely available, in the same way I believe that we as Christians should share our knowledge freely with each other. As we Christians do have a terrible history of fighting and putting words in each others mouths I did decide however to pick the NoDerivatives version which doesn't allow you to adapt these works. Realistically however if you want to remix some answers for a Bible study I sincerely believe that nobody will complain at all.
+              </p>
+            </div>
+          </paper-card>
+        </iron-page>
+        <iron-page data-page="lexham">
+          <paper-card heading="Personal foreword">
+            <div class="card-content">
+              This application relies greatly on the freely available Lexham English Bible for which my thanks goes to Logos Bible Software. A lot of bible translations have extremely restricted licenses making distribution of the bible either illegal or extremely hard. If you are interested in reading more about this I would suggest the following <a href="http://christianity.stackexchange.com/questions/16377/what-major-translations-of-the-bible-are-in-the-public-domain-and-therefore-not" target="_blank">page</a>.
+            </div>
+          </paper-card>
+          <paper-card heading="Lexham English Bible License">
+            <div class="card-content">
+              <p>You can give away the Lexham English Bible, but you can't sell it on its own. If the LEB comprises less than 25% of the content of a larger work, you can sell it as part of that work.</p>
+              <p>If you give away the LEB for use with a commercial product, or sell a work containing more than 1,000 verses from the LEB, you must annually report the number of units sold, distributed, and/or downloaded.</p>
+              <p>You must always attribute quotations of the LEB.</p>
+              <p>If you quote less than 100 verses of the LEB in a single work you can attribute it by simply adding (LEB) after the quotation. Longer quotations, or use of 100 or more verses in a single work, must be accompanied by the following statement:</p>
+              <p style="margin:20px;font-style:italic;">Scripture quotations marked (LEB) are from the Lexham English Bible. Copyright 2012 Logos Bible Software. Lexham is a registered trademark of Logos Bible Software.</p>
+              <p>In electronic use, link "LEB" and "Lexham English Bible" to <a href="http://lexhamenglishbible.com" target="_blank">http://lexhamenglishbible.com</a>, and "Logos Bible Software" to <a href="http://logos.com" target="_blank">http://logos.com</a>. If all quotations are unmarked and from the LEB, you may remove "marked (LEB) are" from the statement.</p>
+              <p>In support of non-English Bible translation, non-profit organizations may use 50% as the maximum portion the LEB may comprise of a work offered for sale. (This specifically allows the creation and commercial sale of diglot Bibles.)</p>
+            </div>
+          </paper-card>
+        </iron-page>
+      </iron-pages>
+
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          currentPage: {
+            type: String,
+            value: 'generic'
+          }
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

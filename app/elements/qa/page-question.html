@@ -47,7 +47,7 @@
       }
       #newAnswer{
         max-width: 800px;
-        margin: 20px auto;
+        margin: 30px auto 20px;
       }
       #drawerContent{
         overflow: auto;
@@ -60,6 +60,7 @@
         margin: auto;
         text-align: center;
         margin-top: 40px;
+        margin-bottom: 50px;
         color: var(--secondary-text-on-primary-color-50);
       }
       .bible-verse:hover{
@@ -67,15 +68,38 @@
         cursor: pointer;
       }
     </style>
+    <style>
+      #toolbar{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        height: 192px;
+        background: var(--primary-color);
+        color: var(--text-on-primary-color);
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      #toolbar > div{
+        height: 64px;
+        display: flex;
+        flex-direction: row;
+      }
+    </style>
 
     <auth-api id="api" action="qa/:id" param-id="{{id}}" response="{{qas}}" logged-in="{{loggedIn}}"></auth-api>
 
     <paper-drawer-panel right-drawer>
       <div main>
-        <paper-toolbar>
+        <!--<paper-toolbar>
           <intelligent-title title="{{qas.question.title}}" no-title></intelligent-title>
-        </paper-toolbar>
-        <div class="page-content">
+        </paper-toolbar>-->
+        <div id="toolbar">
+          <div>
+            <intelligent-title title="{{qas.question.title}}" toolbar-title="Q&A"></intelligent-title>
+          </div>
+        </div>
+        <div id="content" class="page-content" on-scroll="_handleToolbarHeight">
 
           <qa-post type="question" post="{{qas.question}}"></qa-post>
 
@@ -89,7 +113,6 @@
             <span>Nobody has answered this question yet. Know somebody who can? Share this link with them!</span>
             <hr class="divider">
           </div>
-
 
           <div id="logInToAnswer" hidden$="{{loggedIn}}">
             Want to answer this question? <a href="/login">Log in</a> if you have an account or <a href="/register">register now</a>.
@@ -138,9 +161,28 @@
           '_setAnyAnswers(qas.answers.splices)'
         ],
         ready: function(){
+          this._handleToolbarHeight();
         },
         retrieveFromApi: function(){
-          this.$.api.execute();
+          this.$.api.execute().catch(function(err){
+            if(err == 'Not found'){
+              page.replace('/404');
+            }
+          });
+        },
+        _handleToolbarHeight: function(ev){
+          var scrollTop = this.$.content.scrollTop;
+          var percentageGone = Math.min(scrollTop / 38, 1);
+          this.$.content.style.paddingTop = '118px';
+          var toolbarFullHeight = 192;
+          var toolbarSmallHeight = 64;
+          var toolbarHeight = (1 - percentageGone) * (toolbarFullHeight - toolbarSmallHeight) + toolbarSmallHeight;
+          console.log(toolbarHeight);
+          this.$.toolbar.style.height = Math.round(toolbarHeight) + 'px';
+          this.$.toolbar.style.zIndex = toolbarHeight < toolbarSmallHeight + 10 ? 1 : 0;
+          var shadow = `0 2px 2px 0 rgba(0, 0, 0, ${Math.round(percentageGone * 14)/100}), 0 3px 1px -2px rgba(0, 0, 0, ${Math.round(percentageGone * 2)/100}), 0 1px 5px 0 rgba(0, 0, 0, ${Math.round(percentageGone * 12)/100})`;
+          console.log(shadow);
+          this.$.toolbar.style.boxShadow = shadow;
         },
         _setTitle: function(title){
           page.replace('/question/'+this.id+'/'+title.toLowerCase().replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));

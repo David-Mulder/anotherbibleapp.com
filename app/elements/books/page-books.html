@@ -12,6 +12,7 @@
         margin: auto;
       }
     </style>
+    <synced-settings id="settings"></synced-settings>
     <paper-toolbar class="medium-tall">
       <intelligent-title title="Books & Letters of the Bible"></intelligent-title>
       <paper-tabs class="fit bottom" selected="{{sortBooksBy}}" scrollable attr-for-selected="data-value">
@@ -33,8 +34,16 @@
         properties: {
           sortBooksBy: {
             type: String,
-            value: 'tradition'
+            observer: '_saveSort'
           }
+        },
+        ready: function(){
+          this.$.settings.getSetting('page-books-sort-books-by', 'tradition').then(function(value){
+            this.sortBooksBy = value;
+          }.bind(this));
+        },
+        _saveSort: function(){
+          this.$.settings.saveSetting('page-books-sort-books-by', this.sortBooksBy);
         }
       });
     })();

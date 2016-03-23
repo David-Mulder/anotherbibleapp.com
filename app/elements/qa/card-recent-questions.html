@@ -26,10 +26,22 @@
       #content .question-link{
         padding-top: 20px;
         padding-bottom: 20px;
+        display: flex;
       }
       #content .question-link:hover{
         background: rgba(0,0,0,.05);
         cursor: pointer;
+      }
+      #content .question-link .score{
+        width: 40px;
+        padding-right: 10px;
+        font-size: 23px;
+        color: rgba(0,0,0,.5);
+        text-align: center;
+      }
+      #content .question-link .question{
+        flex: 1;
+        padding-top: 4px;
       }
       .info{
         margin-top: 5px;
@@ -39,17 +51,22 @@
         color: var(--secondary-text-on-card-dialog-color);
       }
     </style>
-    <auth-api id="api" action="questions/list/recent" response="{{questions}}"></auth-api>
+    <auth-api id="api" action="questions/list/recent" param-count="{{count}}" response="{{questions}}"></auth-api>
 
     <div id="content">
 
       <paper-card heading="Recent Questions">
         <template is="dom-repeat" items="{{questions}}" as="question">
           <div class="card-actions question-link" on-tap="gotoQuestionPage">
-            <span>{{question.title}}</span>
-            <div class="info">
-              <span class="verses">by {{question.originalAuthor.displayName}}</span>
-              <span class="verses">about {{question.verses}}</span>
+            <div class="score">
+              {{question.score}}
+            </div>
+            <div class="question">
+              <span>{{question.title}}</span>
+              <div class="info">
+                <span class="verses">by {{question.originalAuthor.displayName}}</span>
+                <span class="verses">about {{question.verses}}</span>
+              </div>
             </div>
           </div>
         </template>
@@ -78,16 +95,25 @@
           noResults: {
             type: Boolean,
             value: false
+          },
+          count: {
+            type: Number,
+            value: 5
           }
         },
         observers: [
         ],
         reload: function(){
-          this.$.api.execute().then(() => {
-            this.questions.map(question => {
-              question.verses = question.verses.map(verse => new BibleReference(verse).toLongString()).join(', ');
+
+          this.$.api.execute().then(function(){
+            this.questions.forEach(function(question){
+              var verses = question.verses.map(function(verse){
+                return new BibleReference(verse);
+              });
+              verses = BibleReference.combine(verses);
+              question.verses = verses.map(verse => new BibleReference(verse).toLongString()).join(', ');
             });
-          });
+          }.bind(this));
         },
         gotoQuestionPage: function(ev){
           page('/question/'+ev.model.question._id)

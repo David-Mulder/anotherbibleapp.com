@@ -1,0 +1,69 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="lazy-animted-router">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2 class="page-title"><span>{{greeting}}</span></h2>
+    <span class="paper-font-body2">Update text to change the greeting.</span>
+    <!-- Listens for "input" event and sets greeting to <input>.value -->
+    <input class="paper-font-body2" value="{{greeting::input}}">
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        },
+        ready: function(){
+
+        },
+        _importDependency: function(el){
+
+          app.loading(el);
+
+          return new Promise(function(resolve, reject){
+            if(this._loadedDependencies.indexOf(el) === -1){
+              console.debug('loading', el);
+              this._loadedDependencies.push(el);
+              this.importHref('/elements/' + el + '.html', function(){
+
+                document.getElementById('loading').style.opacity = 0; //should become an event
+                window.dispatchEvent(new Event('resize'));
+
+                setTimeout(function(){
+                  app.finishedLoading(el);
+                }, 0);
+
+                resolve();
+
+              }, function(){
+                alert('Failed loading the requested page.');
+              });
+            }else{
+              app.finishedLoading(el);
+              resolve();
+            }
+          });
+        },
+        loadPage: function(file, elementName){
+          elementName = element || file.split('/').pop();
+          this._importDependency(file).then(function(){
+            //todo: var element = document.querySelector(elementName);
+            //todo: lazyFireEvents(element);
+            var el = document.createElement(elementName);
+            console.log(el);
+          }.bind(this));
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

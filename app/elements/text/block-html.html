@@ -10,7 +10,7 @@
 
         properties: {
           html: {
-            type: String,
+            type: HTMLElement,
             observer: 'setHTML'
           },
           highlightedVerses: {
@@ -33,7 +33,8 @@
             div.setAttribute('chapter-number', this.chapterNumber);
           }
 
-          div.innerHTML = this.html;
+          //div.innerHTML = this.html;
+          div.appendChild(this.html);
           this.parent.scopeSubtree(div, false);
 
           this.setVerseClasses(div, this.selectedVerses, 'selected');

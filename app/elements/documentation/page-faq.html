@@ -1,0 +1,87 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-faq">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Frequently Asked Question"></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <paper-card heading="I don't see any verse or chapter numbers?">
+        <div class="card-content">
+          <p>
+            <strong>Important:</strong> You can alwayse use the toggle in the top right to turn on all the chapter and verse numbers, pericopes and translation notes.
+          </p>
+          <p>
+            The Bible is a compilation of many shorter books written at different times by a variety of authors, and later assembled into the biblical canon. The original manuscripts did not contain the chapter and verse divisions in the numbered form familiar to modern readers. The first English New Testament to use the verse divisions was a 1557 translation by William Whittingham. The goal of these was to allow referencing specific texts, which was super useful, but the necessity for these to be visible whilst reading the text has disappeared.
+          </p>
+        </div>
+      </paper-card>
+      <!--
+      <paper-card heading="I am seeing weird gaps in my text">
+        <div class="card-content">
+          <p>
+            This is a known issue and can be resolved by resizing the page or rotating your device. I apologize.
+          </p>
+        </div>
+      </paper-card>
+      -->
+      <paper-card heading="Someone else edited my post?">
+        <div class="card-content">
+          <p>
+            Everyone is allowed to improve each others posts. The strict rule is that this may only be used within the
+            boundaries of the original author's intent. So the large majority of edits will only improve spelling,
+            improve formatting or remove superfluous text (like salutations and thanks). If a post was edited in a way
+            that breaks with your intent as an author, then you should feel more than free to revert the changes.
+          </p>
+          <p>
+            One type of edit that might be controversial is edits that attempt to make questions on topic. Questions
+            should be specific (only a single question per question) and focused (they can't mix application and
+            historical context). In those cases the author still holds the right to revert the changes, but this may
+            result in the deletion of the post.
+          </p>
+          <p>
+            In the future if this site ever reaches the point where this collaborative nature of the site becomes an issue
+            additional requirements - such a certain number of posts with a certain number of votes - may be introduced
+            before free editing of posts is allowed.
+          </p>
+        </div>
+      </paper-card>
+      <paper-card heading="My question was deleted?">
+        <div class="card-content">
+          <p>
+            Administrators hold the right to delete questions they deem off topic. Questions may be considered off topic
+            because they are too broad or <a href="/help/how-to-ask">for various other reasons</a>. For the moment all
+            administrators will be picked  from users who have experience with the StackExchange platform. In principle the deletion/closure rules will be based on that platform, so if your question got deleted/closed and you're confused why it might
+            be a good idea to check out the documenation of that platform.
+          </p>
+        </div>
+      </paper-card>
+      <paper-card heading="Books aren't showing up in my recently read list?">
+        <div class="card-content">
+          <p>
+            The recently read books list is only 'active' if you either open a book or letter without specifically
+            referencing a single verse. The reason for this is that if you're for example reading through Genesis from
+            start to end you don't want to lose your position just because you opened Genesis 1 again during a sermon.
+          </p>
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

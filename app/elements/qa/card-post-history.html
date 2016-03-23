@@ -80,7 +80,7 @@
             <bible-markdown markdown="{{old.text}}"></bible-markdown>
             <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
 
-            <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+            <div class="time">by {{old.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
 
           </div>
 
@@ -90,7 +90,7 @@
 
             <h3 hidden$="{{!_equals(type, 'question')}}">{{new.title}}</h3>
             <bible-markdown markdown="{{new.text}}"></bible-markdown>
-            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
 
             <template is="dom-if" if="{{newVersionOnly}}">
               <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
@@ -116,9 +116,9 @@
 
             <pre class="title" hidden$="{{!_equals(type, 'question')}}"># {{old.title}}</pre>
             <pre class="text">{{old.text}}</pre>
-            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
 
-            <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+            <div class="time">by {{old.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
 
           </div>
 
