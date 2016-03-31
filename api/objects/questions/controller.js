@@ -140,16 +140,46 @@ module.exports = {
   listRecent: function(req, res){
     Question
       .find(deletionCheck(req, {'downvotes.0': {$exists: false}}))
+      .sort('-createdAt')
+      .limit(Math.min(req.query.count, 25))
+      .populate('originalAuthor', 'displayName _id')
+      .exec(function(err, result){
+        if(err){
+          res.status(500).json(err);
+        }else{
+          res.json(result.map(question => question.makePublic()));
+        }
+      });
+  },
+
+  listRecentlyActive: function(req, res){
+    Question
+      .find(deletionCheck(req, {}))
       .sort('-updatedAt')
       .limit(Math.min(req.query.count, 25))
       .populate('originalAuthor', 'displayName _id')
       .exec(function(err, result){
-      if(err){
-        res.status(500).json(err);
-      }else{
-        res.json(result.map(question => question.makePublic()));
-      }
-    });
+        if(err){
+          res.status(500).json(err);
+        }else{
+          res.json(result.map(question => question.makePublic()));
+        }
+      });
+  },
+
+  listTopUnanswered: function(req, res){
+    Question
+      .find(deletionCheck(req, {'numberOfAnswers': 0}))
+      .sort('-score')
+      .limit(Math.min(req.query.count, 25))
+      .populate('originalAuthor', 'displayName _id')
+      .exec(function(err, result){
+        if(err){
+          res.status(500).json(err);
+        }else{
+          res.json(result.map(question => question.makePublic()));
+        }
+      });
   },
 
   listForVerse: function(req, res){

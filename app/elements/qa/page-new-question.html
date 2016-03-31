@@ -91,7 +91,7 @@
       }
     </style>
     <paper-toolbar>
-      <span>Ask a Question</span>
+      <intelligent-title title="Ask a Question" allow-back></intelligent-title>
       <span class="flex"></span>
     </paper-toolbar>
     <div class="new-question-page">
@@ -100,7 +100,7 @@
       <auth-api id="api" method="PUT" action="question" param-title="{{title}}" param-category="{{category}}" param-text="{{questionText}}" param-verses="{{versesAsNumbers}}"></auth-api>
 
       <div hidden="{{!loggedIn}}">
-        <paper-card>
+        <paper-card id="card">
 
           <div class="card-content">
 
@@ -188,7 +188,36 @@
 
         properties: {
           versesString: String,
-          verses: Array
+          verses: Array,
+          animationConfig: {
+            value: function() {
+              return {
+                // the incoming page defines the 'entry' animation
+                'exit': [{
+                  name: 'hero-animation',
+                  id: 'question-card',
+                  fromPage: this
+                }, {
+                  name: 'fade-out-animation',
+                  node: this
+                }],
+                'entry': [{
+                  name: 'slide-from-bottom-animation',
+                  node: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }]
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'question-card': this.$.card
+              }
+            }
+          }
         },
         observers: [
           'parseVerses(versesString)'
@@ -196,6 +225,9 @@
         listeners: {
           'page-became-visible': '_checkLoggedInOrRedirect'
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         ready: function(){
 
           //this.set('loggedIn', false);
@@ -231,7 +263,7 @@
           }
           if(valid){
             this.$.api.execute().then(function(id){
-              page('/question/'+id)
+              page.replace('/question/'+id)
             }).catch(function(errs){
               alert('Some validation error occurred');
               console.info('validation', errs);

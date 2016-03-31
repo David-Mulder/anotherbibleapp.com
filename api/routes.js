@@ -7,6 +7,7 @@ var votingController = require('./objects/votes/controller');
 var userController = require('./objects/users/controller');
 var searchController = require('./objects/search/controller');
 var commentController = require('./objects/comments/controller');
+var locationController = require('./objects/locations/controller');
 
 var strongLimit = rateLimit({
   delayAfter: 3,
@@ -46,6 +47,8 @@ module.exports = {
     app.put('/question', authenticator.isAuthenticated, questionController.create);
     app.post('/question/:id', authenticator.isAuthenticated, questionController.update);
     app.get('/questions/list/recent', questionController.listRecent);
+    app.get('/questions/list/top-unanswered', questionController.listTopUnanswered);
+    app.get('/questions/list/recently-active', questionController.listRecentlyActive);
     app.get('/questions/list/:verse', questionController.listForVerse);
 
     app.get('/answer/:id', weakLimit, answerController.get);
@@ -60,6 +63,11 @@ module.exports = {
     app.post('/downvote/:type/:id', authenticator.isAuthenticated, votingController.downvote);
 
     app.get('/synonyms/:word', searchController.synonyms);
+
+    app.get('/locations/list/viewport', weakLimit, locationController.listForViewport);
+    app.get('/locations/list/coordinates', weakLimit, locationController.listForCoordinates);
+    app.get('/locations/list/:verse', weakLimit, locationController.listForVerse);
+
 
     app.get('/', function (req, res) {
       res.send('Hello Worldd!');

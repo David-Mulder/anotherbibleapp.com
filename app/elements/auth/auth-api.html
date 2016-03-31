@@ -152,7 +152,7 @@
                   }
 
                   if(urlParams.length > 0){
-                    url += '?' + urlParams.map(p => encodeURIComponent(p[0]) + '=' + encodeURIComponent(p[1])).join('&');
+                    url += '?' + urlParams.map(p => encodeURIComponent(p[0]) + '=' + encodeURIComponent(typeof p[1] === 'string' ? p[1] : JSON.stringify(p[1]))).join('&');
                   }
 
                   console.info('fetch', url);

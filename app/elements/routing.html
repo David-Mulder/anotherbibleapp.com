@@ -10,176 +10,149 @@
       next();
     });
 
+
+
     page(function(ctx, next){
       document.body.dispatchEvent(new CustomEvent("page-navigation", {
         detail: {
+          ctx: ctx
         }
       }));
       next();
     });
 
     page('/', function () {
-      app.loadDependency('dashboard/page-welcome').then(function(){
-        app.route = 'home';
-      });
+      app.$.router.loadPage('dashboard/page-welcome');
     });
 
     page('/login', function (data) {
-      app.loadDependency('auth/page-login').then(function(){
-        app.route = 'login';
-      });
+      app.$.router.loadPage('auth/page-login');
     });
 
     page('/user/:id/:title?', function (data) {
-      app.loadDependency('auth/page-user').then(function(){
-        app.route = 'user';
-        app.set('params.userId', data.params.id);
+      app.$.router.loadPage('auth/page-user', {
+        userId: data.params.id
       });
     });
 
     page('/forgot-my-password/:token?', function (data) {
-      app.loadDependency('auth/page-forgotten-password').then(function(){
-        if(data.params.token){
-          app.set('params.passwordResetToken', data.params.token);
-        }
-        app.route = 'forgotten-password';
+      app.$.router.loadPage('auth/page-forgotten-password', {
+        resetToken: data.params.token
       });
     });
 
     page('/register', function (data) {
-      app.loadDependency('auth/page-register').then(function() {
-        app.route = 'register';
-      });
+      app.$.router.loadPage('auth/page-register');
     });
 
     page('/settings', function (data) {
-      app.loadDependency('settings/page-settings').then(function(){
-        app.route = 'settings';
-      });
+      app.$.router.loadPage('settings/page-settings');
     });
 
     page('/logout', function (data) {
       delete localStorage.token;
+      delete localStorage.user;
+      delete localStorage.settings;
       location.href = '/';
     });
 
     page('/books', function (data) {
-      app.loadDependency('books/page-books').then(function() {
-        app.route = 'books';
-      });
+      app.$.router.loadPage('books/page-books');
     });
 
-    page('/recent/questions', function (data) {
-      app.loadDependency('qa/page-recent-qa').then(function() {
-        app.route = 'recent-qa';
+    page('/questions/:type?', function (data) {
+      app.$.router.loadPage('qa/page-explore-qa', {
+        page: data.params.type || 'recent'
       });
     });
 
     page('/book/:ref', function (data) {
-      app.loadDependency('text/page-book').then(function(){
-        app.route = 'book';
-        app.set('params.bookRef', data.params.ref);
+      app.$.router.loadPage('text/page-book', {
+        ref: data.params.ref
       });
     });
 
     page('/questions/ask/:verses', function (data) {
-      app.loadDependency('qa/page-new-question').then(function(){
-        app.route = 'new-question';
-        app.set('params.newQuestionVerses', data.params.verses);
+      app.$.router.loadPage('qa/page-new-question', {
+        versesString: data.params.verses
       });
     });
 
     page('/:questionOrAnswer/:id/history', function(data) {
-      app.loadDependency('qa/page-post-history').then(function() {
-        app.route = 'post-history';
-        app.set('params.postId', data.params.id);
-        app.set('params.postType', data.params.questionOrAnswer);
+      app.$.router.loadPage('qa/page-post-history', {
+        id: data.params.id,
+        postType: data.params.questionOrAnswer
       });
     });
 
     page('/question/:id/edit', function(data) {
-      app.loadDependency('qa/page-edit-question').then(function() {
-        app.route = 'edit-question';
-        app.set('params.questionId', data.params.id);
+      app.$.router.loadPage('qa/page-edit-question', {
+        id: data.params.id
       });
     });
 
     page('/answer/:id/edit', function(data) {
-      app.loadDependency('qa/page-edit-answer').then(function() {
-        app.route = 'edit-answer';
-        app.set('params.answerId', data.params.id);
+      app.$.router.loadPage('qa/page-edit-answer', {
+        id: data.params.id
       });
     });
 
     page('/question/:id/:title?', function(data) {
-      app.loadDependency('qa/page-question').then(function(){
-        app.route = 'question';
-        app.set('params.questionId', data.params.id);
+      app.$.router.loadPage('qa/page-question', {
+        id: data.params.id
       });
     });
 
-    page('/search', function() {
-      app.loadDependency('search/page-search').then(function(){
-        app.route = 'search';
-        app.set('params.searchQuery', '');
-      });
-    });
-
-    page('/search/:query', function (data) {
-      app.loadDependency('search/page-search').then(function(){
-        app.route = 'search';
-        app.set('params.searchQuery', data.params.query);
-      });
-    });
-
-    page('/help/how-to-ask', function (data) {
-      app.loadDependency('documentation/page-rules-questions').then(function(){
-        app.route = 'rules-questions';
-      });
-    });
-
-    page('/help/how-to-answer', function (data) {
-      app.loadDependency('documentation/page-rules-answers').then(function(){
-        app.route = 'rules-answers';
-      });
-    });
-
-    page('/help/search', function (data) {
-      app.loadDependency('documentation/page-search-docs').then(function(){
-        app.route = 'search-docs';
-      });
-    });
-
-    page('/help/faq', function (data) {
-      app.loadDependency('documentation/page-faq').then(function(){
-        app.route = 'faq';
-      });
-    });
-
-
-    page('/philosophy', function (data) {
-      app.loadDependency('documentation/page-philosophy').then(function(){
-        app.route = 'philosophy';
+    page('/search/:query?', function(data) {
+      app.$.router.loadPage('search/page-search', {
+        searchQuery: data.params.query || ''
+      }, {
+        replace: true
       });
     });
 
     page('/topic/:name', function (data) {
-      app.loadDependency('topics/page-topic').then(function(){
-        app.route = 'topic';
-        app.set('params.topicName', data.params.name);
+      app.$.router.loadPage('topics/page-topic', {
+        topicName: data.params.name
       });
     });
 
+    page('/help/how-to-ask', function (data) {
+      app.$.router.loadPage('documentation/page-rules-questions');
+    });
+
+    page('/help/how-to-answer', function (data) {
+      app.$.router.loadPage('documentation/page-rules-answers');
+    });
+
+    page('/help/search', function (data) {
+      app.$.router.loadPage('documentation/page-search-docs');
+    });
+
+    page('/help/faq', function (data) {
+      app.$.router.loadPage('documentation/page-faq');
+    });
+
+    page('/philosophy', function (data) {
+      app.$.router.loadPage('documentation/page-philosophy');
+    });
+
+
     page('/legal', function (data) {
-      app.loadDependency('documentation/page-legal').then(function(){
-        app.route = 'legal';
+      app.$.router.loadPage('documentation/page-legal');
+    });
+
+    page('/map/:lng?/:lat?', function (data) {
+      app.$.router.loadPage('locations/page-map', {
+        lng: data.params.lng,
+        lat: data.params.lat
+      }, {
+        replace: true
       });
     });
 
     page('*', function(){
-      app.loadDependency('documentation/page-not-found').then(function(){
-        app.route = 'not-found';
-      });
+      app.$.router.loadPage('documentation/page-not-found');
     });
 
     // add #! before urls

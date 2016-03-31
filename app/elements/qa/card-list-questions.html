@@ -1,8 +1,9 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
-<dom-module id="card-recent-questions">
+<dom-module id="card-list-questions">
   <template>
     <style include="shared-styles"></style>
     <style>
@@ -27,6 +28,17 @@
         padding-top: 20px;
         padding-bottom: 20px;
         display: flex;
+        position: relative;
+      }
+      #content .unanswered{
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        padding: 2px 10px;
+        font-size: 12px;
+        background: var(--accent-color-100);
+        color: var(--secondary-text-on-accent-color-100);
+        border-bottom-left-radius: 3px;
       }
       #content .question-link:hover{
         background: rgba(0,0,0,.05);
@@ -51,13 +63,13 @@
         color: var(--secondary-text-on-card-dialog-color);
       }
     </style>
-    <auth-api id="api" action="questions/list/recent" param-count="{{count}}" response="{{questions}}"></auth-api>
 
     <div id="content">
 
-      <paper-card heading="Recent Questions">
+      <paper-card heading="{{heading}}">
         <template is="dom-repeat" items="{{questions}}" as="question">
           <div class="card-actions question-link" on-tap="gotoQuestionPage">
+            <div class="unanswered" hidden$="{{_moreThan(question.numberOfAnswers, 0)}}">Unanswered</div>
             <div class="score">
               {{question.score}}
             </div>
@@ -88,35 +100,24 @@
 
       Polymer({
         properties: {
-          relatedQuestions: {
-            type: Boolean,
-            value: false
-          },
-          noResults: {
-            type: Boolean,
-            value: false
-          },
-          count: {
-            type: Number,
-            value: 5
+          questions: {
+            type: Array
           }
         },
+        behaviors: [
+          abaBehaviors.logic
+        ],
         observers: [
         ],
-        reload: function(){
-
-          this.$.api.execute().then(function(){
-            this.questions.forEach(function(question){
-              var verses = question.verses.map(function(verse){
-                return new BibleReference(verse);
-              });
-              verses = BibleReference.combine(verses);
-              question.verses = verses.map(verse => new BibleReference(verse).toLongString()).join(', ');
-            });
-          }.bind(this));
-        },
         gotoQuestionPage: function(ev){
-          page('/question/'+ev.model.question._id)
+          var target = Polymer.dom(ev).path.find(function(el){
+            return el.matches('.question-link');
+          });
+          this.fire('hero-element-set', {
+            element: target,
+            heroName: 'question-card'
+          });
+          app.navigateTo('/question/'+ev.model.question._id)
         }
       });
     })();

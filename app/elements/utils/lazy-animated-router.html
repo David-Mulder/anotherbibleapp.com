@@ -1,17 +1,43 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="/bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="/bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="/bower_components/neon-animation/animations/hero-animation.html">
+<link rel="import" href="/bower_components/neon-animation/animations/slide-down-animation.html">
+<link rel="import" href="/bower_components/neon-animation/animations/ripple-animation.html">
 
-<dom-module id="lazy-animted-router">
+<dom-module id="lazy-animated-router">
   <template>
     <style include="shared-styles"></style>
     <style>
       :host {
         display: block;
+        height: 100%;
+      }
+      neon-animated-pages{
+        height: 100%;
+        background: var(--primary-color-500);
+        overflow: hidden;
+      }
+      iron-pages{
+        height: 100%;
+        background: var(--primary-color-500);
+        overflow: hidden;
       }
     </style>
-    <h2 class="page-title"><span>{{greeting}}</span></h2>
-    <span class="paper-font-body2">Update text to change the greeting.</span>
-    <!-- Listens for "input" event and sets greeting to <input>.value -->
-    <input class="paper-font-body2" value="{{greeting::input}}">
+    <template is="dom-if" if="{{animated}}">
+      <neon-animated-pages selected="{{_selectedPage}}" attr-for-selected="data-id" id="pages" on-neon-animation-finish="_pageAnimationFinished">
+
+      </neon-animated-pages>
+    </template>
+
+    <template is="dom-if" if="{{!animated}}">
+      <iron-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="data-id">
+
+      </iron-pages>
+    </template>
+
   </template>
 
   <script>
@@ -20,15 +46,30 @@
 
       Polymer({
         properties: {
-
+          page: {
+            type: String
+          },
+          _pageLoadQueue: {
+            type: Array,
+            value: function(){
+              return [];
+            }
+          }
         },
         ready: function(){
+          this._loadedDependencies = [];
+          this._paramsMap = new WeakMap();
+          this._elIdCounter = 0;
 
+          var isChromium = window.chrome,
+            winNav = window.navigator,
+            vendorName = winNav.vendor,
+            isOpera = winNav.userAgent.indexOf("OPR") > -1,
+            isIEedge = winNav.userAgent.indexOf("Edge") > -1,
+            isIOSChrome = winNav.userAgent.match("CriOS");
+          this.animated = isChromium !== null && isChromium !== undefined && vendorName === "Google Inc." && isOpera == false && isIEedge == false && isIOSChrome == null ? true : false;
         },
         _importDependency: function(el){
-
-          app.loading(el);
-
           return new Promise(function(resolve, reject){
             if(this._loadedDependencies.indexOf(el) === -1){
               console.debug('loading', el);
@@ -36,11 +77,6 @@
               this.importHref('/elements/' + el + '.html', function(){
 
                 document.getElementById('loading').style.opacity = 0; //should become an event
-                window.dispatchEvent(new Event('resize'));
-
-                setTimeout(function(){
-                  app.finishedLoading(el);
-                }, 0);
 
                 resolve();
 
@@ -48,18 +84,142 @@
                 alert('Failed loading the requested page.');
               });
             }else{
-              app.finishedLoading(el);
               resolve();
             }
-          });
+          }.bind(this));
         },
-        loadPage: function(file, elementName){
-          elementName = element || file.split('/').pop();
-          this._importDependency(file).then(function(){
-            //todo: var element = document.querySelector(elementName);
-            //todo: lazyFireEvents(element);
-            var el = document.createElement(elementName);
-            console.log(el);
+        _getCurrentPages: function(){
+          return [].slice.call(this.$$('#pages').children);
+        },
+        _pageAnimationFinished: function(ev){
+          ev.detail.toPage.fire('page-finished-animating');
+          ev.detail.fromPage.fire('page-finished-exiting');
+        },
+        _pageAlreadyInMemory: function(elementName, params, opts){
+          var currentPages = this._getCurrentPages();
+          return currentPages.find(function(testedEl){
+            if(testedEl.nodeName.toLowerCase() !== elementName.toLowerCase()){
+              return false;
+            }
+            if(opts.replace){
+              return true;
+            }
+            var testedElementParams = this._paramsMap.get(testedEl);
+            var testedParamsNames = Object.keys(testedElementParams);
+            return testedParamsNames.every(function(paramName){
+              return testedElementParams[paramName] == params[paramName];
+            });
+          }.bind(this));
+        },
+        loadPage: function(file, params, opts){
+          this._pageLoadQueue.push([file, params, opts]);
+          this._checkQueue();
+        },
+        _checkQueue: function(){
+          console.info('checking queue', this._pageLoadQueue);
+          console.info('currently animating', this._isCurrentlyAnimating);
+          this.debounce('stuck-animation-bug-hack-fix', function(){
+            if(this._isCurrentlyAnimating){
+              this._isCurrentlyAnimating = false;
+              this._checkQueue();
+            }
+          }.bind(this), 3000);
+          if(!this._isCurrentlyAnimating && this._pageLoadQueue.length > 0){
+            this._isCurrentlyAnimating = true;
+            var args = this._pageLoadQueue.shift();
+
+            console.log('starting load of', args[0]);
+            app.loading(args[0]);
+            this._loadPage(args[0], args[1], args[2]).then(function(element){
+              console.log('finished load of', args[0]);
+              app.finishedLoading(args[0]);
+              var awaitFinishedAnimation = function(){
+                console.log('finished animation of', args[0]);
+                element.removeEventListener('page-finished-animating', awaitFinishedAnimation);
+                this._isCurrentlyAnimating = false;
+                setTimeout(function(){
+                  this._checkQueue();
+                }.bind(this), 250)
+
+              }.bind(this);
+              element.addEventListener('page-finished-animating', awaitFinishedAnimation);
+            }.bind(this));
+
+          }
+        },
+        _loadPage: function(file, params, opts){
+
+          return new Promise(function(resolve, reject){
+
+            params = params || {};
+            opts = opts || {};
+            var elementName = opts.elementName || file.split('/').pop();
+
+            var prevPage = this.$$('#pages').selectedItem;
+            if(prevPage){
+              prevPage.fire('page-became-invisible');
+            }
+
+            var currentPages = this._getCurrentPages();
+
+            var samePage = this._pageAlreadyInMemory(elementName, params, opts);
+
+            if(samePage){
+              if(opts.replace){
+                this._paramsMap.set(samePage, params);
+                Object.keys(params).forEach(function(paramName){
+                  samePage.set(paramName, params[paramName]);
+                });
+              }
+              this._selectedPage = samePage.dataset.id;
+              samePage.fire('page-became-visible');
+              setTimeout(function(){
+                resolve(samePage);
+
+                if(!this.animated){
+                  samePage.fire('page-finished-animating');
+                  if(prevPage){
+                    prevPage.fire('page-finished-exiting');
+                  }
+                }
+              }, 0);
+            }else{
+              this._importDependency(file).then(function(){
+                if(currentPages.length > 3){
+                  //todo: maintain currentPages array that will be by order of usage, including samePage behavior
+                  Polymer.dom(this.$$('#pages')).removeChild(currentPages[0]);
+                  //this._selectedPage = this._selectedPage - 1;
+                }
+
+                var el = document.createElement(elementName);
+                el.setAttribute('data-id', this._elIdCounter++);
+                this._paramsMap.set(el, params);
+                console.log('params', params);
+                Object.keys(params).forEach(function(paramName){
+                  el.set(paramName, params[paramName]);
+                });
+                Polymer.dom(this.$$('#pages')).appendChild(el);
+                //Polymer.dom(this.$.dummy).appendChild(el);
+                this.async(function(){
+                  this._selectedPage = el.dataset.id;
+                  window.dispatchEvent(new Event('resize'));
+
+                  el.fire('page-became-visible');
+
+                  resolve(el);
+
+                  setTimeout(function(){
+                    if(this._elIdCounter == 1 || !this.animated){
+                      el.fire('page-finished-animating');
+                      if(prevPage){
+                        prevPage.fire('page-finished-exiting');
+                      }
+                    }
+                  }.bind(this), 0);
+                }, 100);
+                console.log(el); //s
+              }.bind(this));
+            }
           }.bind(this));
         }
       });

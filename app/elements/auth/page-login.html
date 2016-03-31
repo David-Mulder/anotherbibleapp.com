@@ -51,7 +51,7 @@
       <form is="iron-form" id="form" method="post" action="/form/handler" hidden="{{loggedIn}}">
         <paper-card id="login" heading="Log in">
           <div class="card-content">
-            <paper-input id="username" label="E-mail" value="{{username}}" on-keyup="_checkForSubmit" autofocus></paper-input>
+            <paper-input id="username" label="E-mail" value="{{username}}" on-keyup="_checkForSubmit"></paper-input>
             <paper-input id="password" type="password" value="{{password}}" on-keyup="_checkForSubmit" label="Password"></paper-input>
             <div class="actions">
               <paper-button class="blue" on-tap="login">Log In</paper-button>
@@ -84,7 +84,18 @@
           username: String,
           password: String
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
+        listeners: {
+          'page-finished-animating': '_focusEmailField'
+        },
         ready: function(){
+        },
+        _focusEmailField: function(){
+          this.async(function() {
+            this.$.username.focus();
+          });
         },
         _checkForSubmit: function(ev){
           if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
@@ -118,7 +129,7 @@
             if(this.loggedIn){
               this.$.settings.reset().then(function(){
                 page.back();
-                //page('/');
+                //app.navigateTo('/');
               });
             }
           }.bind(this)).catch(function(err){
@@ -136,10 +147,10 @@
           }.bind(this));
         },
         goToForgotPassword: function(){
-          page('/forgot-my-password');
+          app.navigateTo('/forgot-my-password');
         },
         _goToRegister: function(){
-          page('/register');
+          app.navigateTo('/register');
         }
       });
     })();

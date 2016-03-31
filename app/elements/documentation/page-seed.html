@@ -8,7 +8,7 @@
 
     </style>
     <paper-toolbar>
-      <intelligent-title title="Seed"></intelligent-title>
+      <intelligent-title title="Seed" allow-back></intelligent-title>
     </paper-toolbar>
     <div class="page-content">
       <paper-card heading="test">
@@ -26,7 +26,10 @@
       Polymer({
         properties: {
 
-        }
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
       });
     })();
   </script>

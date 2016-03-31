@@ -41,7 +41,7 @@
         <paper-card id="login" heading="Register">
           <div class="card-content">
 
-            <paper-input type="text" value="{{displayName}}" autofocus label="Display Name" on-keyup="_checkForEnter" maxlength="25" char-counter></paper-input>
+            <paper-input id="displayName" type="text" value="{{displayName}}" label="Display Name" on-keyup="_checkForEnter" maxlength="25" char-counter></paper-input>
             <paper-input id="email" label="E-mail" value="{{username}}" on-keyup="_checkForEnter"></paper-input>
             <gold-password-input label="Password" value="{{password}}" strength-meter on-keyup="_checkForEnter"></gold-password-input>
             <google-recaptcha id="recaptcha" sitekey="6LdkoBYTAAAAABH1QTVoIqDvzZTsC0aTHwVAbWlv" response="{{captchaResponse}}"></google-recaptcha>
@@ -76,12 +76,32 @@
           }
         },
         listeners: {
-          'page-became-visible': 'ready'
+          'page-became-visible': 'ready',
+          'page-finished-animating': '_finishedAnimating',
+          'page-became-invisible': '_hideRecaptcha'
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         ready: function(){
           if(this.loggedIn){
-            page('/');
+            app.navigateTo('/');
           }
+        },
+        _finishedAnimating: function(){
+          this._showRecaptcha();
+          this._setDefaultFocus();
+        },
+        _showRecaptcha: function(){
+          this.$.recaptcha.removeAttribute('hidden');
+          this.$.recaptcha.fire('iron-resize');
+        },
+        _hideRecaptcha: function(){
+          this.$.recaptcha.setAttribute('hidden', true);
+          this.$.recaptcha.fire('iron-resize');
+        },
+        _setDefaultFocus: function(){
+          this.$.displayName.focus();
         },
         _checkForEnter: function(ev){
           if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
@@ -103,7 +123,7 @@
           this.$.api.execute().then(function(){
             app.set('params.username', this.username);
             app.set('params.password', this.password);
-            page('/login');
+            app.navigateTo('/login');
           }.bind(this)).catch(function(err){
             this.$.recaptcha.reset();
             app.toast(err.humanError);

@@ -50,7 +50,7 @@
             var reference = new BibleReference(ev.target.value);
             if(reference.book){
               ev.target.blur();
-              page('/book/'+reference.toString());
+              app.navigateTo('/book/'+reference.toString());
             }else{
               this.invalid = true;
             }

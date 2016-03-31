@@ -22,7 +22,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   };
   app.finishedLoading = function(name){
     app._currentlyLoading.splice(app._currentlyLoading.indexOf(name), 1);
-    app.isLoading = app._currentlyLoading.length > 0;
+    setTimeout(function(){
+      app.isLoading = app._currentlyLoading.length > 0;
+    }, 400);
   };
 
   /*
@@ -33,69 +35,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   };
   */
-
-  var lazyEventQueue = new WeakMap();
-
-  var lazyEvent = function(element, event, detail){
-    if(element.constructor == HTMLElement){
-      //element not yet registered, add to lazy event queue
-      var events = [];
-      if(lazyEventQueue.has(element)){
-        events = lazyEventQueue.get(element);
-      }
-      events.push([event, detail]);
-      lazyEventQueue.set(element, events);
-    }else{
-      element.fire(event, detail);
-    }
-  };
-
-  var lazyFireEvents = function(element){
-    if(lazyEventQueue.has(element)){
-      var events = lazyEventQueue.get(element);
-      console.info(events , 'for', element);
-      events.forEach(event => console.debug(element,event[0], event[1]));
-      console.debug(events.length,'length');
-      //element.fire('page-became-visible', {});
-      events.forEach(event => element.fire(event[0], event[1]));
-      lazyEventQueue.delete(element);
-    }else{
-      console.log('no events for', element);
-    }
-  };
-
-  app.loadedDependencies = [];
-  app.loadDependency = function(el){
-
-    app.loading(el);
-
-    return new Promise(function(resolve, reject){
-      if(app.loadedDependencies.indexOf(el) === -1){
-        console.debug('loading', el);
-        app.loadedDependencies.push(el);
-        app.importHref('/elements/' + el + '.html', function(){
-
-          document.getElementById('loading').style.opacity = 0;
-          window.dispatchEvent(new Event('resize'));
-
-          var element = document.querySelector(el.split('/').pop());
-          lazyFireEvents(element);
-
-          setTimeout(function(){
-            app.finishedLoading(el);
-          }, 0);
-
-          resolve();
-
-        }, function(){
-          alert('Failed loading the requested page.');
-        });
-      }else{
-        app.finishedLoading(el);
-        resolve();
-      }
-    });
-  };
 
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
@@ -118,29 +57,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }));
     });
 
-    var func;
-    var oldSelectedPage;
-    document.querySelector('iron-pages').addEventListener('iron-select', func = function(){
-      var pages = document.querySelector('iron-pages');
-      var page = document.querySelector('iron-pages').selectedItem
-      if(oldSelectedPage !== page){
-        console.log('yeah');
-        lazyEvent(page, 'page-became-visible', {});
-        console.log('page became visible event sent', page);
-        oldSelectedPage = page;
-      }
-      //document.querySelector('iron-pages').selectedItem.fire('page-became-visible');
-    });
-    func();
-
   });
 
   document.querySelector('body').addEventListener('click', function(ev){
-    var el = ev.path[0];
+    var el = Polymer.dom(ev).path[0];
     if(el.nodeName.toLowerCase() == 'a'){
       var href = el.getAttribute('href');
       if(href && href.replace(location.origin, '').substr(0,1) == '/'){
-        page(href.replace(location.origin, ''));
+        app.navigateTo(href.replace(location.origin, ''));
         ev.preventDefault();
       }
     }
@@ -181,8 +105,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   };
 
+  var ctrlDown = false;
+  document.addEventListener('keydown', function(ev){
+    console.log('down', ev.code);
+    if(ev.code == 'ControlLeft' || ev.code == 'ControlRight'){
+      ctrlDown = true;
+    }else{
+      //alert('he?');
+    }
+  });
+  document.addEventListener('keyup', function(ev){
+    console.log('up', ev.code);
+    if(ev.code == 'ControlLeft' || ev.code == 'ControlRight'){
+      ctrlDown = false;
+    }
+  });
+  app.navigateTo = function(name){
+    if(ctrlDown){
+      var win = window.open(name);
+      setTimeout(function(){
+        win.focus();
+      }, 0);
+    }else{
+      page(name);
+    }
+  };
   app.goToHome = function(){
-    page('/');
+    app.navigateTo('/');
   };
 
   app.isHome = function(){

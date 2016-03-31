@@ -1,0 +1,73 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="card-list-questions.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
+<dom-module id="card-explore-questions">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+        display: block;
+      }
+    </style>
+
+    <auth-api id="api" action="questions/list/{{listType}}" param-count="{{count}}" response="{{questions}}"></auth-api>
+
+    <div id="content">
+      <card-list-questions heading="{{heading}}" questions="{{questions}}"></card-list-questions>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var BibleReference = require('bible-reference-parser');
+
+      Polymer({
+        properties: {
+          noResults: {
+            type: Boolean,
+            value: false
+          },
+          count: {
+            type: Number,
+            value: 5
+          },
+          listType: {
+            type: String,
+            value: 'recent'
+          },
+          heading: {
+            type: String,
+            computed: '_getHeading(listType)'
+          }
+        },
+        observers: [
+          'reload(listType)'
+        ],
+        reload: function(){
+          this.$.api.execute().then(function(){
+            this.questions.forEach(function(question){
+              var verses = question.verses.map(function(verse){
+                return new BibleReference(verse);
+              });
+              verses = BibleReference.combine(verses);
+              question.verses = verses.map(verse => new BibleReference(verse).toLongString()).join(', ');
+            });
+          }.bind(this));
+        },
+        _getHeading: function(type){
+          return {
+            'recent': 'Recent Questions',
+            'top-unanswered': 'Highest Voted Unanswered Questions',
+            'recently-active': 'Recently Active Questions'
+          }[type];
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

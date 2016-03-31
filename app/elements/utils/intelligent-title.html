@@ -10,10 +10,10 @@
         align-items: center;
       }
       .title{
-        margin-left: 0px;
+        margin-left: 15px;
         font-size: 20px;
       }
-      :host(:not([narrow])) paper-icon-button{
+      :host(:not([narrow])) #menu{
         display: none;
       }
       :host([no-title-if-wide]:not([narrow])){
@@ -25,8 +25,18 @@
       :host([narrow]) .title{
         margin-left: 15px;
       }
+      #back{
+        display: none;
+      }
+      :host([allow-back][can-go-back]) #back{
+        display: block;
+      }
+      :host([allow-back][can-go-back]) #menu{
+        display: none;
+      }
     </style>
-    <paper-icon-button icon="menu" on-tap="openDrawer"></paper-icon-button>
+    <paper-icon-button id="menu" icon="menu" on-tap="openDrawer"></paper-icon-button>
+    <paper-icon-button id="back" icon="arrow-back" on-tap="_goBack"></paper-icon-button>
     <span class="title">{{_toolbarTitle}}</span>
   </template>
 
@@ -51,7 +61,14 @@
               return app.isNarrow();
             }
           },
+          canGoBack: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
           noTitleIfWide: {
+            reflectToAttribute: true
+          },
+          allowBack: {
             reflectToAttribute: true
           },
           noTitle: {
@@ -75,6 +92,16 @@
           document.body.addEventListener('narrow-changed', function(ev){
             this.set('narrow', ev.detail.narrow);
           }.bind(this));
+
+          document.body.addEventListener('page-navigation', this._setCanGoBack.bind(this));
+
+          this._setCanGoBack();
+        },
+        _setCanGoBack: function(){
+          this.canGoBack = page.len > 0;
+        },
+        _goBack: function(){
+          page.back();
         },
         _getToolbarTitle: function(title, toolbarTitle){
           return toolbarTitle && toolbarTitle.length > 0 ? toolbarTitle : title;

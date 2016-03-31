@@ -57,9 +57,9 @@
     <auth-api id="api" action=":postType/:id" param-id="{{id}}" param-post-type="{{postType}}" param-history></auth-api>
 
       <paper-toolbar class="medium-tall">
-        <intelligent-title title="Post history"></intelligent-title>
+        <intelligent-title title="Post history" allow-back></intelligent-title>
         <div class="bottom fit">
-          <paper-tabs selected="{{mode}}" attr-for-selected="data-mode">
+          <paper-tabs selected="{{mode}}" attr-for-selected="data-mode" scrollable>
             <!--<paper-tab data-mode="inline">Inline changes</paper-tab>-->
             <paper-tab data-mode="html">Side-by-side</paper-tab>
             <paper-tab data-mode="markdown">Side-by-side markdown</paper-tab>
@@ -85,6 +85,7 @@
       Polymer({
         properties: {
           postType: String,
+          id: String,
           revisions: Array,
           mode: {
             type: String,
@@ -97,6 +98,9 @@
         listeners: {
           'page-became-visible': 'retrieveFromApi'
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         retrieveFromApi: function(){
           this.revisions = [];
           this.$.api.execute().then(function(post){

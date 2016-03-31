@@ -172,8 +172,8 @@
     <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}"></auth-api>
     <auth-api id="deleteCommentApi" method="DELETE" action="comment/:id" param-id="{{commentId}}"></auth-api>
 
-    <paper-card deleted$="{{post.deleted}}">
-      <div class="card-title" hidden$="{{!_equals(type, 'question')}}">
+    <paper-card id="post" deleted$="{{post.deleted}}">
+      <div id="title" class="card-title" hidden$="{{!_equals(type, 'question')}}">
         <h1>{{post.title}}</h1>
       </div>
       <div class="card-content">
@@ -300,20 +300,36 @@
           }
         },
         upvote: function(){
-          this.$.upvoteApi.execute().then(function(post){
-            this.set('post', post);
-          }.bind(this));
+          if(this.loggedIn){
+            this.$.upvoteApi.execute().then(function(post){
+              this.set('post', post);
+            }.bind(this)).catch(function(err){
+              app.toast(err);
+            });
+          }else{
+            app.toast('You need to be logged in to vote on posts.');
+          }
         },
         downvote: function(){
-          this.$.downvoteApi.execute().then(function(post){
-            this.set('post', post);
-          }.bind(this));
+          if(this.loggedIn){
+            this.$.downvoteApi.execute().then(function(post){
+              this.set('post', post);
+            }.bind(this)).catch(function(err){
+              app.toast(err);
+            });
+          }else{
+            app.toast('You need to be logged in to vote on posts.');
+          }
         },
-        goToEdit: function(){
-          page('/' + this.type + '/' + this.post._id + '/' + 'edit');
+        goToEdit: function(ev){
+          this.fire('hero-element-set', {
+            element: this.$.post,
+            heroName: 'post'
+          });
+          app.navigateTo('/' + this.type + '/' + this.post._id + '/' + 'edit');
         },
         goToHistory: function(){
-          page('/' + this.type + '/' + this.post._id + '/' + 'history');
+          app.navigateTo('/' + this.type + '/' + this.post._id + '/' + 'history');
         },
         toggleComments: function(){
           this.commentsVisible = this.commentsVisible ? false : true;
@@ -351,13 +367,13 @@
           }
         },
         _goToUser: function(ev){
-          page('/user/' + this.post.originalAuthor._id);
+          app.navigateTo('/user/' + this.post.originalAuthor._id);
         },
         _goToCommentUser: function(ev){
-          page('/user/' + ev.model.comment.user._id);
+          app.navigateTo('/user/' + ev.model.comment.user._id);
         },
         _goToLogin: function(ev){
-          page('/login');
+          app.navigateTo('/login');
         },
         _deleteComment: function(ev){
           this.commentId = ev.model.comment._id;

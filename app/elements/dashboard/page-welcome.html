@@ -2,7 +2,7 @@
 <link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
-<link rel="import" href="../qa/card-recent-questions.html">
+<link rel="import" href="../qa/card-explore-questions.html">
 <link rel="import" href="./card-welcome-back.html">
 <link rel="import" href="./card-quick-nav.html">
 <link rel="import" href="./card-recent-books.html">
@@ -12,13 +12,13 @@
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
-      card-recent-questions, card-welcome-back, card-quick-nav, card-recent-books{
+      card-explore-questions, card-welcome-back, card-quick-nav, card-recent-books{
         max-width: 700px;
         margin: auto;
         margin-bottom: 8px;
       }
       @media all and (min-width: 500px) {
-        card-recent-questions, card-welcome-back, card-quick-nav, card-recent-books {
+        card-explore-questions, card-welcome-back, card-quick-nav, card-recent-books {
           margin-bottom: 16px;
         }
       }
@@ -58,6 +58,9 @@
       #wideTitle{
         display: none;
       }
+      #narrowTitle{
+        margin-left: 50px;
+      }
       @media all and (min-width: 600px) {
         #wideTitle{
           display: block;
@@ -67,7 +70,7 @@
         }
       }
     </style>
-    <paper-scroll-header-panel condenses keep-condensed-header on-paper-header-transform="_setTitleMargin">
+    <paper-scroll-header-panel id="headerPanel" condenses keep-condensed-header on-paper-header-transform="_setTitleMargin">
 
       <paper-toolbar class="tall">
 
@@ -99,7 +102,7 @@
           <card-welcome-back narrow="{{narrow}}"></card-welcome-back>
           <!--<card-quick-nav></card-quick-nav>-->
           <card-recent-books></card-recent-books>
-          <card-recent-questions></card-recent-questions>
+          <card-explore-questions></card-explore-questions>
         </template>
 
         <div hidden="{{loggedIn}}">
@@ -147,14 +150,17 @@
 
         },
         listeners: {
-          'page-became-visible': '_fireReloads'
+          'page-became-visible': '_pageBecameVisible'
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         ready: function(){
 
         },
-        _fireReloads: function(){
+        _pageBecameVisible: function(){
           if(this.$$('card-recent-books')) this.$$('card-recent-books').reload();
-          if(this.$$('card-recent-questions')) this.$$('card-recent-questions').reload();
+          if(this.$$('card-explore-questions')) this.$$('card-explore-questions').reload();
         },
         _setTitleMargin: function(ev){
           var marginTop = (128-ev.detail.y)/128*-20;
@@ -163,16 +169,16 @@
           this.$.wideTitle.style.fontSize = fontSize + 'px';
         },
         goToSearch: function(){
-          page.show('/search');
+          app.navigateTo('/search');
         },
         goToLogin: function(){
-          page.show('/login');
+          app.navigateTo('/login');
         },
         goToLogout: function(){
-          page.show('/logout');
+          app.navigateTo('/logout');
         },
         goToRegister: function(){
-          page.show('/register');
+          app.navigateTo('/register');
         }
       });
     })();

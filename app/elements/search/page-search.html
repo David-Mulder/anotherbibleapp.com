@@ -58,11 +58,11 @@
     </style>
 
     <paper-toolbar class="medium-tall">
-      <intelligent-title title="{{title}}"></intelligent-title>
+      <intelligent-title title="{{_smartCaps(title)}}"></intelligent-title>
       <div class="search-box bottom">
         <iron-icon icon="search"></iron-icon>
         <input id="searchInput" is="iron-input" value="[[searchQuery]]" on-keyup="_setValueIfEnter" x-webkit-speech></input>
-        <iron-icon icon="av:mic"></iron-icon>
+        <!--<iron-icon icon="av:mic"></iron-icon>-->
       </div>
     </paper-toolbar>
 
@@ -95,23 +95,39 @@
           searchStarted: {
             type: Boolean,
             value: false
+          },
+          _operatorLessSearchQuery: {
+            type: String,
+            computed: '_getOperatorLessSearchQuery(searchQuery)'
           }
         },
 
+        behaviors: [
+          abaBehaviors.page,
+          abaBehaviors.text
+        ],
+
         listeners: {
-          'page-became-visible': '_focusIfEmptySearch'
+          'page-finished-animating': '_focusIfEmptySearch'
+        },
+
+        _getOperatorLessSearchQuery: function(){
+          return this.searchQuery.split(' ').filter(function(word){
+            return word.indexOf(':') == -1
+          }).join(' ').trim();
         },
 
         _focusIfEmptySearch: function(){
           this.async(function(){
-            if(this.searchQuery.length == 0){
+
+            if(this._operatorLessSearchQuery.length == 0){
               this.$.searchInput.focus();
             }
           });
         },
 
         _setSearchStarted: function(){
-          this.searchStarted = this.searchQuery.length > 0;
+          this.searchStarted = this._operatorLessSearchQuery.length > 0;
           this.title = this.searchStarted ? this.searchQuery : 'Search'
           if(this.searchStarted)
             app.loading('search');
@@ -123,7 +139,7 @@
 
         _setValueIfEnter: function(ev){
           if(ev.keyCode == 13){
-            page('/search/'+ev.target.value);
+            app.navigateTo('/search/'+ev.target.value);
             ev.target.blur();
             //this.searchQuery = ev.target.value;
           }

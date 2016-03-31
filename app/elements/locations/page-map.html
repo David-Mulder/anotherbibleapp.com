@@ -1,0 +1,620 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="/bower_components/iron-icons/hardware-icons.html">
+
+<link rel="import" href="../text/bible-snippet.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+<link id="map-style" rel="import" href="map.style.html">
+<link id="labels" rel="import" href="labels.data.html">
+<link id="routes" rel="import" href="routes.data.html">
+
+<dom-module id="page-map">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      .page-content{
+        padding: 0px;
+        position: relative;
+        display: flex;
+      }
+      #map{
+        flex: 1;
+      }
+      [main]{
+        display: flex;
+        flex-direction: column;
+      }
+      div[drawer]{
+        display: flex;
+        flex-direction: column;
+      }
+      #info{
+        flex: 1;
+        background: var(--primary-color-50);
+        padding: 10px;
+        overflow: auto;
+      }
+      paper-card{
+        display: block;
+        margin-bottom: 10px;
+      }
+      #info .within{
+        padding-top: 0px;
+        font-variant: small-caps;
+      }
+      #info .verse:hover{
+        background: rgba(0,0,0,.05);
+        cursor: pointer;
+      }
+      #info #noSelection{
+        padding-top: 30px;
+        color: var(--secondary-text-on-primary-color-50);
+        text-align: center;
+      }
+      .page-content{
+        position: relative;
+      }
+
+      .mode-selector{
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        z-index: 1;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        background: white;
+        right: 10px;
+        max-width: 300px;
+      }
+      .warning-note{
+        position: absolute;
+        left: 10px;
+        bottom: 10px;
+        z-index: 1;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        background: white;
+        right: 10px;
+        max-width: 560px;
+        padding: 10px;
+        font-size: 12px;
+      }
+      .route-selector{
+        padding: 20px;
+        display: none;
+      }
+      [visible]{
+        display: block !important;
+      }
+      [flex-visible]{
+        display: flex !important;
+      }
+      .route-selector paper-dropdown-menu{
+        display: block;
+      }
+      .route-selector .route-navigation{
+        display: none;
+        padding-top: 10px;
+        text-align: center;
+      }
+
+      #map-locations-drawer, #map-route-drawer{
+        display:none;
+        height: 100%;
+        flex-direction: column;
+        background: var(--primary-color-50);
+
+      }
+      #map-route-drawer{
+        counter-reset: marker;
+      }
+      .location{
+        display: flex;
+        padding: 10px 20px 10px 20px;
+        border-bottom: 1px solid rgba(0,0,0,.1);
+        align-items: center;
+      }
+      .location:hover{
+        cursor: pointer;
+        background: rgba(0,0,0,.05);
+      }
+      .location[highlighted]{
+        background: rgba(255,110,64,.2);
+      }
+      .location .marker::before{
+        display: block;
+        counter-increment: marker;
+        content: counter(marker, upper-alpha);
+        background: url('maps-marker.png');
+        width: 22px;
+        height: 38px;
+        padding-top: 2px;
+        text-align: center;
+      }
+      .location .info{
+        flex: 1;
+        padding-left: 20px;
+      }
+      #map .route-location-info-content{
+        padding: 0px 13px;
+        margin-bottom: -3px;
+        max-width: 350px;
+      }
+      #map .route-location-info-content h2{
+        font-weight: normal;
+      }
+      #map .verse{
+        color: var(--accent-color);
+      }
+      .drawer-content{
+        overflow: auto;
+      }
+    </style>
+    <auth-api id="api" action="locations/list/viewport" param-viewport="{{_viewport}}" param-zoom="{{_zoom}}"></auth-api>
+    <auth-api id="apiInfo" action="locations/list/coordinates" param-lat="{{lat}}" param-lng="{{lng}}"></auth-api>
+
+    <div id="routeLocationInfo">
+      <div class="route-location-info-content">
+        <h2>{{selectedRouteLocation.title}}</h2>
+        <p>
+          {{selectedRouteLocation.description}}
+        </p>
+      </div>
+      <template is="dom-repeat" items="{{selectedRouteLocation.verses}}">
+        <paper-button class="verse" on-tap="_goToVerseFromButton">{{item}}</paper-button>
+      </template>
+    </div>
+
+    <paper-drawer-panel id="drawerPanel" responsive-width="900px" right-drawer drawer-width="300px">
+      <div main>
+        <paper-toolbar>
+          <intelligent-title title="Map" allow-back></intelligent-title>
+        </paper-toolbar>
+        <div class="page-content">
+          <div class="warning-note">
+            Important note: This map is not historically accurate and mixes names and places
+            from different periods.
+          </div>
+          <div class="mode-selector">
+            <paper-tabs selected="{{mode}}" attr-for-selected="data-mode">
+              <paper-tab data-mode="locations">Locations</paper-tab>
+              <paper-tab data-mode="routes">Routes</paper-tab>
+            </paper-tabs>
+            <div class="route-selector" visible$="{{_equals(mode, 'routes')}}">
+              <paper-dropdown-menu label="Select a journey" no-label-float horizontal-align="left">
+                <paper-menu class="dropdown-content" selected="{{_selectedRoute}}" attr-for-selected="data-index">
+                  <template is="dom-repeat" items="{{routes}}" index-as="i">
+                    <paper-item data-index$="{{i}}">{{item.person}}</paper-item>
+                  </template>
+                </paper-menu>
+              </paper-dropdown-menu>
+              <div class="route-navigation" visible$="{{_selectedRoute}}">
+                <paper-icon-button icon="hardware:keyboard-arrow-left" on-tap="goToPrevRouteLocation" disabled$="{{_equals(_routeLocationIndex, 0)}}"></paper-icon-button>
+                <paper-icon-button icon="hardware:keyboard-arrow-right" on-tap="goToNextRouteLocation" disabled$="{{_equals(_routeLocationIndex, _maximumRouteIndex)}}"></paper-icon-button>
+              </div>
+            </div>
+          </div>
+          <div id="map"></div>
+          <!--
+          <google-map id="map" zoom="11" additional-map-options='{"mapTypeId":"terrain", "streetViewControl": false, "rotateControl": false, "mapTypeControl": false, "fullscreenControl": false}' on-google-map-ready="_mapReady" on-google-map-dragend="_loadData" on-zoom-changed="_loadData" drag-events api-key="AIzaSyA0uckToOVLcHixEBd0FWOt5yKBOrNWlhw">
+          -->
+            <!--
+			<google-map-marker latitude="31.7" longitude="35"
+			  draggable="true" title="Go Giants!"></google-map-marker>
+			<template is="dom-repeat" items="{{locations}}" as="location">
+			  <google-map-marker latitude$="{{location.coordinates.1}}" longitude$="{{location.coordinates.0}}" draggable="true" title="Go Giants!">{{location.title}}</google-map-marker>
+			</template>
+			-->
+          <!--
+          </google-map>
+          -->
+        </div>
+      </div>
+      <div drawer>
+
+        <div id="map-locations-drawer" flex-visible$="{{_equals(mode, 'locations')}}">
+          <paper-toolbar>
+            <div class="title">Locations</div>
+          </paper-toolbar>
+          <div id="info">
+            <div id="noSelection" hidden="{{locationSelected}}">
+              Tap on a <iron-icon icon="info"></iron-icon> for information about a location.
+            </div>
+            <template is="dom-repeat" items="{{infoLocations}}" as="location">
+              <paper-card heading="{{location.title}}">
+                <div class="card-content within" hidden="{{!location.root}}">
+                  Located within {{location.root}}
+                </div>
+                <template is="dom-repeat" items="{{location.combinedVerses}}" as="snippet">
+                  <div class="card-actions verse" on-tap="_goToVerse">
+                    <bible-snippet start="{{snippet.start}}" end="{{snippet.end}}" highlight="{{location.title}}"></bible-snippet>
+                  </div>
+                </template>
+              </paper-card>
+            </template>
+          </div>
+        </div>
+        <div id="map-route-drawer" flex-visible$="{{_equals(mode, 'routes')}}">
+          <paper-toolbar>
+            <div class="title">Route</div>
+          </paper-toolbar>
+          <div class="drawer-content">
+            <template is="dom-repeat" items="{{route.locations}}" index-as="routeLocationIndex">
+              <div class="location" on-tap="_setRouteLocationIndex" highlighted$="{{_isRouteLocationHighlighted(routeLocationIndex, _routeLocationIndex)}}">
+                <div class="marker"></div>
+                <div class="info">
+                  <div class="title">{{item.title}}</div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <!--
+        <paper-toolbar>
+          <div class="title">Route</div>
+        </paper-toolbar>
+        <div id="info">
+          <div class="route-location">
+
+          </div>
+        </div>
+        -->
+      </div>
+    </paper-drawer-panel>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var BibleReference = require('bible-reference-parser');
+      var mapStyle = require('map-style');
+      var routes = require('routes');
+      var genericLabels = require('labels');
+
+      Polymer({
+        properties: {
+          lat: {
+            type: Number
+          },
+          lng: {
+            type: Number
+          },
+          mode: {
+            type: String,
+            value: 'locations'
+          },
+          routes: {
+            type: Array,
+            value: routes
+          },
+          map: {
+            type: Object
+          },
+          _routeLocationIndex: {
+            type: Number,
+            value: 0
+          },
+          _mapItems: {
+            type: Array,
+            value: function(){
+              return [];
+            }
+          },
+          _maximumNumberOfRouteSegments: {
+            type: Number,
+            value: 4
+          },
+          animationConfig: {
+            value: function() {
+              return {
+                // the incoming page defines the 'entry' animation
+                'entry': [{
+                  name: 'hero-animation',
+                  id: 'question-card',
+                  toPage: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }],
+                'exit': [{
+                  name: 'slide-down-animation',
+                  node: this
+                }, {
+                  name: 'fade-out-animation',
+                  node: this
+                }]
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'question-card': this.$.map
+              }
+            }
+          }
+        },
+        behaviors: [
+          abaBehaviors.page,
+          abaBehaviors.logic,
+          Polymer.IronResizableBehavior
+        ],
+        listeners: {
+          'iron-resize': '_resized'
+        },
+        observers: [
+          '_infoPositionChanged(lng, lat)',
+          '_modeChanged(mode)',
+          '_drawRoutes(_selectedRoute, _routeLocationIndex)'
+        ],
+        ready: function(){
+          this.locationSelected = false;
+
+          window.initMap = function(){
+            this.map = new google.maps.Map(this.$.map, {
+              center: {lat: 31.777455442549336, lng: 35.23493499999995},
+              zoom: 8,
+              styles: mapStyle,
+              "mapTypeId":"terrain",
+              "streetViewControl": false,
+              "rotateControl": false,
+              "mapTypeControl": false,
+              "fullscreenControl": false,
+              maxZoom: 14,
+              minZoom: 4
+            });
+
+            var script = document.createElement('script');
+            script.setAttribute('src', 'https://google-maps-utility-library-v3.googlecode.com/svn/trunk/maplabel/src/maplabel.js');
+            document.body.appendChild(script);
+
+            script.addEventListener('load', function(){
+              this._mapReady();
+            }.bind(this));
+          }.bind(this);
+
+          var script = document.createElement('script');
+          script.setAttribute('src', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA0uckToOVLcHixEBd0FWOt5yKBOrNWlhw&callback=initMap');
+          document.body.appendChild(script);
+        },
+        _resized: function(){
+          this.debounce('resize', function(){
+            //this.$.map.fire('iron-resize');
+            google.maps.event.trigger(this.map, 'resize')
+            //this._loadData();
+          }, 500);
+        },
+        _mapReady: function(){
+
+          this.map.addListener('bounds_changed', this._loadData.bind(this));
+
+          this._markerImage = new google.maps.MarkerImage(
+            '/elements/locations/marker.png',
+            new google.maps.Size(18,18),
+            new google.maps.Point(0,0),
+            new google.maps.Point(9,18)
+          );
+
+          this._markerImageShape = {
+            coord: [13,0,14,1,15,2,16,3,17,4,17,5,17,6,17,7,17,8,17,9,17,10,17,11,17,12,17,13,16,14,15,15,14,16,13,17,4,17,3,16,2,15,1,14,0,13,0,12,0,11,0,10,0,9,0,8,0,7,0,6,0,5,0,4,1,3,2,2,3,1,4,0,13,0],
+            type: 'poly'
+          };
+
+          this._mapIsReady = true;
+          this._drawGenericInfo();
+          this._drawRoutes();
+          this.async(function(){
+            this._moveToPosition();
+            this._loadData();
+          }, 500);
+        },
+        _drawGenericInfo: function(){
+          genericLabels.forEach(function(label){
+            label.map = this.map;
+            label.strokeWeight = 2;
+            label.fontFamily = 'Roboto';
+            label.position = new google.maps.LatLng(label.position[1], label.position[0]);
+            new MapLabel(label);
+          }.bind(this));
+/*      map: this.map,
+ strokeWeight: 2,
+ fontFamily: 'Roboto'*/
+        },
+        _modeChanged: function(){
+          if(this._mapIsReady){
+            this._clearMap();
+            this.async(function(){
+              this._loadData();
+              this._drawRoutes();
+            }, 0);
+          }
+        },
+        _setRouteLocationIndex: function(ev){
+          this._routeLocationIndex = ev.model.routeLocationIndex;
+        },
+        goToNextRouteLocation: function(){
+          this._routeLocationIndex++;
+        },
+        goToPrevRouteLocation: function(){
+          this._routeLocationIndex--;
+        },
+        _drawRoutes: function(){
+          if(this._mapIsReady && this.mode == 'routes' && this._selectedRoute >= 0) {
+            this._clearMap();
+
+            var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            var lineSymbol = {
+              path: 'M 0,-1 0,1',
+              strokeOpacity: 1,
+              scale: 3
+            };
+
+            this.route = this.routes[this._selectedRoute];
+            this._maximumRouteIndex = this.route.locations.length - 1;
+            var path = [];
+            var highlightedPath = [];
+
+            this.route.locations.forEach(function (location, i) {
+              var latLng = new google.maps.LatLng(location.coordinates[1], location.coordinates[0]);
+              //if (selectedI !== -1 && Math.abs(i - selectedI) <= 1) {
+              //  highlightedPath.push(latLng);
+              //}
+              if(this._routeLocationIndex >= i && i > this._routeLocationIndex - this._maximumNumberOfRouteSegments){
+                path.push(latLng);
+
+                var marker = new google.maps.Marker({
+                  position: latLng,
+                  label: labels[i],
+                  map: this.map
+                });
+                this.push('_mapItems', marker);
+              }
+
+            }.bind(this));
+
+            var mainRouteLine = new google.maps.Polyline({
+              path: path,
+              map: this.map,
+              strokeColor: 'rgba(255,110,64,1)',
+              strokeWeight: 2,
+              icons: [{
+                icon: {
+                  path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                  scale: 2
+                },
+                /*
+                offset: '0',
+                repeat: '15px'
+                */
+                offset: '50%',
+                repeat: '140px'
+              }]
+            });
+            this.push('_mapItems', mainRouteLine);
+
+            this.selectedRouteLocation = this.route.locations[this._routeLocationIndex];
+            var bounds = this.map.getBounds();
+            //while(!bounds.contains(path[path.length - 1]) && this.map.getZoom() > 5){
+            //  this.map.setZoom(this.map.getZoom() - 1);
+            //  bounds = this.map.getBounds();
+            //}
+            setTimeout(function(){
+              this.map.panTo(path[path.length - 1]);
+            }.bind(this), 250);
+
+            var infoWindow = new google.maps.InfoWindow({
+              content: this.$.routeLocationInfo,
+              map: this.map,
+              position: path[path.length - 1],
+              maxWidth: 350
+            });
+
+            this.push('_mapItems', infoWindow);
+
+            /*var highlightedSegment = new google.maps.Polyline({
+              path: highlightedPath,
+              map: map,
+              geodesic: true,
+              strokeColor: 'rgba(255,110,64,.8)',
+              strokeOpacity: 1.0,
+              strokeWeight: 2
+            });
+            this.push('_mapItems', highlightedSegment);*/
+
+          }else{
+
+          }
+        },
+        _isRouteLocationHighlighted: function(i){
+          return i <= this._routeLocationIndex && i > (this._routeLocationIndex - this._maximumNumberOfRouteSegments);
+        },
+        _clearMap: function(){
+          this._mapItems.forEach(function(marker){
+            marker.setMap(null);
+          });
+          this._mapItems = [];
+        },
+        _setLocation: function(ev){
+          var location = ev.latLng.toJSON();
+          this._noMoveOnce = true;
+          if(page.current == '/map'){
+            app.navigateTo('/map/'+location.lng+'/'+location.lat);
+          }else{
+            page.replace('/map/'+location.lng+'/'+location.lat);
+          }
+        },
+        _infoPositionChanged: function(lng, lat){
+          this.debounce('get-coor-info', function(){
+            if(this._mapIsReady){
+              this._moveToPosition();
+            }
+            this.locationSelected = true;
+            this.$.apiInfo.execute().then(function(infoLocations){
+              infoLocations.forEach(function(location){
+                location.combinedVerses = BibleReference.combine(location.verses.map(function(v){
+                  return new BibleReference(v);
+                })).splice(0, 10);
+              });
+              this.infoLocations = infoLocations;
+              this.$.drawerPanel.openDrawer();
+            }.bind(this));
+          }, 0);
+        },
+        _moveToPosition: function(){
+          if(!this._noMoveOnce) {
+            if (this.lat && this.lng) {
+              var latLng = new google.maps.LatLng(this.lat, this.lng);
+              this.map.setCenter(latLng);
+              this.map.setZoom(13);
+            }else{
+              this.map.setCenter({lat: 31.777455442549336, lng: 35.23493499999995});
+            }
+          }else{
+            this._noMoveOnce = false;
+          }
+        },
+        _loadData: function(){
+          if(this.mode == 'locations') {
+            if(this.map) {
+              this.debounce('load-markers', function () {
+                var bounds = this.map.getBounds();
+                var bottomLeft = [bounds.getSouthWest().lng(), bounds.getSouthWest().lat()];
+                var topRight = [bounds.getNorthEast().lng(), bounds.getNorthEast().lat()];
+                this.set('_viewport', [bottomLeft, topRight]);
+                this.set('_zoom', this.map.getZoom());
+                this.$.api.execute().then(function (locations) {
+                  this._clearMap();
+
+                  locations.forEach(function (location) {
+                    var marker = new google.maps.Marker({
+                      position: {lat: location.coordinates[1] + Math.random() / 10000, lng: location.coordinates[0]},
+                      map: this.map,
+                      icon: this._markerImage,
+                      shape: this._markerImageShape
+                    });
+                    marker.addListener('click', this._setLocation.bind(this));
+                    this.push('_mapItems', marker);
+                  }.bind(this));
+                  //alert(this._mapItems.length);
+                }.bind(this));
+                console.log(bottomLeft, topRight);
+              }, 500);
+            }
+          }
+        },
+        _goToVerse: function(ev){
+          app.navigateTo('/book/'+ev.model.snippet);
+        },
+        _goToVerseFromButton: function(ev){
+          app.navigateTo('/book/'+ev.target.textContent);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

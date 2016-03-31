@@ -1,0 +1,55 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="card-explore-questions.html">
+
+<dom-module id="page-explore-qa">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      card-explore-questions{
+        max-width: 800px;
+        margin: auto;
+      }
+    </style>
+    <paper-toolbar class="medium-tall">
+      <intelligent-title title="Explore Questions"></intelligent-title>
+      <paper-tabs class="bottom fit" selected="{{page}}" scrollable attr-for-selected="data-page">
+        <paper-tab data-page="recent">New Questions</paper-tab>
+        <paper-tab data-page="top-unanswered">Upvoted Unanswered Questions</paper-tab>
+        <paper-tab data-page="recently-active">Recently Active Questions</paper-tab>
+      </paper-tabs>
+    </paper-toolbar>
+    <div class="page-content">
+      <card-explore-questions count="10" list-type="{{page}}"></card-explore-questions>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+          page: {
+            type: String,
+            value: 'recent'
+          }
+        },
+        listeners: {
+          'page-became-visible': '_fireReloads'
+        },
+        behaviors: [
+          abaBehaviors.page
+        ],
+        ready: function(){
+
+        },
+        _fireReloads: function(){
+          if(this.$$('card-explore-questions')) this.$$('card-explore-questions').reload();
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

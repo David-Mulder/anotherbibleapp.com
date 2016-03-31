@@ -20,6 +20,9 @@
         color: var(--secondary-text-on-card-dialog-color);
         font-size: smaller;
       }
+      #card .book{
+        padding: 10px 20px;
+      }
       .book:hover{
         background: rgba(0,0,0,.05);
         cursor: pointer;
@@ -28,7 +31,7 @@
     <synced-settings id="settings"></synced-settings>
     <paper-card id="card" heading="Recently read Books & Letters" hidden$="{{noResults}}">
       <template is="dom-repeat" items="{{books}}" as="book">
-        <div class="card-actions book" on-tap="goToBook">
+        <div class="card-actions book" on-tap="_goToBook">
           {{book.title}}
 
           <relative-time time="{{book.date}}"></relative-time>
@@ -90,11 +93,19 @@
           });
         },
 
-        goToBook: function(ev){
+        _goToBook: function(ev){
+          var target = Polymer.dom(ev).path.find(function(el){
+            return el.matches && el.matches('.book');
+          });
+          this.fire('hero-element-set', {
+            element: target,
+            heroName: 'book-title'
+          });
+
           //piercing the router consciously
           window.doSavePosition = true;
 
-          page('/book/'+ev.model.book.reference);
+          app.navigateTo('/book/'+ev.model.book.reference);
         }
 
       });

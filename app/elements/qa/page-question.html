@@ -89,19 +89,19 @@
 
     <auth-api id="api" action="qa/:id" param-id="{{id}}" response="{{qas}}" logged-in="{{loggedIn}}"></auth-api>
 
-    <paper-drawer-panel right-drawer>
+    <paper-drawer-panel right-drawer narrow="{{_relatedPanelNarrow}}">
       <div main>
         <!--<paper-toolbar>
           <intelligent-title title="{{qas.question.title}}" no-title></intelligent-title>
         </paper-toolbar>-->
         <div id="toolbar">
           <div>
-            <intelligent-title title="{{qas.question.title}}" toolbar-title="Q&A"></intelligent-title>
+            <intelligent-title title="{{qas.question.title}}" toolbar-title="Q&A" allow-back></intelligent-title>
           </div>
         </div>
         <div id="content" class="page-content" on-scroll="_handleToolbarHeight">
 
-          <qa-post type="question" post="{{qas.question}}"></qa-post>
+          <qa-post id="question" type="question" post="{{qas.question}}"></qa-post>
 
           <hr class="divider">
 
@@ -123,8 +123,10 @@
         </div>
       </div>
       <div drawer>
-        <paper-toolbar>
-          <span>Related</span>
+        <paper-toolbar id="relatedToolbar">
+          <div class="bottom">
+            <span class="title">Related</span>
+          </div>
         </paper-toolbar>
         <div id="drawerContent">
           <paper-card heading="Discussed texts">
@@ -149,7 +151,35 @@
         is: 'page-question',
 
         properties: {
-
+          animationConfig: {
+            value: function() {
+              return {
+                // the incoming page defines the 'entry' animation
+                'entry': [{
+                  name: 'hero-animation',
+                  id: 'question-card',
+                  toPage: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }],
+                'exit': [{
+                  name: 'slide-down-animation',
+                  node: this
+                }, {
+                  name: 'fade-out-animation',
+                  node: this
+                }]
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'question-card': this.$.question
+              }
+            }
+          }
         },
         listeners: {
           'page-became-visible': 'retrieveFromApi',
@@ -160,10 +190,15 @@
           '_setCombinedVerses(qas.question.verses)',
           '_setAnyAnswers(qas.answers.splices)'
         ],
+        behaviors: [
+          abaBehaviors.page
+        ],
         ready: function(){
           this._handleToolbarHeight();
         },
         retrieveFromApi: function(){
+
+          //alert(this.id);
           this.$.api.execute().catch(function(err){
             if(err == 'Not found'){
               page.replace('/404');
@@ -177,15 +212,18 @@
           var toolbarFullHeight = 192;
           var toolbarSmallHeight = 64;
           var toolbarHeight = (1 - percentageGone) * (toolbarFullHeight - toolbarSmallHeight) + toolbarSmallHeight;
-          console.log(toolbarHeight);
+
           this.$.toolbar.style.height = Math.round(toolbarHeight) + 'px';
+          if(!this._relatedPanelNarrow){
+            this.$.relatedToolbar.style.height = Math.round(toolbarHeight) + 'px';
+          }
+
           this.$.toolbar.style.zIndex = toolbarHeight < toolbarSmallHeight + 10 ? 1 : 0;
           var shadow = `0 2px 2px 0 rgba(0, 0, 0, ${Math.round(percentageGone * 14)/100}), 0 3px 1px -2px rgba(0, 0, 0, ${Math.round(percentageGone * 2)/100}), 0 1px 5px 0 rgba(0, 0, 0, ${Math.round(percentageGone * 12)/100})`;
-          console.log(shadow);
           this.$.toolbar.style.boxShadow = shadow;
         },
         _setTitle: function(title){
-          page.replace('/question/'+this.id+'/'+title.toLowerCase().replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));
+          page.replace('/question/'+this.id+'/'+title.toLowerCase().replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''), null, null, false);
         },
         _setAnyAnswers: function(){
           this.set('anyAnswers', this.qas.answers.length > 0);
@@ -199,7 +237,7 @@
           this.relatedVerses = verses;
         },
         _goToVerse: function(ev){
-          page('/book/'+ev.model.item.start.toString());
+          app.navigateTo('/book/'+ev.model.item.start.toString());
         }
       });
     })();

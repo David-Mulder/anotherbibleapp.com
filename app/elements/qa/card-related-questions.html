@@ -32,12 +32,12 @@
         font-weight: bold;
         margin: 0px;
       }
-      #content .question-link{
+      #content .question-link, #content .location-link{
         padding-top: 20px;
         padding-bottom: 20px;
         display: flex;
       }
-      .question-link .score{
+      .question-link .score, .location-link .score{
         color: rgba(0,0,0,.5);
         font-size: 23px;
         display: inline-block;
@@ -45,17 +45,28 @@
         text-align: center;
         width: 30px;
       }
-      .question-link .title{
+      .question-link .title, .location-link .title{
         flex: 1;
         align-items: center;
         padding-top: 3px;
       }
-      #content .question-link:hover{
+      #content .question-link:hover, #content .location-link:hover{
         background: rgba(0,0,0,.05);
         cursor: pointer;
       }
+      #content .unanswered{
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        padding: 2px 8px;
+        font-size: 11px;
+        background: var(--accent-color-100);
+        color: var(--secondary-text-on-accent-color-100);
+        border-bottom-left-radius: 3px;
+      }
     </style>
     <auth-api id="api" action="questions/list/:verse" param-verse="{{verseId}}" logged-in="{{loggedIn}}" response="{{questions}}"></auth-api>
+    <auth-api id="locationApi" action="locations/list/:verse" param-verse="{{verseId}}" response="{{locations}}"></auth-api>
 
     <div id="content">
       <div id="noResult" hidden$="{{!noResults}}">
@@ -64,9 +75,17 @@
 
       <paper-card heading="Related Questions" hidden$="{{!relatedQuestions}}">
         <template is="dom-repeat" items="{{questions}}" as="question">
-          <div class="card-actions question-link" on-tap="gotoQuestionPage">
+          <div class="card-actions question-link" on-tap="_gotoQuestionPage">
+            <div class="unanswered" hidden$="{{_moreThan(question.numberOfAnswers, 0)}}">Unanswered</div>
+
             <span class="score">{{question.score}}</span>
             <span class="title">{{question.title}}</span>
+          </div>
+        </template>
+        <template is="dom-repeat" items="{{locations}}" as="location">
+          <div class="card-actions location-link" on-tap="_gotoLocationPage">
+            <span class="score">0</span>
+            <span class="title">Where is {{location.title}} located?</span>
           </div>
         </template>
         <div class="card-actions">
@@ -98,39 +117,64 @@
         observers: [
           'verseChanged(verse)'
         ],
+        behaviors: [
+          abaBehaviors.logic
+        ],
         goToLogin: function(){
 
-          page('/login');
+          app.navigateTo('/login');
         },
         newQuestion: function(){
           if(this.loggedIn){
             this.fire('multi-verse-selection', {
               label: 'Please tap on all the verses that are relevant to your question.',
               finishedSelection: function(verses){
-                page('/questions/ask/' + verses);
+                app.navigateTo('/questions/ask/' + verses);
               }
             });
           }else{
-            page('/login');
+            app.navigateTo('/login');
           }
         },
         //newQuestionSelectionFinished: function(){
-        //  page('/questions/ask/'+this.verses.toString());
+        //  app.navigateTo('/questions/ask/'+this.verses.toString());
         //},
         verseChanged: function(){
           if(this.verse){
             this.verseId = this.verse.toNumeric();
-            this.$.api.execute().then(function(questions){
-              this.set('relatedQuestions', questions.length > 0)
-              this.set('noResults', questions.length === 0)
+            var questions = this.$.api.execute();
+            var locations = this.$.locationApi.execute();
+            Promise.all([questions, locations]).then(function(results){
+              var questions = results[0];
+              var locations = results[1];
+
+              this.set('relatedQuestions', questions.length > 0 || locations.length > 0);
+              this.set('noResults', questions.length === 0 && locations.length === 0);
             }.bind(this));
           }else{
             this.noResults = false;
             this.relatedQuestions = false;
           }
         },
-        gotoQuestionPage: function(ev){
-          page('/question/'+ev.model.question._id)
+        _gotoQuestionPage: function(ev){
+          var target = Polymer.dom(ev).path.find(function(el){
+            return el.matches('.question-link');
+          });
+          this.fire('hero-element-set', {
+            element: target,
+            heroName: 'question-card'
+          });
+          app.navigateTo('/question/'+ev.model.question._id)
+        },
+        _gotoLocationPage: function(ev){
+          var target = Polymer.dom(ev).path.find(function(el){
+            return el.matches('.location-link');
+          });
+          this.fire('hero-element-set', {
+            element: target,
+            heroName: 'question-card'
+          });
+          app.navigateTo('/map/'+ev.model.location.coordinates[0]+'/'+ev.model.location.coordinates[1]);
         }
       });
     })();

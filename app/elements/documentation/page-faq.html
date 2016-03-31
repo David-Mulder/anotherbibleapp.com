@@ -20,15 +20,14 @@
           </p>
         </div>
       </paper-card>
-      <!--
       <paper-card heading="I am seeing weird gaps in my text">
         <div class="card-content">
           <p>
-            This is a known issue and can be resolved by resizing the page or rotating your device. I apologize.
+            This is a known issue and can be resolved by opening the menu in the top right and hitting 'force reflow'.
+            I apologize for the inconvenience.
           </p>
         </div>
       </paper-card>
-      -->
       <paper-card heading="Someone else edited my post?">
         <div class="card-content">
           <p>
@@ -79,7 +78,10 @@
       Polymer({
         properties: {
 
-        }
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
       });
     })();
   </script>

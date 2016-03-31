@@ -8,7 +8,7 @@
 
     </style>
     <paper-toolbar>
-      <intelligent-title title="Philosophy behind the Q&A Bible"></intelligent-title>
+      <intelligent-title title="Philosophy behind the Q&A Bible" allow-back></intelligent-title>
     </paper-toolbar>
     <div class="page-content">
       <paper-card heading="The Nature of Bible Study">
@@ -47,7 +47,10 @@
       Polymer({
         properties: {
 
-        }
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
       });
     })();
   </script>

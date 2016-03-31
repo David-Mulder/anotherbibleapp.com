@@ -68,11 +68,11 @@
     <utils-books id="utils"></utils-books>
 
     <paper-toolbar>
-      <intelligent-title title="Edit question"></intelligent-title>
+      <intelligent-title title="Edit question" allow-back></intelligent-title>
     </paper-toolbar>
     <div class="page-content">
 
-      <paper-card>
+      <paper-card id="post">
         <div class="card-content">
           <bible-markdown-editor label="Answer" value="{{answer.text}}" rows="7"></bible-markdown-editor>
         </div>
@@ -91,8 +91,37 @@
 
       Polymer({
         properties: {
-          title: String
+          title: String,
+          animationConfig: {
+            value: function() {
+              return {
+                // the incoming page defines the 'entry' animation
+                'entry': [{
+                  name: 'hero-animation',
+                  id: 'post',
+                  toPage: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }],
+                'exit': [{
+                  name: 'slide-down-animation',
+                  node: this
+                }]
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'post': this.$.post
+              }
+            }
+          }
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         observers: [
           'retrieveFromApi(id)'
         ],
@@ -103,7 +132,7 @@
         },
         save: function(){
           this.$.save.execute().then(function(answer){
-            page('/question/'+answer.question+'/');
+            app.navigateTo('/question/'+answer.question+'/');
           });
         }
       });

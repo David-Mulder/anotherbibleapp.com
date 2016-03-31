@@ -7,6 +7,9 @@
       :host{
         display: block;
       }
+      paper-card{
+        display: block;
+      }
       .verse:hover{
         background: rgba(0,0,0,.05);
         cursor: pointer;
@@ -33,11 +36,13 @@
         properties: {
           topic: Object
         },
+
         ready: function(){
         },
+
         goToVerse: function(ev){
           var snippet = ev.model.snippet;
-          page('/book/'+snippet.start);
+          app.navigateTo('/book/'+snippet.start);
           console.log(snippet);
         }
       });

@@ -52,7 +52,6 @@
         overflow: auto;
       }
       .page-content paper-card{
-        padding-top: 20px;
         max-width: 1300px;
       }
       #verseContainer{
@@ -67,20 +66,33 @@
           font-size: 22px;
         };
       }
+      .card-title{
+        background: var(--primary-color-400);
+        color: var(--text-on-primary-color-400);
+        padding: 25px 30px;
+        margin-bottom: 20px;
+      }
+      .card-title paper-input{
+        --paper-input-container-input-color: white;
+        --paper-input-container-color: white;
+        --paper-input-container-focus-color: var(--accent-color);
+      }
     </style>
 
     <auth-api id="api" action="question/:id" param-id="{{id}}" response="{{question}}"></auth-api>
     <auth-api id="save" action="question/:id" param-id="{{id}}" method="POST" param-title="{{title}}" todo-param-category="{{category}}" param-text="{{text}}" param-verses="{{versesAsNumbers}}"></auth-api>
 
     <paper-toolbar>
-      <intelligent-title title="Edit question"></intelligent-title>
+      <intelligent-title title="Edit question" allow-back></intelligent-title>
     </paper-toolbar>
 
     <div class="page-content">
-      <paper-card>
+      <paper-card id="post">
 
-        <div class="card-content">
+        <div class="card-title">
           <paper-input id="title" label="Question title" value="{{title}}" char-counter maxlength="200" minlength="15"></paper-input>
+        </div>
+        <div class="card-content">
           <bible-markdown-editor label="Question in detail" value="{{text}}" rows="7"></bible-markdown-editor>
           <div id="verseContainer">
             <paper-input label="Verses" value="{{verseString}}" error-message="One of the verses can not be parsed" invalid="{{invalidVerseFound}}"></paper-input>
@@ -105,12 +117,43 @@
       Polymer({
         properties: {
           title: String,
-
+          animationConfig: {
+            value: function() {
+              return {
+                // the incoming page defines the 'entry' animation
+                'entry': [{
+                  name: 'hero-animation',
+                  id: 'post',
+                  toPage: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }],
+                'exit': [{
+                  name: 'slide-down-animation',
+                  node: this
+                }, {
+                  name: 'fade-out-animation',
+                  node: this
+                }]
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'post': this.$.post
+              }
+            }
+          }
         },
         observers: [
           'retrieveFromApi(id)',
           'setQuestion(question)',
           'setVersesFromString(verseString)'
+        ],
+        behaviors: [
+          abaBehaviors.page
         ],
         ready: function(){
         },
@@ -136,7 +179,7 @@
         },
         save: function(){
           this.$.save.execute().then(function(question){
-            page('/question/'+question._id+'/');
+            app.navigateTo('/question/'+question._id+'/');
           });
         }
       });

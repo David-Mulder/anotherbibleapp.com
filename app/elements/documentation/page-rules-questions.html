@@ -10,7 +10,7 @@
       }
     </style>
     <paper-toolbar>
-      <intelligent-title title="How to Write and Ask a Good Question"></intelligent-title>
+      <intelligent-title title="How to Write and Ask a Good Question" allow-back></intelligent-title>
     </paper-toolbar>
     <div class="page-content">
       <paper-card heading="Writing a Question">
@@ -101,7 +101,10 @@ and you continue like normal again.</code>
 
         properties: {
 
-        }
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
       });
     })();
   </script>

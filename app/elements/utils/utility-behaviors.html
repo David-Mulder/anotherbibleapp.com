@@ -7,8 +7,21 @@
     },
     _isEmpty: function(a){
       return typeof a === 'undefined' || a.length === 0;
+    },
+    _lessThanEquals: function(a, b){
+      return a <= b;
+    },
+    _moreThanEquals: function(a, b){
+      return a >= b;
+    },
+    _lessThan: function(a, b){
+      return a < b;
+    },
+    _moreThan: function(a, b){
+      return a > b;
     }
   };
+
   abaBehaviors.text = {
     _smartCaps: function(s){
       var boringWords = ['and', 'from', 'with', 'against', 'the', 'to', 'your', 'in', 'of', 'or'];
@@ -27,4 +40,87 @@
       return s;
     }
   };
+
+  abaBehaviors.page = [Polymer.NeonAnimatableBehavior, Polymer.IronResizableBehavior, {
+    properties: {
+      __noResizeEventsTill: {
+        type: Date,
+        value: function(){
+          return new Date();
+        }
+      },
+      animationConfig: {
+        value: function() {
+          return {
+            entry: [{
+              name: 'fade-in-animation',
+              node: this
+            }, {
+              name: 'slide-from-bottom-animation',
+              node: this
+            }],
+            exit: [{
+              name: 'fade-out-animation',
+              node: this
+            }, {
+              name: 'slide-down-animation',
+              node: this
+            }]
+          }
+        }
+      },
+      sharedElements: {
+        value: function() {
+          return {
+            'hero': this
+          }
+        }
+      }
+    },
+    listeners: {
+      'page-became-visible': '__pageBecameVisible',
+      'hero-element-set': '_setHero',
+      'iron-resize': '_triggerResizes'
+    },
+    _setHero: function(ev){
+      console.info('SET HERO', ev.detail);
+      this.sharedElements[ev.detail.heroName || 'hero'] = ev.detail.element;
+      var originalConfig = this.animationConfig;
+      this.animationConfig = {
+        'exit': [{
+          name: 'hero-animation',
+          id: ev.detail.heroName || 'hero',
+          fromPage: this
+        },{
+          name: 'fade-out-animation',
+          node: this
+        }]
+      };
+      setTimeout(function(){
+        this.animationConfig = originalConfig;
+      }.bind(this), 5000)
+    },
+    __pageBecameVisible: function(){
+      this._triggerResizes();
+      this._setEntryAnimation();
+    },
+    _setEntryAnimation: function(){
+
+    },
+    _triggerResizes: function(){
+      if(new Date() > this.__noResizeEventsTill) {
+        var root = this.root || this.shadowRoot;
+        var resizables = root.querySelectorAll('paper-tabs, paper-scroll-header-panel, google-recaptcha');
+        for (var i = 0; i < resizables.length; i++) {
+          (function (resizable) {
+            this.async(function () {
+              console.log('resizable', resizable);
+              resizable.fire('iron-resize');
+            }, 100);
+          }.bind(this))(resizables[i])
+        }
+        this.__noResizeEventsTill = new Date() + 5000;
+      }
+    }
+  }];
 </script>

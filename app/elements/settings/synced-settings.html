@@ -37,7 +37,9 @@
 
           if(!syncStarted){
             syncStarted = true;
-            this.sync();
+            this.sync().catch(function(err){
+
+            });
           }
         },
         _dateify: function(obj, prop){

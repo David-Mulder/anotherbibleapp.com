@@ -9,11 +9,11 @@
 
     </style>
     <paper-toolbar>
-      <intelligent-title title="{{beautifulTitle}}"></intelligent-title>
+      <intelligent-title title="{{beautifulTitle}}" allow-back></intelligent-title>
       <span class="flex"></span>
     </paper-toolbar>
     <div class="page-content">
-      <topic-card topic="{{topic}}" class="card"></topic-card>
+      <topic-card id="card" topic="{{topic}}" class="card"></topic-card>
     </div>
   </template>
 
@@ -27,13 +27,42 @@
         properties: {
           topicName: {
             type: String
+          },
+          animationConfig: {
+            value: function(){
+              return {
+                'entry': [{
+                  name: 'hero-animation',
+                  id: 'topic-card',
+                  toPage: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }],
+                'exit': [{
+                  name: 'slide-down-animation',
+                  node: this
+                }, {
+                  name: 'fade-out-animation',
+                  node: this
+                }]
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'topic-card': this.$.card
+              }
+            }
           }
         },
         observers: [
           'topicChanged(topicName)'
         ],
         behaviors: [
-          abaBehaviors.text
+          abaBehaviors.text,
+          abaBehaviors.page
         ],
         ready: function(){
 

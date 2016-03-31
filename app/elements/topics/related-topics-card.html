@@ -65,7 +65,14 @@
           }
         },
         openTopicPage: function(ev){
-          page('/topic/'+ev.model.topic.title);
+          var target = Polymer.dom(ev).path.find(function(el){
+            return el.matches('.topic');
+          });
+          this.fire('hero-element-set', {
+            element: target,
+            heroName: 'topic-card'
+          });
+          app.navigateTo('/topic/'+ev.model.topic.title);
           //console.log(ev.model.topic);
         }
       });

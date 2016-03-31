@@ -10,7 +10,7 @@
       }
     </style>
     <paper-toolbar>
-      <intelligent-title title="How to write a Good Answer"></intelligent-title>
+      <intelligent-title title="How to write a Good Answer" allow-back></intelligent-title>
     </paper-toolbar>
     <div class="page-content">
       <paper-card heading="How to write a Good Answer">
@@ -58,7 +58,10 @@
       Polymer({
         properties: {
 
-        }
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
       });
     })();
   </script>

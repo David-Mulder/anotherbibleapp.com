@@ -4,6 +4,10 @@
   };
 
   var require = function(id){
-    return document._currentScript.ownerDocument.getElementById(id).import.exports;
+    var importEl = document._currentScript.ownerDocument.getElementById(id);
+    if(!importEl){
+      alert('import: ' + id + ' not found');
+    }
+    return importEl.import.exports;
   };
 </script>

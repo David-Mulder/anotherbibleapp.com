@@ -1,4 +1,5 @@
 var Answer = require('./model');
+var Question = require('../questions/model');
 
 module.exports = {
   get: function(req, res){
@@ -41,11 +42,22 @@ module.exports = {
       question: req.body.question
     });
 
-    answer.save(function(err, result){
+    answer.save(function(err, answer){
       if(err){
         res.status(400).json(err);
       }else{
-        res.json(result._id);
+
+        var questionQuery = Question.findOne({
+          _id: req.body.question
+        });
+        questionQuery.exec().then(function(question){
+          question.numberOfAnswers = question.numberOfAnswers + 1;
+          question.updatedAt = Date.now();
+          question.save().then(function(){
+            res.json(answer._id);
+          });
+        });
+
       }
     });
   },
@@ -65,8 +77,8 @@ module.exports = {
   delete: function(req, res){
 
     Answer.findOne({
-        _id: req.params.id
-      })
+      _id: req.params.id
+    })
       .populate('originalAuthor', 'displayName _id')
       .populate('revisionAuthor', 'displayName _id')
       .exec()
@@ -74,7 +86,18 @@ module.exports = {
         if(answer.originalAuthor._id.equals(req.user._id) || req.user.admin){
           answer.deleted = !answer.deleted;
           answer.save().then(function(answer){
-            res.json(answer.makePublic());
+
+            var questionQuery = Question.findOne({
+              _id: answer.question
+            });
+            questionQuery.exec().then(function(question){
+              question.numberOfAnswers = question.numberOfAnswers - 1;
+              question.updatedAt = Date.now();
+              question.save().then(function(){
+                res.json(answer.makePublic());
+              });
+            });
+
           });
         }
       });

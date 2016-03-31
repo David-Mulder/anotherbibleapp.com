@@ -13,6 +13,10 @@ var schema = new Schema({
   },
   upvotes: Array,
   downvotes: Array,
+  score: {
+    type: Number,
+    default: 0
+  },
   originalAuthor: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -45,7 +49,7 @@ schema.methods.makePublic = function(userId){
   obj.downvoted = obj.downvotes.some(uID => uID.equals(userId));
   obj.upvotes = obj.upvotes.length;
   obj.downvotes = obj.downvotes.length;
-  obj.score = obj.upvotes - obj.downvotes;
+  //obj.score = obj.upvotes - obj.downvotes;
 
   delete obj.originalAuthor.password; //unnecessary, but just in case
   return obj;
@@ -57,7 +61,7 @@ schema.plugin(version, {
   get model(){
     return Answer;
   },
-  ignore: ['upvotes', 'downvotes', 'comments', 'deleted']
+  ignore: ['upvotes', 'downvotes', 'comments', 'deleted', 'score']
 });
 
 Answer = mongoose.model('answers', schema);

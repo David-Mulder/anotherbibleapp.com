@@ -71,61 +71,11 @@
       <paper-drawer-panel id="mainDrawer" responsive-width="1275px" force-narrow="{{forceNarrow}}">
         <!-- Drawer Scroll Header Panel -->
         <div drawer fixed>
-
-          <!--
-          <paper-toolbar id="drawerToolbar">
-            <span class="title" style="margin-left:0px;">Books & Letters</span>
-            <paper-icon-button icon="home" on-tap="goToHome" hidden$="{{isHome(route)}}"></paper-icon-button>
-          </paper-toolbar>
-          <div style="position:absolute;left:0px;top:0px;bottom:0px;right:0px;overflow: auto;">
-            <books-list current-ref="{{params.bookRef}}"></books-list>
-          </div>
-          -->
-
           <app-menu></app-menu>
-
         </div>
-
-        <!-- Main Area -->
-        <paper-scroll-header-panel main condenses keep-condensed-header>
-
-          <!-- Main Content -->
-          <div class="content">
-            <iron-pages attr-for-selected="data-route" selected="{{route}}">
-
-              <page-welcome data-route="home"></page-welcome>
-              <page-book data-route="book" ref$="{{params.bookRef}}"></page-book>
-              <page-search data-route="search" search-query$="{{params.searchQuery}}"></page-search>
-              <page-login data-route="login" username$="{{params.username}}" password$="{{params.password}}"></page-login>
-              <page-register data-route="register"></page-register>
-              <page-edit-question data-route="edit-question" id$="{{params.questionId}}"></page-edit-question>
-              <page-edit-answer data-route="edit-answer" id$="{{params.answerId}}"></page-edit-answer>
-              <page-post-history data-route="post-history" id$="{{params.postId}}" post-type$="{{params.postType}}"></page-post-history>
-              <page-new-question data-route="new-question" verses-string$="{{params.newQuestionVerses}}"></page-new-question>
-              <page-question data-route="question" id$="{{params.questionId}}"></page-question>
-              <page-rules-questions data-route="rules-questions"></page-rules-questions>
-              <page-rules-answers data-route="rules-answers"></page-rules-answers>
-              <page-search-docs data-route="search-docs"></page-search-docs>
-              <page-topic data-route="topic" topic-name$="{{params.topicName}}"></page-topic>
-              <page-settings data-route="settings"></page-settings>
-              <page-not-found data-route="not-found"></page-not-found>
-              <page-user data-route="user" user-id$="{{params.userId}}"></page-user>
-              <page-forgotten-password data-route="forgotten-password" reset-token$="{{params.passwordResetToken}}"></page-forgotten-password>
-              <page-books data-route="books"></page-books>
-              <page-recent-qa data-route="recent-qa"></page-recent-qa>
-              <page-legal data-route="legal"></page-legal>
-              <page-faq data-route="faq"></page-faq>
-              <page-philosophy data-route="philosophy"></page-philosophy>
-              <!--<section data-route="home">
-
-				<paper-material elevation="1" class="paper-font-body2">
-				  <bible-text book-name="Da"></bible-text>
-				</paper-material>
-
-			  </section>-->
-            </iron-pages>
-          </div>
-        </paper-scroll-header-panel>
+        <div main>
+          <lazy-animated-router id="router" page="{{route}}"></lazy-animated-router>
+        </div>
       </paper-drawer-panel>
 
       <!-- Uncomment next block to enable Service Worker support (1/2)

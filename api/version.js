@@ -17,6 +17,10 @@ module.exports = exports = function(schema, options) {
 
   options.ignore = options.ignore || [];
 
+  options.ignore.push('updatedAt');
+  options.ignore.push('createdAt');
+  options.ignore.push('version');
+
   schema.add({ updatedAt: Date })
   schema.add({ createdAt: {type: Date, default: Date.now} });
   schema.add({ version: Number });

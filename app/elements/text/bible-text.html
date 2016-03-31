@@ -55,11 +55,7 @@
           border-bottom: 0px;
         }
       }
-      /*vn.selected, vn.selected li{
-        background: var(--accent-color-100);
-        color: var(--text-on-accent-color-100);
-      }*/
-      vn[class='selected'], vn[class='selected'] li{
+      vn.selected, vn.selected li{
         background: var(--accent-color-100);
         color: var(--text-on-accent-color-100);
       }
@@ -255,6 +251,9 @@
           this.selectedVerses = [];
           this.blocks = [];
           this.this = this;
+          window.addEventListener('resize', function(){
+            this.$.text.fire('iron-resize');
+          }.bind(this));
         },
 
         _setSettingStyles: function(){
@@ -354,14 +353,15 @@
                   console.info('loaded book', this.textRef.book)
 
                   this._loadedBook = this.textRef.book.name;
-
-                  this.loadBlocksFromBook(httpRequest.responseXML);
+                  console.log('test', httpRequest);
+                  this.loadBlocksFromBook(httpRequest.response);
 
                   onceLoaded();
                 }
               }
             }.bind(this);
 
+            httpRequest.overrideMimeType('text/html');
             httpRequest.responseType = 'document';
             httpRequest.open('GET', url);
             httpRequest.send();

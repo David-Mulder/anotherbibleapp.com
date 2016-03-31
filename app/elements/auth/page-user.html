@@ -163,7 +163,8 @@
         },
         behaviors: [
           abaBehaviors.logic,
-          abaBehaviors.text
+          abaBehaviors.text,
+          abaBehaviors.page
         ],
         listeners: {
           'page-became-visible': '_retrieveFromApi'
@@ -175,7 +176,7 @@
         _retrieveFromApi: function(){
           this._saveChanges = false;
           this.$.api.execute().then(function(result){
-            page.replace('/user/'+result.user._id+'/'+result.user.displayName.replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''));
+            page.replace('/user/'+result.user._id+'/'+result.user.displayName.replace(/ /g, '-').replace(/[^a-zA-Z0-9\-]/g, ''), null, null, false);
             this.activity = result.activity;
             this.activity.map(function(item){
               if(item.type === 'question'){
@@ -208,10 +209,10 @@
         },
         _goToQuestion: function(ev){
           var id = ev.model.item.question ? ev.model.item.question._id : ev.model.item._id;
-          page('/question/'+id);
+          app.navigateTo('/question/'+id);
         },
         _goToSettings: function(){
-          page('/settings');
+          app.navigateTo('/settings');
         }
       });
     })();

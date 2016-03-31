@@ -5,15 +5,15 @@ module.exports = {
   upvote: function(req, res){
     module.exports.vote('up', req).then(function(post){
       res.json(post);
-    }).catch(function(){
-      res.status(500).json('noooz');
+    }).catch(function(err){
+      res.status(500).json(err);
     });
   },
   downvote: function(req, res){
     module.exports.vote('down', req).then(function(post){
       res.json(post);
-    }).catch(function(){
-      res.status(500).json('noooz');
+    }).catch(function(err){
+      res.status(500).json(err);
     });
   },
   vote: function(direction, req){
@@ -24,7 +24,7 @@ module.exports = {
           reject(err);
         }else{
           if(req.user && req.user._id.equals(post.originalAuthor._id)){
-            return resolve(post.makePublic());
+            return reject('You can\'t vote for your own post');
           }
           if(typeof post.upvotes === 'undefined'){
             post.upvotes = [];
@@ -42,6 +42,8 @@ module.exports = {
           if(votedArray.indexOf(req.user._id) == -1){
             votedArray.push(req.user._id);
           }
+
+          post.score = post.upvotes.length - post.downvotes.length;
 
           post.save(function(err, result){
             if(err){

@@ -3,6 +3,8 @@ High Priority
  - ev.code enter does not work on mobile
  - scrolling with arrow keys doesnt work
  - paper-menu-button-icon doesn't work in narrow drawer
+ - DONE paper-scroll-header-panel hates neon-animated-pages
+ - DONE literal search click doesnt work
 
 Normal priority
  - Offline
@@ -12,27 +14,30 @@ Normal priority
  - improve error reporting in api to prevent crashes
  - NOTE's showing weird for timo :/
  - validation in edit post forms
- - dyslexic font
+ - error in book list
+ - register -> login prefill seems not to be working
+ - add attribution on map
+ - check topical attribution
+ - DONE make bible snippets linkable on map
+ - DONE check bounds and set center on load on map
+ - DONE list locations in related questions card
+ - add floating info icon above profile pic with gravatar instructions
 
 Low Priority
- - pass text blocks as objects instead of string
  - change 'recent questions' to 'recent activity'
  - add browsing option of recent activity rather than just top 10
  - Refactor: search for 13 enter and fix to `code` enter (qa-post:264 or page-login)
  - refactor app.toast/ask/etc to a... element or behavior
- - blur in search (for mobile keyboards)
- - figure out a way to apply consistent styling everywhere... and maybe run polylint or something
- - DONE deleted post page
- - animated lazy router pages
- - add paper dropdown menu icon item on dashboard where you can config which cards you want to see
- - add arrow back on settings or something along those lines~
- - clarify settings for reading mode being only for reading mode
  - consider reworking bible list to look like BibleGateway on desktop :/
  - invalidate all sessionTokesn after forgotten password
  - add explicit save button to user page
  - add to menu continue reading button
  - Google analtyics (http://www.outfox.com/do-not-track-for-google-analytics/)
  - move scrollbar in text to side
+ - make logout a page after all
+ - make editable description for locations
+ - make editable detailed polygons for locations (visible on info)
+ - fix map links
 
 Very Low Priority
  - add a contact us page
@@ -43,7 +48,9 @@ Very Low Priority
  - refactor to use private properties and functions everywhere properly (`_` start)
  - on mobile, dashboard 'more menu' touches top border
  - reapply firstIndex better after read -> study modus
-
+ - dyslexic font
+ - maybe run polylint or something
+ - add paper dropdown menu icon item on dashboard where you can config which cards you want to see
 
 Optional
  - remove JS logic out of JS-only-elements... including maybe even auth-api
@@ -149,3 +156,13 @@ DONE
  - DONE add [title] to bible-snippet
  - DONE add register link to log in
  - DONE privacy & terms of use
+ - DONE pass text blocks as objects instead of string
+ - DONE blur in search (for mobile keyboards)
+ - DONE deleted post page
+ - DONE animated lazy router pages
+ - DONE add arrow back on settings or something along those lines~
+ - DONE clarify settings for reading mode being only for reading mode
+ - DONE focus on search
+ - DONE change height of related toolbar in page-questoin as well
+ - DONE fix arrow-back on map
+ - DONE ignore navigations during page navigation animations

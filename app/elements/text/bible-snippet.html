@@ -60,64 +60,73 @@
           'getText(start, end)'
         ],
         getText: function(start, end) {
-          console.info('verse snippet for', start, end);
+          //console.info('verse snippet for', start, end);
           //var text = this.getBoundingClientRect();
           //return false;
 
-          this.endReference = new BibleReference(end);
-          this.startReference = new BibleReference(start);
-          var xmlFile = this.resolveUrl('text/'+this.startReference.book.name+'.xml');
-          fetch(xmlFile).then(function(response){
-            return response.text();
-          }).then(function(text){
-            var startIndex = text.indexOf('<vn id="'+this.startReference.toString()+'">');
-            if(startIndex === -1){
-              console.warn('not found start point', this.startReference.toString())
-              return;
-            }
-            var endIndex = text.indexOf('<vn id="'+this.endReference.toString()+'">');
-            if(endIndex > -1){
-              endIndex = endIndex + 10;
-              while(endIndex < text.length){
-                endIndex = text.indexOf('<vn id="', endIndex);
-                var endIndexQuote = text.indexOf('"', endIndex + '<vn id="'.length);
-                var verse = text.substring(endIndex + '<vn id="'.length, endIndexQuote);
-                if(verse !== this.endReference.toString()){
-                  break;
-                }else{
-                  endIndex += 1;
+          this.debounce('get-text', function(){
+
+            this.endReference = new BibleReference(end);
+            this.startReference = new BibleReference(start);
+            var xmlFile = this.resolveUrl('text/'+this.startReference.book.name+'.xml');
+            fetch(xmlFile).then(function(response){
+              return response.text();
+            }).then(function(text){
+              console.info(xmlFile, this.startReference.toString());
+              var startIndex = text.indexOf('<vn id="'+this.startReference.toString()+'">');
+              if(startIndex === -1){
+                window._debug = text;
+                window._debug2 = xmlFile;
+                window._debug3 = this.startReference;
+                window._debug4 = start;
+                console.warn('not found start point', this.startReference.toString())
+                return;
+              }
+              var endIndex = text.indexOf('<vn id="'+this.endReference.toString()+'">');
+              if(endIndex > -1){
+                endIndex = endIndex + 10;
+                while(endIndex < text.length){
+                  endIndex = text.indexOf('<vn id="', endIndex);
+                  var endIndexQuote = text.indexOf('"', endIndex + '<vn id="'.length);
+                  var verse = text.substring(endIndex + '<vn id="'.length, endIndexQuote);
+                  if(verse !== this.endReference.toString()){
+                    break;
+                  }else{
+                    endIndex += 1;
+                  }
                 }
               }
-            }
-            if(endIndex === -1){
-              endIndex = text.length;
-            }
+              if(endIndex === -1){
+                endIndex = text.length;
+              }
 
-            var snippet = text.substring(startIndex, endIndex);
-            snippet = snippet.replace(/<\/p>.*?<p>/g,'');
-            snippet = snippet.replace(/<n.*?>.*?<\/n>/g, '');
-            //snippet = snippet.replace(/<verse-number.*?>.*?<\/verse-number>/g, '');
-            snippet = snippet.replace(/<caption>.*?<\/caption>/g,'');
-            snippet = snippet.replace(/<.*?>/g,'');
+              var snippet = text.substring(startIndex, endIndex);
+              snippet = snippet.replace(/<\/p>.*?<p>/g,'');
+              snippet = snippet.replace(/<n.*?>.*?<\/n>/g, '');
+              //snippet = snippet.replace(/<verse-number.*?>.*?<\/verse-number>/g, '');
+              snippet = snippet.replace(/<caption>.*?<\/caption>/g,'');
+              snippet = snippet.replace(/<.*?>/g,'');
 
-            if(this.highlight.length){
-              var highlights = this.highlight.split(/\s/g).map(function(word){
-                return smartStemmer(word.toLowerCase().replace(/[^a-z0-9.]+/, ''));
-              });
-              snippet = snippet.split(/\s/g).map(function(word){
-                var stemmed = smartStemmer(word.toLowerCase().replace(/[^a-z0-9]+/, ''));
-                if(highlights.indexOf(stemmed) > -1){
-                  return '<strong>'+word+'</strong>';
-                }else{
-                  return word;
-                }
-              }).join(' ');
-            }
+              if(this.highlight.length){
+                var highlights = this.highlight.split(/\s/g).map(function(word){
+                  return smartStemmer(word.toLowerCase().replace(/[^a-z0-9.]+/, ''));
+                });
+                snippet = snippet.split(/\s/g).map(function(word){
+                  var stemmed = smartStemmer(word.toLowerCase().replace(/[^a-z0-9]+/, ''));
+                  if(highlights.indexOf(stemmed) > -1){
+                    return '<strong>'+word+'</strong>';
+                  }else{
+                    return word;
+                  }
+                }).join(' ');
+              }
 
-            this.text = snippet;
+              this.text = snippet;
 
-            this.$.snippet.innerHTML = snippet;
-          }.bind(this));
+              this.$.snippet.innerHTML = snippet;
+            }.bind(this));
+
+          }, 0);
         }
       });
     })();

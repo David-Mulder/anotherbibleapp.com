@@ -20,6 +20,10 @@ var schema = new Schema({
   },
   upvotes: Array,
   downvotes: Array,
+  score: {
+    type: Number,
+    default: 0
+  },
   verses: {
     type: Array,
     required: true
@@ -37,7 +41,11 @@ var schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Comment'
   }],
-  deleted: Boolean
+  deleted: Boolean,
+  numberOfAnswers: {
+    type: Number,
+    default: 0
+  }
 });
 
 schema.methods.makePublic = function(userId){
@@ -47,7 +55,7 @@ schema.methods.makePublic = function(userId){
   obj.downvoted = obj.downvotes.some(uID => uID.equals(userId));
   obj.upvotes = obj.upvotes.length;
   obj.downvotes = obj.downvotes.length;
-  obj.score = obj.upvotes - obj.downvotes;
+  //obj.score = obj.upvotes - obj.downvotes;
 
   return obj;
 };
@@ -58,7 +66,7 @@ schema.plugin(version, {
   get model(){
     return Question;
   },
-  ignore: ['upvotes', 'downvotes', 'comments', 'deleted']
+  ignore: ['upvotes', 'downvotes', 'comments', 'deleted', 'score', 'numberOfAnswers']
 });
 
 Question = mongoose.model('Question', schema);

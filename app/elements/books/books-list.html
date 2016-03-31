@@ -127,7 +127,20 @@
           this._selectedBook = reference.book.name;
         },
         goToBook: function(ev){
-          page('/book/'+ev.model.book.name);
+          var target = Polymer.dom(ev).path.find(function(el){
+            return el.matches('.card-actions');
+          });
+
+          this.fire('hero-element-set', {
+            element: target,
+            heroName: 'book-title'
+          });
+
+          app.navigateTo('/book/'+ev.model.book.name);
+        },
+        _debug: function(a){
+          console.log(a.length);
+          return 'test';
         }
       });
     })();

@@ -29,11 +29,12 @@
     </style>
 
     <paper-toolbar>
-      <intelligent-title title="Settings"></intelligent-title>
+      <intelligent-title title="Settings" allow-back></intelligent-title>
     </paper-toolbar>
 
     <div class="page-content">
       <paper-card heading="Reading Mode" class="card">
+
         <div class="card-actions">
           <div class="item">
             <label>Color scheme</label>
@@ -44,6 +45,7 @@
             </paper-radio-group>
           </div>
         </div>
+
         <div class="card-actions">
           <div class="item">
             <label>Font Size</label>
@@ -55,6 +57,7 @@
             </paper-radio-group>
           </div>
         </div>
+
         <div class="card-actions">
           <div class="item">
             <label>Line Height</label>
@@ -74,6 +77,7 @@
         </div>
       </paper-card>
       <paper-card heading="Study Tools" class="card">
+
         <div class="card-actions">
           <div class="item">
             <label>Show print-only notes</label>
@@ -83,6 +87,7 @@
             </paper-radio-group>
           </div>
         </div>
+
       </paper-card>
     </div>
   </template>
@@ -98,6 +103,9 @@
         listeners: {
           'page-became-visible': 'loadSettings'
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         loadSettings: function(){
           var settingsToFill = this.shadowRoot.querySelectorAll('[data-setting]');
           for(var i=0;i<settingsToFill.length;i++){

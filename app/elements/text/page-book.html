@@ -63,6 +63,10 @@
         margin-left: 10px;
         margin-right: 10px;
       }
+      bible-text{
+        opacity: 0;
+        transition: .1s linear opacity;
+      }
     </style>
 
     <utils-books id="bookUtils"></utils-books>
@@ -73,7 +77,7 @@
 
       <div main>
 
-        <paper-toolbar>
+        <paper-toolbar id="toolbar">
 
           <intelligent-title title="{{title}}"></intelligent-title>
 
@@ -84,6 +88,7 @@
             <paper-menu class="dropdown-content">
               <paper-item on-tap="goToSearch">Search&nbsp;in&nbsp;{{fullRef.book.title}}</paper-item>
               <paper-item on-tap="goToSettings">Settings</paper-item>
+              <paper-item on-tap="_forceReflow">Force Reflow</paper-item>
             </paper-menu>
           </paper-menu-button>
 
@@ -99,7 +104,7 @@
 
       <div drawer>
 
-        <verse-information-drawer verses="{{selectedVerses}}" on-multi-verse-selection="_multiSelectionMode" on-finished-with-information-drawer="_closeDrawer"></verse-information-drawer>
+        <verse-information-drawer id="drawer" verses="{{selectedVerses}}" on-multi-verse-selection="_multiSelectionMode" on-finished-with-information-drawer="_closeDrawer"></verse-information-drawer>
 
       </div>
 
@@ -120,10 +125,34 @@
             type: String
           },
           studyTools: Boolean,
-          newQuestionMode: Boolean,
           disableLocationSaving: {
             type: Boolean,
             value: false
+          },
+          animationConfig: {
+            value: function() {
+              return {
+                'entry': [{
+                  name: 'hero-animation',
+                  id: 'book-title',
+                  toPage: this
+                }, {
+                  name: 'fade-in-animation',
+                  node: this
+                }],
+                'exit': {
+                  name: 'slide-down-animation',
+                  node: this
+                }
+              }
+            }
+          },
+          sharedElements: {
+            value: function() {
+              return {
+                'book-title': this.$.toolbar
+              }
+            }
           }
         },
 
@@ -133,17 +162,24 @@
         ],
 
         listeners: {
-          'page-became-visible': 'pageBecameVisible'
+          'page-became-visible': '_pageBecameVisible',
+          'page-finished-animating': '_finishedAnimation'
         },
 
         behaviors: [
+          abaBehaviors.page
         ],
 
         ready: function(){
-          this.set('newQuestionMode', false);
+          this.verseSelectionMode = false;
         },
 
-        pageBecameVisible: function(){
+        _finishedAnimation: function(){
+          this.$.text.style.opacity = 1;
+        },
+
+        _pageBecameVisible: function(){
+          this.$.text.style.opacity = 0;
           this.$.text.fire('element-became-visible');
           this.setMode();
         },
@@ -180,7 +216,7 @@
             }
           }
 
-          this.title = this.fullRef.book.title;
+          this.title = this.fullRef.book.plainLongTitle;
           //app.setTitle(this.fullRef.book.title);
 
         },
@@ -189,7 +225,7 @@
           if(this.selectedVerses.length == 1){
             page.replace('/book/'+this.selectedVerses[0].replace(/ /g, ''), null, null, false);
           }
-          if(!this.newQuestionMode && this.selectedVerses.length > 0){
+          if(!this.verseSelectionMode && this.selectedVerses.length > 0){
             this.$.qaDrawerPanel.openDrawer();
           }
         },
@@ -209,7 +245,7 @@
         },
 
         setMode: function(){
-          console.trace('force narrow');
+          //console.trace('force narrow');
 
           if(this.studyTools){
             this.mode = 'study';
@@ -221,11 +257,11 @@
         },
 
         goToSearch: function(){
-          page('/search/in:'+this.fullRef.book.name.replace(/ /g, '')+' ');
+          app.navigateTo('/search/in:'+this.fullRef.book.name.replace(/ /g, '')+' ');
         },
 
         goToSettings: function(){
-          page('/settings');
+          app.navigateTo('/settings');
         },
 
         savePosition: function(ev){
@@ -242,6 +278,10 @@
 
         _closeDrawer: function(){
           this.$.qaDrawerPanel.closeDrawer();
+        },
+
+        _forceReflow: function(){
+          this.$.text.$.text.fire('iron-resize');
         }
 
       });

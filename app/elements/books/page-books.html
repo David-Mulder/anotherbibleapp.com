@@ -37,6 +37,9 @@
             observer: '_saveSort'
           }
         },
+        behaviors: [
+          abaBehaviors.page
+        ],
         ready: function(){
           this.$.settings.getSetting('page-books-sort-books-by', 'tradition').then(function(value){
             this.sortBooksBy = value;
