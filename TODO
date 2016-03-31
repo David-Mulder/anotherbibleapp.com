@@ -22,6 +22,7 @@ Normal priority
  - DONE check bounds and set center on load on map
  - DONE list locations in related questions card
  - add floating info icon above profile pic with gravatar instructions
+ - scrollbar due to actions in drawer
 
 Low Priority
  - change 'recent questions' to 'recent activity'

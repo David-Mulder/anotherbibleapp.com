@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="block-html.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -9,17 +8,13 @@
     <style include="shared-styles"></style>
     <style>
       :host {
-        display: block;
-        position: absolute;
-        left: 0px;
-        bottom: 0px;
-        right: 0px;
-        top: 0px;
         display: flex;
+        overflow: auto;
+        flex-direction: column;
+        position: relative;
       }
-      iron-list{
+      #text{
         flex: 1;
-
         max-width: 900px;
         margin-left: auto;
         margin-right: auto;
@@ -60,11 +55,10 @@
         color: var(--text-on-accent-color-100);
       }
       .license{
-        margin-bottom: 20px;
-      }
-      .license p{
-        margin-top:0px;
+        padding: 10px 20px 20px 20px;
         font-size: small;
+        max-width: 600px;
+        margin: auto;
       }
       #note ci{
         color: var(--accent-color);
@@ -73,41 +67,36 @@
       }
     </style>
     <style>
-      :host([mode='read']){
+      :host([internal-mode='read']){
         background: var(--reading-background-color);
         color: var(--reading-text-color);
         font-size: var(--font-size);
         line-height: var(--line-height);
       }
-      :host([mode='read']) #text{
+      :host([internal-mode='read']) #text{
         padding: 10px;
       }
-      :host([mode='read']) chapter{
+      :host([internal-mode='read']) chapter{
         display: block;
       }
-      :host([mode='read']) n, :host([mode='read']) pericope{
+      :host([internal-mode='read']) n, :host([internal-mode='read']) pericope{
         display: none;
       }
     </style>
     <style>
-      :host([mode='study']) {
+      :host([internal-mode='study']) {
         font-size: 15px;
       }
-      :host([mode='study']) block-html[chapter-start] > div{
-        margin-top: 10px;
-        padding-top: 20px;
-      }
-      :host([mode='study']) block-html > div{
-        background: var(--card-dialog-color);
-        margin: 0px 10px 0px 10px;
-        padding-left: 20px;
-        padding-right: 20px;
-        padding-bottom: 1px;
-        padding-top: 0px;
+      :host([internal-mode='study']) chapter{
         display: block;
-        /*box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;*/
+        background: var(--card-dialog-color);
+        padding: 20px;
+        margin: 10px 10px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+        0 1px 5px 0 rgba(0, 0, 0, 0.12),
+        0 3px 1px -2px rgba(0, 0, 0, 0.2);
       }
-      :host([mode='study']) block-html[chapter-start] > div::before{
+      :host([internal-mode='study']) chapter::before{
         content: attr(chapter-number);
         display: inline-block;
         float: left;
@@ -115,12 +104,36 @@
         min-width: 40px;
         text-align: center;
       }
-      :host([mode='study']) block-html[chapter-start] > div::after{
+      /*
+      :host([internal-mode='study']) block-html[chapter-start] > div{
+        margin-top: 10px;
+        padding-top: 20px;
+      }
+      :host([internal-mode='study']) block-html > div{
+        background: var(--card-dialog-color);
+        margin: 0px 10px 0px 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 1px;
+        padding-top: 0px;
+        display: block;
+        /*box-shadow: rgba(0, 0, 0, 0.098) 0px 2px 4px, rgba(0, 0, 0, 0.098) 0px 0px 3px;* /
+      }
+      :host([internal-mode='study']) block-html[chapter-start] > div::before{
+        content: attr(chapter-number);
+        display: inline-block;
+        float: left;
+        font-size: 32px;
+        min-width: 40px;
+        text-align: center;
+      }
+      :host([internal-mode='study']) block-html[chapter-start] > div::after{
         content: '';
         display: block;
         clear: both;
       }
-      :host([mode='study']) pericope{
+      */
+      :host([internal-mode='study']) pericope{
         display: block;
         text-indent:0px;
         font-size: .9em;
@@ -130,17 +143,17 @@
         padding-bottom: 15px;;
       }
 
-      :host([mode='study']) n io{
+      :host([internal-mode='study']) n io{
         display: none;
       }
-      :host([mode='study']) n{
+      :host([internal-mode='study']) n{
         position: relative;
       }
-      :host([mode='study']) n[tag='NFP']{
+      :host([internal-mode='study']) n[tag='NFP']{
         display: var(--print-only-display);
       }
       /*
-      :host([mode='study']) n:hover io{
+      :host([internal-mode='study']) n:hover io{
         display: block;
         position: absolute;
         left: 0px;
@@ -157,7 +170,7 @@
         border-radius: 2px;
       }
       */
-      :host([mode='study']) n:after{
+      :host([internal-mode='study']) n:after{
         content: 'NOTE';
         position: relative; top: -1em;
         font-size: 7px;
@@ -165,7 +178,7 @@
         font-family: Verdana;
         cursor: pointer;
       }
-      :host([mode='study']) vn[first]::before{
+      :host([internal-mode='study']) vn[first]::before{
         content: attr(n);
         display: inline-block;
         text-align: center;
@@ -176,10 +189,10 @@
         min-height: 12px;
         transform: scale(0.9) translateY(-20%);
       }
-      :host([mode='study']) sd{
+      :host([internal-mode='study']) sd{
         font-variant: small-caps;
       }
-      :host([mode='study']) im{
+      :host([internal-mode='study']) im{
         font-style: italic;
       }
     </style>
@@ -191,11 +204,20 @@
       <div class="content" on-tap="_handleTapOnNote"></div>
     </paper-dialog>
 
+    <div id="text" on-tap="_handleTapOnText">
+
+    </div>
+    <p class="license">
+      <span style="display: block;text-align:center;margin-bottom:10px;">(LEB)</span>
+      Scripture quotations marked (LEB) are from the Lexham English Bible. Copyright 2012 Logos Bible Software. Lexham is a registered trademark of Logos Bible Software.
+    </p>
+    <!--
     <iron-list id="text" items="{{blocks}}" as="block" on-tap="_handleTapOnText" on-scroll="_handleScroll">
       <template>
         <block-html html="{{block.html}}" chapter-start$="{{block.start}}" chapter-end$="{{block.end}}" selected-verses="{{selectedVerses}}" highlighted-verses="{{highlightedVerses}}" chapter-number="{{block.chapterNumber}}" class$="{{block.class}}" parent="{{this}}"></block-html>
       </template>
     </iron-list>
+    -->
   </template>
 
   <script>
@@ -221,6 +243,9 @@
             type: Array
           },
           mode: {
+            type: String
+          },
+          internalMode: {
             type: String,
             reflectToAttribute: true
           },
@@ -239,11 +264,14 @@
         },
 
         observers: [
-          'resetSizes(mode)'
+          'switchMode(mode)',
+          'setSelectionClassesFromSplices(selectedVerses.splices)',
+          'setHighlightClasses(highlightedVerses)'
         ],
 
         listeners: {
-          'element-became-visible': '_setSettingStyles'
+          'element-became-visible': '_setSettingStyles',
+          'scroll': '_handleScroll'
         },
 
         ready: function() {
@@ -252,8 +280,45 @@
           this.blocks = [];
           this.this = this;
           window.addEventListener('resize', function(){
-            this.$.text.fire('iron-resize');
+            //this.$.text.fire('iron-resize');
           }.bind(this));
+        },
+
+        _savePosition: function(){
+          if(this._isBookLoaded){
+            this._savedFirstVerse = this._getFirstVisibleVerse();
+          }
+        },
+
+        _restorePosition: function(){
+          if(this._savedFirstVerse){
+            var offsetTop = this._savedFirstVerse.offsetTop;
+            offsetTop = offsetTop < 80 ? 0 : offsetTop;
+
+            var interval = setInterval(function(){
+              if(this._savedFirstVerse.offsetTop !== offsetTop){
+                this.scrollTop = offsetTop;
+                offsetTop = this._savedFirstVerse.offsetTop;
+                offsetTop = offsetTop < 80 ? 0 : offsetTop;
+              }
+            }.bind(this), 500);
+
+            setTimeout(function(){
+              clearInterval(interval);
+            }, 5000);
+
+            for(var i=0;i<10;i++){
+              this.async(function(){
+                this.scrollTop = offsetTop;
+              }, 100*i);
+            }
+          }
+        },
+
+        switchMode: function(newMode){
+          this._savePosition();
+          this.internalMode = newMode;
+          this._restorePosition();
         },
 
         _setSettingStyles: function(){
@@ -308,8 +373,10 @@
           }.bind(this));
 
           Promise.all([readingColor, fontSize, lineHeight, printOnlyNotes]).then(function(){
+            this._savePosition();
             this.updateStyles();
-            this.$.text.fire('iron-resize');
+            this._restorePosition();
+            //this.$.text.fire('iron-resize');
           }.bind(this));
 
         },
@@ -321,15 +388,18 @@
         loadBook: function(){
           console.info('loading book', this.textRef);
 
-          app.loading('book')
+          app.loading('book');
+
+          this._isBookLoaded = false;
 
           this.autoSelectReference = true;
 
           var onceLoaded = function(){
             this.async(function(){
+              this._isBookLoaded = true;
               this.scrollToReference();
               app.finishedLoading('book');
-              this.$.text.fire('iron-resize');
+              //this.$.text.fire('iron-resize');
             }, 500);
           }.bind(this);
 
@@ -353,7 +423,6 @@
                   console.info('loaded book', this.textRef.book)
 
                   this._loadedBook = this.textRef.book.name;
-                  console.log('test', httpRequest);
                   this.loadBlocksFromBook(httpRequest.response);
 
                   onceLoaded();
@@ -368,75 +437,73 @@
           }
         },
 
+        //todo: rename
         loadBlocksFromBook: function(book){
-          this.blocks = [];
           var chapters = [].slice.call(book.querySelectorAll('chapter'));
-
-          var s = new XMLSerializer();
-
-          chapters.forEach((chapter, chapterI) => {
-            var chapterBlocks = [].slice.call(chapter.querySelectorAll('pa, pericope'));
-            chapterBlocks.forEach((block, i) => {
-              var firstVerse = block.querySelector('vn');
-              if(firstVerse){
-                var reference = new BibleReference(firstVerse.id);
-              }
-
-              //todo: consider switching to simply passing the raw xml object instead of stringifying
-
-              this.push('blocks', {
-                start: i == 0,
-                end: i == chapterBlocks.length - 1,
-                debug: i+'/'+(chapterBlocks.length -1),
-                html: block,
-                chapterNumber: chapterI + 1,
-                verseStart: firstVerse ? reference.toNumeric() : null
-              });
-            });
-          });
-
-          var p = document.createElement('p');
-          p.textContent = 'Scripture quotations marked (LEB) are from the Lexham English Bible. Copyright 2012 Logos Bible Software. Lexham is a registered trademark of Logos Bible Software.';
-          this.push('blocks', {
-            start: true,
-            end: true,
-            html: p,
-            class: 'license'
-          });
-
-          console.info('loaded', this.blocks.length, 'blocks');
-        },
-
-        resetSizes: function(){
-          this.$.text.items.forEach(function(item, i){
-            this.$.text.updateSizeForItem(item);
+          chapters.forEach(function(chapter){
+            chapter.setAttribute('chapter-number', (new BibleReference(chapter.id)).chapter)
+            this._setVerseNumberAttributes(chapter);
+            this.$.text.appendChild(chapter);
           }.bind(this));
-          var i = this.$.text._firstVisibleIndexVal;
-          this.async(function(){
-            this.$.text.scrollToIndex(i);
-          }, 0);
+          this.setHighlightClasses();
+        },
+        _setVerseNumberAttributes: function(element){
+          var verses = element.querySelectorAll('vn');
+          var cVerse = "";
+          for(var i=0;i<verses.length;i++) {
+            var split = verses[i].id.split(':');
+            if(split.length > 1){
+              verses[i].setAttribute('n', split[1]);
+            }else{
+              verses[i].setAttribute('n', verses[i].id.split(' ')[1]);
+            }
+
+            if(cVerse !== verses[i].id){
+              verses[i].setAttribute('first', '');
+            }
+            cVerse = verses[i].id;
+          }
+        },
+        setSelectionClassesFromSplices: function(){
+          this.setVerseClasses(this.$.text, this.selectedVerses, 'selected');
+        },
+        setHighlightClasses: function(){
+          this.setVerseClasses(this.$.text, this.highlightedVerses, 'highlighted');
+        },
+        setVerseClasses: function(element, newVerses, className){
+          if(newVerses){
+            var verses = element.querySelectorAll('vn.'+className);
+            for(var i=0;i<verses.length;i++){
+              verses[i].classList.remove(className);
+            }
+            newVerses.forEach(function(verse){
+              var verseEls = element.querySelectorAll('vn[id="'+verse+'"]');
+              if(verseEls.length > 0){
+                for(var i=0;i<verseEls.length;i++){
+                  verseEls[i].classList.add(className);
+                }
+              }
+            }.bind(this));
+          }
         },
 
         scrollToReference: function() {
 
           if(this.textRef.chapter) {
-            console.log('searching for', this.textRef.toNumeric());
-            var lastValidIndex;
-            var verseIndex = this.textRef.toNumeric();
-            for (var i = 0; i < this.blocks.length; i++) {
-              if (this.blocks[i].verseStart) {
-                if (this.blocks[i].verseStart > verseIndex) {
-                  break;
-                }
-                lastValidIndex = i;
+            var verse = this.$.text.querySelector('vn[id="'+this.textRef.toString()+'"]');
+
+            var offsetTop = verse.offsetTop;
+            var interval = setInterval(function(){
+              if(verse.offsetTop !== offsetTop){
+                this.scrollTop = verse.offsetTop < 80 ? 0 : verse.offsetTop - 10;
+                offsetTop = verse.offsetTop;
               }
-            }
-            if (lastValidIndex) {
-              if(isNaN(this.textRef.verseStart) && this.blocks[lastValidIndex-1].verseStart == null){
-                lastValidIndex--;
-              }
-              this.$.text.scrollToIndex(lastValidIndex);
-            }
+            }.bind(this), 100);
+            setTimeout(function(){
+              clearInterval(interval);
+            }, 5000);
+            this.scrollTop = offsetTop < 80 ? 0 : offsetTop - 10;
+
           }
 
           if(this.autoSelectReference){
@@ -445,14 +512,6 @@
               this.set('selectedVerses', [this.textRef.start.toString()])
             }
           }
-          //this.blocks.findIndex(block => block.firstVerse);
-          /*
-          if(this.textRef.chapter){
-            this.$.text.scrollToIndex(this.textRef.chapter-1);
-            if(this.textRef.verseStart){
-              this.set('selectedVerses', [this.textRef.toString()])
-            }
-          }*/
         },
         _handleTapOnNote: function(ev){
           if(Polymer.dom(ev).path[0].nodeName.toLowerCase() == 'ci'){
@@ -468,40 +527,48 @@
             this.$.note.opened = true;
           }
 
-          if(true){
-            var verseNumberElement = Polymer.dom(ev).path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
-            if(this.selectionMode === 'multiple'){
-              if(verseNumberElement) {
-                var isSelected = this.selectedVerses.includes(verseNumberElement.id);
-                if (isSelected) {
-                  //unselect
-                  this.splice('selectedVerses', this.selectedVerses.indexOf(verseNumberElement.id), 1);
-                } else {
-                  //select
-                  this.push('selectedVerses', verseNumberElement.id);
-                }
+          var verseNumberElement = Polymer.dom(ev).path.find((el) => el.nodeName && el.nodeName.toLowerCase() === 'vn');
+          if(this.selectionMode === 'multiple'){
+            if(verseNumberElement) {
+              var isSelected = this.selectedVerses.includes(verseNumberElement.id);
+              if (isSelected) {
+                //unselect
+                this.splice('selectedVerses', this.selectedVerses.indexOf(verseNumberElement.id), 1);
+              } else {
+                //select
+                this.push('selectedVerses', verseNumberElement.id);
               }
+            }
+          }else{
+            if(!verseNumberElement){ // || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)
+              this.set('selectedVerses', []);
             }else{
-              if(!verseNumberElement){ // || (this.selectedVerses.length > 0 && this.selectedVerses[0] == verseNumberElement.id)
-                this.set('selectedVerses', []);
-              }else{
-                this.set('selectedVerses', verseNumberElement ? [verseNumberElement.id] : []);
-              }
+              this.set('selectedVerses', verseNumberElement ? [verseNumberElement.id] : []);
             }
-            this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
           }
+          this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
         },
+        _getFirstVisibleVerse: function(){
+          var scrollTop = this.scrollTop;
+          var verses = [].slice.call(this.$.text.querySelectorAll('vn'));
 
-        _handleScroll: function(){
-          console.log('current', this.blocks[this.$.text.firstVisibleIndex].verseStart);
-          this.debounce('scroll', function(){
-            var firstIndex = this.$.text.firstVisibleIndex;
-            if(this.blocks[firstIndex].verseStart === null){
-              firstIndex++;
+          var verseIndexOfFirstVisibleVerse = verses.findIndex(function(verse){
+            if(scrollTop < verse.offsetTop){
+              return true;
             }
-            this.fire('scroll', {
-              verse: this.blocks[firstIndex].verseStart
-            });
+          });
+          return verses[Math.max(0, verseIndexOfFirstVisibleVerse - 1)];
+        },
+        _handleScroll: function(){
+          this.debounce('scroll', function(){
+
+            var verse = this._getFirstVisibleVerse();
+            if(verse) {
+              this.fire('scrolled', {
+                  verse:verse.id
+              });
+            }
+
           }, 10000);
         }
 

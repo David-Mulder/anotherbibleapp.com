@@ -22,23 +22,11 @@
         display: flex;
         flex-direction: column;
         background: var(--primary-color-50);
-
-      }
-      #textContainer{
-        flex: 1;
-        position: relative;
-      }
-      .bible-text{
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        right: 0px;
-        bottom: 0px;
       }
       paper-drawer-panel{
         flex: 1;
       }
-      paper-drawer-panel [main]{
+      paper-drawer-panel div[main]{
         display: flex;
         flex-direction: column;
       }
@@ -66,6 +54,7 @@
       bible-text{
         opacity: 0;
         transition: .1s linear opacity;
+        flex: 1;
       }
     </style>
 
@@ -94,11 +83,7 @@
 
         </paper-toolbar>
 
-        <div id="textContainer">
-
-          <bible-text id="text" text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="verseSelected" mode="{{mode}}" on-scroll="savePosition"></bible-text>
-
-        </div>
+        <bible-text id="text" text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="verseSelected" mode="{{mode}}" on-scrolled="savePosition"></bible-text>
 
       </div>
 

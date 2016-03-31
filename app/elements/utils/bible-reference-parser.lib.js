@@ -24,7 +24,7 @@ define(function(){
       var matches = bibleReferenceParserRegex.exec(vs.trim());
       if(matches){
         var bookObject = bibleBooks.findBook(matches[1]);
-        console.info('bookObject', bookObject);
+        //console.info('bookObject', bookObject);
         if(bookObject && bookObject.matchQuality <= 30 && !matches[3]){
           bookObject = undefined;
         }

@@ -217,4 +217,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
   };
 
+  var ignoredErrors = ['/books'];
+  var reload;
+  var errorOverlay = document.querySelector('#error');
+
+  window.onerror = function(err){
+    if(ignoredErrors.indexOf(page.current) == -1){
+      errorOverlay.style.display = 'block';
+      if(!reload){
+        reload = setTimeout(function(){
+          location.reload(true);
+        }, 10000);
+      }
+    }
+  }
+  document.getElementById('cancelErrorRefresh').addEventListener('click', function(){
+    clearTimeout(reload);
+    errorOverlay.style.display = 'none';
+    reload = 0;
+  });
+
 })(document);
