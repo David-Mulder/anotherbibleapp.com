@@ -3,6 +3,8 @@
 <link rel="import" href="/bower_components/gold-password-input/gold-password-input.html">
 <link rel="import" href="../utils/google-recaptcha.html">
 
+<link rel="import" href="../utils/utils-dialogs.html">
+
 <dom-module id="page-register">
   <template>
     <style include="shared-styles"></style>
@@ -28,6 +30,8 @@
         margin-top: 40px;
       }
     </style>
+
+    <utils-dialogs id="dialogs"></utils-dialogs>
 
     <paper-toolbar>
       <intelligent-title title="Register"></intelligent-title>
@@ -121,12 +125,14 @@
         },
         register: function(){
           this.$.api.execute().then(function(){
-            app.set('params.username', this.username);
-            app.set('params.password', this.password);
+            app.crossNavigationalData.credentials = {
+              username: this.username,
+              password: this.password
+            };
             app.navigateTo('/login');
           }.bind(this)).catch(function(err){
             this.$.recaptcha.reset();
-            app.toast(err.humanError);
+            this.$.dialogs.toast(err.humanError);
           }.bind(this));
         }
       });

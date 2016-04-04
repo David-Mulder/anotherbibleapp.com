@@ -6,6 +6,7 @@
 <link rel="import" href="./bible-text.html">
 <link rel="import" href="./verse-information-drawer.html">
 <link rel="import" href="../settings/synced-settings.html">
+<link rel="import" href="../utils/utils-dialogs.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -38,6 +39,7 @@
         flex: 1;
       }
       paper-toggle-button{
+        white-space: nowrap;
         --paper-toggle-button-checked-bar:{
           background: var(--accent-color);
         };
@@ -61,6 +63,7 @@
     <utils-books id="bookUtils"></utils-books>
     <synced-settings id="settings"></synced-settings>
     <iron-localstorage name="study-tools" value="{{studyTools}}"></iron-localstorage>
+    <utils-dialogs id="dialogs"></utils-dialogs>
 
     <paper-drawer-panel id="qaDrawerPanel" right-drawer responsive-width="700px" drawer-width="300px" force-narrow="{{!studyTools}}">
 
@@ -68,16 +71,15 @@
 
         <paper-toolbar id="toolbar">
 
-          <intelligent-title title="{{title}}"></intelligent-title>
+          <intelligent-title title="{{fullRef.book.plainLongTitle}}" short-title="{{fullRef.book.title}}"></intelligent-title>
 
-          <paper-toggle-button checked="{{studyTools}}" id="study-tools">Study tools</paper-toggle-button>
+          <paper-toggle-button checked="{{studyTools}}" id="study-tools">Study&nbsp;tools</paper-toggle-button>
 
           <paper-menu-button horizontal-align="right">
             <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
             <paper-menu class="dropdown-content">
               <paper-item on-tap="goToSearch">Search&nbsp;in&nbsp;{{fullRef.book.title}}</paper-item>
               <paper-item on-tap="goToSettings">Settings</paper-item>
-              <paper-item on-tap="_forceReflow">Force Reflow</paper-item>
             </paper-menu>
           </paper-menu-button>
 
@@ -89,7 +91,7 @@
 
       <div drawer>
 
-        <verse-information-drawer id="drawer" verses="{{selectedVerses}}" on-multi-verse-selection="_multiSelectionMode" on-finished-with-information-drawer="_closeDrawer"></verse-information-drawer>
+        <verse-information-drawer id="drawer" verses="{{selectedVerses}}" on-multi-verse-selection="_multiSelectionMode" on-finished-with-information-drawer="_closeDrawerAndDeselectVerses"></verse-information-drawer>
 
       </div>
 
@@ -181,7 +183,7 @@
               var lastRead = new BibleReference(setting.position);
               if(!(lastRead.verseStart == 1 && lastRead.chapter == 1)){
 
-                app.askToast('Do you wish to continue reading from your last position?', ['Continue from '+lastRead.toString()]).then(function(answer, i){
+                this.$.dialogs.askToast('Do you wish to continue reading from your last position?', ['Continue from '+lastRead.toString()]).then(function(answer, i){
                   this.set('fullRef', lastRead);
                   this.$.text.autoSelectReference = false;
                 }.bind(this)).catch(function(){});
@@ -201,7 +203,6 @@
             }
           }
 
-          this.title = this.fullRef.book.plainLongTitle;
           //app.setTitle(this.fullRef.book.title);
 
         },
@@ -218,7 +219,7 @@
         _multiSelectionMode: function(ev){
           this.$.qaDrawerPanel.closeDrawer();
           this.set('verseSelectionMode', 'multiple');
-          app.askToast(ev.detail.label, ['Tap here once you\'re done.'], function(){
+          this.$.dialogs.askToast(ev.detail.label, ['Tap here once you\'re done.'], function(){
             this.duration = 0;
             this.classList.add('fit-bottom');
           }).then(function(){
@@ -250,23 +251,22 @@
         },
 
         savePosition: function(ev){
-          if(!this.disableLocationSaving){
-            var ref = new BibleReference(ev.detail.verse);
-            if(!(ref.verseStart == 1 && ref.chapter == 1)){
-              this.$.settings.saveSetting('book-reading-position-'+this.fullRef.book.name.replace(' ', '-'), {
-                position: ev.detail.verse,
-                date: new Date()
-              });
+          this.debounce('save-position', function(){
+            if(!this.disableLocationSaving){
+              var ref = new BibleReference(ev.detail.verse);
+              if(!(ref.verseStart == 1 && ref.chapter == 1)){
+                this.$.settings.saveSetting('book-reading-position-'+this.fullRef.book.name.replace(' ', '-'), {
+                  position: ev.detail.verse,
+                  date: new Date()
+                });
+              }
             }
-          }
+          }, 10000);
         },
 
-        _closeDrawer: function(){
+        _closeDrawerAndDeselectVerses: function(){
           this.$.qaDrawerPanel.closeDrawer();
-        },
-
-        _forceReflow: function(){
-          this.$.text.$.text.fire('iron-resize');
+          this.set('selectedVerses', []);
         }
 
       });

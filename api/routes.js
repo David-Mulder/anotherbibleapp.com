@@ -2,12 +2,14 @@ var rateLimit = require('express-rate-limit');
 
 var authenticator = require('./objects/users/authenticator');
 var questionController = require('./objects/questions/controller');
+var importController = require('./objects/questions/importController');
 var answerController = require('./objects/answers/controller');
 var votingController = require('./objects/votes/controller');
 var userController = require('./objects/users/controller');
 var searchController = require('./objects/search/controller');
 var commentController = require('./objects/comments/controller');
 var locationController = require('./objects/locations/controller');
+var tokenController = require('./objects/loginTokens/controller');
 
 var strongLimit = rateLimit({
   delayAfter: 3,
@@ -67,6 +69,10 @@ module.exports = {
     app.get('/locations/list/viewport', weakLimit, locationController.listForViewport);
     app.get('/locations/list/coordinates', weakLimit, locationController.listForCoordinates);
     app.get('/locations/list/:verse', weakLimit, locationController.listForVerse);
+
+    app.get('/token-cleanup', authenticator.isAdmin, tokenController.cleanup);
+
+    app.get('/import/stackexchange/:id', authenticator.isAdmin, importController.christianityStackExchange);
 
 
     app.get('/', function (req, res) {

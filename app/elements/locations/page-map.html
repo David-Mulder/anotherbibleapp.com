@@ -82,6 +82,17 @@
         padding: 10px;
         font-size: 12px;
       }
+      .license-note{
+        position: absolute;
+        bottom: 13px;
+        z-index: 1;
+        background: rgba(255, 255, 255, .6);
+        right: 50px;
+        max-width: 560px;
+        padding: 1px 10px;
+        font-size: 10px;
+        color: rgba(0,0,0,.9);
+      }
       .route-selector{
         padding: 20px;
         display: none;
@@ -177,6 +188,9 @@
           <div class="warning-note">
             Important note: This map is not historically accurate and mixes names and places
             from different periods.
+          </div>
+          <div class="license-note">
+            Location data : CC BY 4.0 : OpenBible.info
           </div>
           <div class="mode-selector">
             <paper-tabs selected="{{mode}}" attr-for-selected="data-mode">
@@ -365,6 +379,7 @@
               "rotateControl": false,
               "mapTypeControl": false,
               "fullscreenControl": false,
+              scaleControl: true,
               maxZoom: 14,
               minZoom: 4
             });
@@ -385,13 +400,15 @@
         _resized: function(){
           this.debounce('resize', function(){
             //this.$.map.fire('iron-resize');
-            google.maps.event.trigger(this.map, 'resize')
+            if(google){
+              google.maps.event.trigger(this.map, 'resize')
+            }
             //this._loadData();
           }, 500);
         },
         _mapReady: function(){
 
-          this.map.addListener('bounds_changed', this._loadData.bind(this));
+          this.map.addListener('idle', this._loadData.bind(this));
 
           this._markerImage = new google.maps.MarkerImage(
             '/elements/locations/marker.png',
@@ -417,6 +434,8 @@
           genericLabels.forEach(function(label){
             label.map = this.map;
             label.strokeWeight = 2;
+            label.fontColor = 'rgba(0,0,0,.9)';
+            label.strokeColor = 'rgba(255,255,255,.6)';
             label.fontFamily = 'Roboto';
             label.position = new google.maps.LatLng(label.position[1], label.position[0]);
             new MapLabel(label);
@@ -587,18 +606,53 @@
                 var topRight = [bounds.getNorthEast().lng(), bounds.getNorthEast().lat()];
                 this.set('_viewport', [bottomLeft, topRight]);
                 this.set('_zoom', this.map.getZoom());
+
                 this.$.api.execute().then(function (locations) {
                   this._clearMap();
-
+                  var minDist = ({
+                    4: 1.6,
+                    5: 0.8,
+                    6: 0.4,
+                    7: 0.2,
+                    8: 0.15,
+                    9: 0.075,
+                    10: 0.04,
+                    11: 0.02,
+                    12: 0.01,
+                    13: 0,
+                    14: 0
+                  })[this._zoom];
                   locations.forEach(function (location) {
-                    var marker = new google.maps.Marker({
-                      position: {lat: location.coordinates[1] + Math.random() / 10000, lng: location.coordinates[0]},
-                      map: this.map,
-                      icon: this._markerImage,
-                      shape: this._markerImageShape
-                    });
-                    marker.addListener('click', this._setLocation.bind(this));
-                    this.push('_mapItems', marker);
+                    if(minDist > 0) {
+                      var tooClose = this._mapItems.some(function (item) {
+                        var latDiff = item.position.lat() - location.coordinates[1];
+                        var lngDiff = item.position.lng() - location.coordinates[0];
+                        if (latDiff + lngDiff > minDist * 4) {
+                          return false;
+                        }
+                        var dist = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lngDiff, 2));
+                        return dist < minDist;
+                      });
+                    }
+                    if(!tooClose) {
+                      /*if(location.verses.length > 20){
+                        var label = new MapLabel({
+                          position: new google.maps.LatLng({lat: location.coordinates[1], lng: location.coordinates[0]}),
+                          text: location.title,
+                          fontSize: 10,
+                          map: this.map
+                        });
+                        this.push('_mapItems', label);
+                      }*/
+                      var marker = new google.maps.Marker({
+                        position: {lat: location.coordinates[1], lng: location.coordinates[0]},
+                        map: this.map,
+                        icon: this._markerImage,
+                        shape: this._markerImageShape
+                      });
+                      marker.addListener('click', this._setLocation.bind(this));
+                      this.push('_mapItems', marker);
+                    }
                   }.bind(this));
                   //alert(this._mapItems.length);
                 }.bind(this));

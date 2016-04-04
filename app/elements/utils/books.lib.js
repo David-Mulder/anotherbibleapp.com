@@ -2,6 +2,7 @@ define(function(){
   var bibleBooks = [
     {
       'name': 'Ge',
+      'longName': 'gen',
       'short_title': 'Gen.',
       'title': 'Genesis',
       'timeline': {
@@ -17,6 +18,7 @@ define(function(){
     },
     {
       'name': 'Ex',
+      'longName': 'exo',
       'short_title': 'Exo.',
       'title': 'Exodus',
       'timeline': {
@@ -32,6 +34,7 @@ define(function(){
     },
     {
       'name': 'Le',
+      'longName': 'lev',
       'short_title': 'Levi.',
       'title': 'Leviticus',
       'timeline': {
@@ -47,6 +50,7 @@ define(function(){
     },
     {
       'name': 'Nu',
+      'longName': 'num',
       'short_title': 'Numb.',
       'title': 'Numbers',
       'timeline': {
@@ -62,6 +66,7 @@ define(function(){
     },
     {
       'name': 'Dt',
+      'longName': 'deu',
       'short_title': 'Deut.',
       'title': 'Deuteronomy',
       'timeline': {
@@ -77,6 +82,7 @@ define(function(){
     },
     {
       'name': 'Jos',
+      'longName': 'jos',
       'short_title': 'Josh.',
       'title': 'Joshua',
       'timeline': {
@@ -92,6 +98,7 @@ define(function(){
     },
     {
       'name': 'Jdg',
+      'longName': 'jdg',
       'short_title': 'Judg.',
       'title': 'Judges',
       'timeline': {
@@ -107,6 +114,7 @@ define(function(){
     },
     {
       'name': 'Ru',
+      'longName': 'rth',
       'short_title': 'Ruth',
       'title': 'Ruth',
       'timeline': {
@@ -122,6 +130,7 @@ define(function(){
     },
     {
       'name': '1 Sa',
+      'longName': '1sa',
       'short_title': '1 Sam',
       'title': '1 Samuel',
       'long_title': {prefix: 'First book of', title: 'Samuel'},
@@ -139,6 +148,7 @@ define(function(){
     },
     {
       'name': '2 Sa',
+      'longName': '2sa',
       'short_title': '2 Sam',
       'title': '2 Samuel',
       'long_title': {prefix: 'Second book of', title: 'Samuel'},
@@ -156,6 +166,7 @@ define(function(){
     },
     {
       'name': '1 Ki',
+      'longName': '1ki',
       'short_title': '1 King',
       'title': '1 Kings',
       'long_title': {prefix: 'First book of', title: 'Kings'},
@@ -173,6 +184,7 @@ define(function(){
     },
     {
       'name': '2 Ki',
+      'longName': '2ki',
       'short_title': '2 King',
       'title': '2 Kings',
       'long_title': {prefix: 'Second book of', title: 'Kings'},
@@ -189,6 +201,7 @@ define(function(){
     },
     {
       'name': '1 Ch',
+      'longName': '1ch',
       'short_title': '1 Chr.',
       'title': '1 Chronicles',
       'long_title': {prefix: 'First book of', title: 'Chronicles'},
@@ -205,6 +218,7 @@ define(function(){
     },
     {
       'name': '2 Ch',
+      'longName': '2ch',
       'short_title': '2 Chr.',
       'title': '2 Chronicles',
       'long_title': {prefix: 'Second book of', title: 'Chronicles'},
@@ -221,6 +235,7 @@ define(function(){
     },
     {
       'name': 'Ezr',
+      'longName': 'ezr',
       'short_title': 'Ezra',
       'title': 'Ezra',
       'timeline': {
@@ -236,6 +251,7 @@ define(function(){
     },
     {
       'name': 'Ne',
+      'longName': 'neh',
       'short_title': 'Neh.',
       'title': 'Nehemiah',
       'timeline': {
@@ -251,6 +267,7 @@ define(function(){
     },
     {
       'name': 'Es',
+      'longName': 'est',
       'short_title': 'Est.',
       'title': 'Esther',
       'timeline': {
@@ -266,6 +283,7 @@ define(function(){
     },
     {
       'name': 'Job',
+      'longName': 'job',
       'short_title': 'Job',
       'title': 'Job',
       'timeline': {
@@ -281,6 +299,7 @@ define(function(){
     },
     {
       'name': 'Ps',
+      'longName': 'psa',
       'short_title': 'Psa.',
       'title': 'Psalms',
       'long_title': {prefix: '', title: 'Psalms'},
@@ -297,6 +316,7 @@ define(function(){
     },
     {
       'name': 'Pr',
+      'longName': 'pro',
       'short_title': 'Pro.',
       'title': 'Proverbs',
       'timeline': {
@@ -312,6 +332,7 @@ define(function(){
     },
     {
       'name': 'Ec',
+      'longName': 'ecc',
       'short_title': 'Ecc.',
       'title': 'Ecclesiastes',
       'long_title': {prefix: '', title: 'Ecclesiastes'},
@@ -329,6 +350,7 @@ define(function(){
     },
     {
       'name': 'So',
+      'longName': 'sng',
       'short_title': 'Songs',
       'title': 'Songs',
       'long_title': {prefix: '', title: 'Songs', suffix: 'of Solomon'},
@@ -346,6 +368,7 @@ define(function(){
     },
     {
       'name': 'Is',
+      'longName': 'isa',
       'short_title': 'Isa.',
       'title': 'Isaiah',
       'timeline': {
@@ -361,6 +384,7 @@ define(function(){
     },
     {
       'name': 'Je',
+      'longName': 'jer',
       'short_title': 'Jer.',
       'title': 'Jeremiah',
       'timeline': {
@@ -376,6 +400,7 @@ define(function(){
     },
     {
       'name': 'La',
+      'longName': 'lam',
       'short_title': 'Lam.',
       'title': 'Lamentations',
       'timeline': {
@@ -391,6 +416,7 @@ define(function(){
     },
     {
       'name': 'Eze',
+      'longName': 'eze',
       'short_title': 'Eze.',
       'title': 'Ezekiel',
       'timeline': {
@@ -406,6 +432,7 @@ define(function(){
     },
     {
       'name': 'Da',
+      'longName': 'dan',
       'short_title': 'Dan.',
       'title': 'Daniel',
       'timeline': {
@@ -421,6 +448,7 @@ define(function(){
     },
     {
       'name': 'Ho',
+      'longName': 'hos',
       'short_title': 'Hos.',
       'title': 'Hosea',
       'timeline': {
@@ -436,6 +464,7 @@ define(function(){
     },
     {
       'name': 'Joe',
+      'longName': 'joe',
       'short_title': 'Joel',
       'title': 'Joel',
       'timeline': {
@@ -451,6 +480,7 @@ define(function(){
     },
     {
       'name': 'Am',
+      'longName': 'amo',
       'short_title': 'Amos',
       'title': 'Amos',
       'timeline': {
@@ -466,6 +496,7 @@ define(function(){
     },
     {
       'name': 'Ob',
+      'longName': 'oba',
       'short_title': 'Oba.',
       'title': 'Obadiah',
       'timeline': {
@@ -481,6 +512,7 @@ define(function(){
     },
     {
       'name': 'Jon',
+      'longName': 'jon',
       'short_title': 'Jon.',
       'title': 'Jonah',
       'timeline': {
@@ -496,6 +528,7 @@ define(function(){
     },
     {
       'name': 'Mic',
+      'longName': 'mic',
       'short_title': 'Mic.',
       'title': 'Micah',
       'timeline': {
@@ -511,6 +544,7 @@ define(function(){
     },
     {
       'name': 'Na',
+      'longName': 'nah',
       'short_title': 'Nah.',
       'title': 'Nahum',
       'timeline': {
@@ -526,6 +560,7 @@ define(function(){
     },
     {
       'name': 'Hab',
+      'longName': 'hab',
       'short_title': 'Hab.',
       'title': 'Habakkuk',
       'timeline': {
@@ -541,6 +576,7 @@ define(function(){
     },
     {
       'name': 'Zep',
+      'longName': 'zep',
       'short_title': 'Zep.',
       'title': 'Zephaniah',
       'timeline': {
@@ -556,6 +592,7 @@ define(function(){
     },
     {
       'name': 'Hag',
+      'longName': 'hag',
       'short_title': 'Hag.',
       'title': 'Haggai',
       'timeline': {
@@ -571,6 +608,7 @@ define(function(){
     },
     {
       'name': 'Zec',
+      'longName': 'zec',
       'short_title': 'Zec.',
       'title': 'Zechariah',
       'timeline': {
@@ -586,6 +624,7 @@ define(function(){
     },
     {
       'name': 'Mal',
+      'longName': 'mal',
       'short_title': 'Mal.',
       'title': 'Malachi',
       'timeline': {
@@ -601,6 +640,7 @@ define(function(){
     },
     {
       'name': 'Mt',
+      'longName': 'mat',
       'short_title': 'Mat.',
       'title': 'Matthew',
       'long_title': {prefix: 'Gospel of', title: 'Matthew'},
@@ -617,6 +657,7 @@ define(function(){
     },
     {
       'name': 'Mk',
+      'longName': 'mar',
       'short_title': 'Mark',
       'title': 'Mark',
       'long_title': {prefix: 'Gospel of', title: 'Mark'},
@@ -634,6 +675,7 @@ define(function(){
     },
     {
       'name': 'Lk',
+      'longName': 'luk',
       'short_title': 'Luke',
       'title': 'Luke',
       'long_title': {prefix: 'Gospel of', title: 'Luke'},
@@ -651,6 +693,7 @@ define(function(){
     },
     {
       'name': 'Jn',
+      'longName': 'jhn',
       'short_title': 'John',
       'title': 'John',
       'long_title': {prefix: 'Gospel of', title: 'John'},
@@ -668,6 +711,7 @@ define(function(){
     },
     {
       'name': 'Ac',
+      'longName': 'act',
       'short_title': 'Acts',
       'title': 'Acts',
       'long_title': {prefix: 'Acts of the', title: 'Apostles'},
@@ -685,6 +729,7 @@ define(function(){
     },
     {
       'name': 'Ro',
+      'longName': 'rom',
       'short_title': 'Rom.',
       'title': 'Romans',
       'long_title': {prefix: 'Epistle to the', title: 'Romans'},
@@ -702,6 +747,7 @@ define(function(){
     },
     {
       'name': '1 Co',
+      'longName': '1co',
       'short_title': '1 Co.',
       'title': '1 Corinthians',
       'long_title': {prefix: 'First Epistle to the', title: 'Corinthians'},
@@ -719,6 +765,7 @@ define(function(){
     },
     {
       'name': '2 Co',
+      'longName': '2co',
       'short_title': '2 Co.',
       'title': '2 Corinthians',
       'long_title': {prefix: 'Second Epistle to the', title: 'Corinthians'},
@@ -736,6 +783,7 @@ define(function(){
     },
     {
       'name': 'Ga',
+      'longName': 'gal',
       'short_title': 'Gal.',
       'title': 'Galatians',
       'long_title': {prefix: 'Epistle to the', title: 'Galatians'},
@@ -753,6 +801,7 @@ define(function(){
     },
     {
       'name': 'Eph',
+      'longName': 'eph',
       'short_title': 'Eph.',
       'title': 'Ephesians',
       'long_title': {prefix: 'Epistle to the', title: 'Ephesians'},
@@ -770,6 +819,7 @@ define(function(){
     },
     {
       'name': 'Php',
+      'longName': 'phl',
       'short_title': 'Php.',
       'title': 'Philippians',
       'long_title': {prefix: 'Epistle to the', title: 'Philippians'},
@@ -787,6 +837,7 @@ define(function(){
     },
     {
       'name': 'Col',
+      'longName': 'col',
       'short_title': 'Col.',
       'title': 'Colossians',
       'long_title': {prefix: 'Epistle to the', title: 'Colossians'},
@@ -804,6 +855,7 @@ define(function(){
     },
     {
       'name': '1 Th',
+      'longName': '1th',
       'short_title': '1 Th.',
       'title': '1 Thessalonians',
       'long_title': {prefix: 'First Epistle to the', title: 'Thessalonians'},
@@ -821,6 +873,7 @@ define(function(){
     },
     {
       'name': '2 Th',
+      'longName': '2th',
       'short_title': '2 Th.',
       'title': '2 Thessalonians',
       'long_title': {prefix: 'Second Epistle to the', title: 'Thessalonians'},
@@ -838,6 +891,7 @@ define(function(){
     },
     {
       'name': '1 Ti',
+      'longName': '1ti',
       'short_title': '1 Ti.',
       'title': '1 Timothy',
       'long_title': {prefix: 'First Epistle to', title: 'Timothy'},
@@ -855,6 +909,7 @@ define(function(){
     },
     {
       'name': '2 Ti',
+      'longName': '2ti',
       'short_title': '2 Ti.',
       'title': '2 Timothy',
       'long_title': {prefix: 'Second Epistle to', title: 'Timothy'},
@@ -872,6 +927,7 @@ define(function(){
     },
     {
       'name': 'Titus',
+      'longName': 'tit',
       'short_title': 'Tit.',
       'title': 'Titus',
       'long_title': {prefix: 'Epistle to', title: 'Titus'},
@@ -889,6 +945,7 @@ define(function(){
     },
     {
       'name': 'Phm',
+      'longName': 'phm',
       'short_title': 'Phm.',
       'title': 'Philemon',
       'long_title': {prefix: 'Epistle to', title: 'Philemon'},
@@ -906,6 +963,7 @@ define(function(){
     },
     {
       'name': 'Heb',
+      'longName': 'heb',
       'short_title': 'Heb.',
       'title': 'Hebrews',
       'long_title': {prefix: 'Epistle to the', title: 'Hebrews'},
@@ -923,6 +981,7 @@ define(function(){
     },
     {
       'name': 'Jas',
+      'longName': 'jas',
       'short_title': 'Jam.',
       'title': 'James',
       'long_title': {prefix: 'Epistle of', title: 'James'},
@@ -940,6 +999,7 @@ define(function(){
     },
     {
       'name': '1 Pe',
+      'longName': '1pe',
       'short_title': '1 Pe.',
       'title': '1 Peter',
       'long_title': {prefix: 'First Epistle of', title: 'Peter'},
@@ -957,6 +1017,7 @@ define(function(){
     },
     {
       'name': '2 Pe',
+      'longName': '2pe',
       'short_title': '2 Pe.',
       'title': '2 Peter',
       'long_title': {prefix: 'Second Epistle of', title: 'Peter'},
@@ -974,6 +1035,7 @@ define(function(){
     },
     {
       'name': '1 Jn',
+      'longName': '1jo',
       'short_title': '1 Jn.',
       'title': '1 John',
       'long_title': {prefix: 'First Epistle of', title: 'John'},
@@ -991,6 +1053,7 @@ define(function(){
     },
     {
       'name': '2 Jn',
+      'longName': '2jo',
       'short_title': '2 Jn.',
       'title': '2 John',
       'long_title': {prefix: 'Second Epistle of', title: 'John'},
@@ -1008,6 +1071,7 @@ define(function(){
     },
     {
       'name': '3 Jn',
+      'longName': '3jo',
       'short_title': '3 Jn.',
       'title': '3 John',
       'long_title': {prefix: 'Third Epistle of', title: 'John'},
@@ -1025,6 +1089,7 @@ define(function(){
     },
     {
       'name': 'Jud',
+      'longName': 'jde',
       'short_title': 'Jude',
       'title': 'Jude',
       'long_title': {prefix: 'Epistle of', title: 'Jude'},
@@ -1042,6 +1107,7 @@ define(function(){
     },
     {
       'name': 'Re',
+      'longName': 'rev',
       'short_title': 'Rev.',
       'title': 'Revelation',
       'long_title': {prefix: '', title: 'Revelation'},
@@ -1058,6 +1124,8 @@ define(function(){
       'chapters': 22
     }
   ];
+
+  //window._BB = bibleBooks; //for debugging only
 
   bibleBooks.forEach(function(bibleBook){
     bibleBook.long_title = bibleBook.long_title || {prefix: 'Book of', title: bibleBook.title};

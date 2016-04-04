@@ -1,0 +1,89 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="utils-dialogs">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        toast: function(msg, duration, affector){
+          var pt = document.createElement('paper-toast');
+          pt.duration = duration || 10000;
+          if(affector){
+            (affector.bind(pt))();
+          }
+          pt.opened = true;
+          pt.text = msg;
+          document.body.appendChild(pt);
+          pt.addEventListener('iron-overlay-closed', function(){
+            document.body.removeChild(pt);
+          });
+          var dismisser = function(){
+            pt.opened = false;
+            document.body.removeEventListener('page-navigation', dismisser);
+          };
+          document.body.addEventListener('page-navigation', dismisser);
+
+          return pt;
+        },
+        askToast: function(msg, options, affector){
+          return new Promise(function(resolve, reject) {
+            var pt = this.toast(msg, 25000, affector);
+
+            options.forEach(function(option, i) {
+              var pb = document.createElement('paper-button');
+              pb.textContent = option;
+              pb.style.padding = '5px';
+              pb.style.margin = '-5px 0px';
+              pb.addEventListener('tap', function () {
+                pt.close();
+                resolve(option, i);
+              });
+              pt.appendChild(pb);
+            }.bind(this));
+          }.bind(this));
+        },
+        msg: function(msg, title){
+          var pd = document.createElement('paper-dialog');
+          pd.entryAnimation = 'scale-up-animation';
+          pd.innerHTML = '<h1></h1><div></div><div class="buttons"></div>';
+          pd.querySelector('div').textContent = msg;
+          pd.querySelector('h1').textContent = title;
+          if(typeof title == 'undefined'){
+            pd.querySelector('h1').style.display = 'none';
+          }
+          pd.withBackdrop = true;
+          document.body.appendChild(pd);
+          pd.opened = true;
+          pd.addEventListener('iron-overlay-closed', function(){
+            document.body.removeChild(pd);
+          });
+          return pd;
+        },
+        ask: function(msg, title, options){
+          return new Promise(function(resolve, reject){
+
+            var pd = this.msg(msg, title);
+
+            pd.addEventListener('iron-overlay-canceled', function(){
+              reject();
+            }.bind(this));
+
+            options.forEach(function(option, i){
+              var pb = document.createElement('paper-button');
+              pb.textContent = option;
+              pb.addEventListener('tap', function(){
+                pd.close();
+                resolve(option, i);
+              });
+              pd.querySelector('.buttons').appendChild(pb);
+            }.bind(this));
+
+          }.bind(this));
+        }
+
+      });
+    })();
+  </script>
+
+</dom-module>

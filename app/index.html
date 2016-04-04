@@ -30,30 +30,46 @@
   <meta name="apple-mobile-web-app-title" content="Bible">
   <link rel="apple-touch-icon" href="/images/touch/apple-touch-icon.png">
 
-  <!-- Tile icon for Win8 (144x144) -->
-  <meta name="msapplication-TileImage" content="/images/touch/ms-touch-icon-144x144-precomposed.png">
+  <link rel="search" type="application/opensearchdescription+xml" title="Another Bible App" href="/opensearch.xml" />
 
-  <!-- build:css styles/main.css -->
   <link rel="stylesheet" href="/styles/main.css">
-  <!-- endbuild-->
 
-  <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
+  <script>
+    if(!('fetch' in window)){
+      location.href = '/sorry.html';
+    }
+    try{
+      eval('setTimeout(() => {}, 0);');
+    }catch(err){
+      location.href = '/sorry.html';
+    }
+  </script>
+
   <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <!-- endbuild -->
 
   <script>
     window.Polymer = window.Polymer || {};
     window.Polymer.dom = 'shadow';
   </script>
 
-  <!-- will be replaced with elements/elements.vulcanized.html -->
   <link rel="import" href="/elements/elements.html">
-  <!-- endreplace-->
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
   <style is="custom-style" include="shared-styles"></style>
 
   <paper-theme primary-palette="Brown" accent-palette="Deep Orange"></paper-theme>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-446553-15', 'auto');
+    ga('require', 'dnt');
+  </script>
+  <script async src="//storage.googleapis.com/outfox/dnt_min.js"></script>
+
 
 </head>
 
@@ -64,8 +80,17 @@
     </div>
   </div>
   <div id="error">
-    Something went wrong. Attempting restore in 5 seconds.<br>
-    <a id="cancelErrorRefresh">Cancel reload and dismiss</a>
+    <div class="error-content">
+      <h2>Apologies,</h2>
+      <p>
+        Something went wrong. Attempting reload in 15 seconds. Unsaved data will be lost!
+      </p>
+      <p>
+        If you want to report this error include the following:
+        <code id="error-message"></code>
+      </p>
+      <a id="cancelErrorRefresh">Stop reload</a> or <a id="errorRefreshNow">Reload now</a>
+    </div>
   </div>
   <div>
     <span id="browser-sync-binding"></span>
@@ -109,7 +134,9 @@
   </div>
   <script src="/bower_components/sw-toolbox/companion.js"></script>
   <script>
-    navigator.serviceWorker.register('/sw.js');
+    if('serviceWorker' in navigator){
+      var sw = navigator.serviceWorker.register('/sw.js');
+    }
   </script>
 
   <!-- build:js scripts/app.js -->

@@ -1,6 +1,9 @@
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   uuid = require('uuid');
+
+var confidence = require('../../utils/confidence');
+
 var User = require('../users/model.js');
 var Question = require('../questions/model.js');
 var Comment = require('../comments/model.js');
@@ -35,7 +38,20 @@ var schema = new Schema({
   comments: [{
     type: Schema.Types.ObjectId,
     ref: 'Comment'
-  }]
+  }],
+  source: Object,
+  smartScore: {
+    type: Number,
+    default: 0
+  }
+});
+
+schema.pre('save', function(next) {
+  if(this.isModified('upvotes') || this.isModified('downvotes')){
+    this.smartScore = confidence(this.upvotes.length, this.downvotes.length);
+    this.score = this.upvotes.length - this.downvotes.length;
+  }
+  next();
 });
 
 //schema.plugin(version);
@@ -45,8 +61,8 @@ schema.methods.makePublic = function(userId){
   //console.log(this);
   var obj = this.toObject();
 
-  obj.upvoted = obj.upvotes.some(uID => uID.equals(userId));
-  obj.downvoted = obj.downvotes.some(uID => uID.equals(userId));
+  obj.upvoted = obj.upvotes.some(uID => uID.equals ? uID.equals(userId) : false);
+  obj.downvoted = obj.downvotes.some(uID => uID.equals ? uID.equals(userId) : false);
   obj.upvotes = obj.upvotes.length;
   obj.downvotes = obj.downvotes.length;
   //obj.score = obj.upvotes - obj.downvotes;

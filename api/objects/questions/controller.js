@@ -72,6 +72,7 @@ module.exports = {
             .find(deletionCheck(req, {
               question: req.params.id
             }))
+            .sort('-smartScore')
             .populate('originalAuthor', 'displayName _id')
             .populate('revisionAuthor', 'displayName _id')
             .populate({
@@ -87,9 +88,6 @@ module.exports = {
                 res.status(500).json(err);
               }else{
                 var answers = answers.map(a => a.makePublic(userId));
-                  answers.sort(function(a, b){
-                  return b.score - a.score;
-                });
                 res.json({
                   question: question.makePublic(userId),
                   answers: answers

@@ -2,7 +2,7 @@ define(function(){
 
   var bibleBooks = require('books');
 
-  var bibleReferenceParserRegex = new RegExp('^([a-zA-Z0-9 ]+?) ?(([0-9]*?)(([: ])(([0-9]*?)([\-\u2013]([0-9]*?))?)?)?)?$');
+  var bibleReferenceParserRegex = new RegExp('^([a-zA-Z0-9 ]+?) ?(([0-9]*?)(([:\. ])((title|[0-9]*?)([\-\u2013]([0-9]*?))?)?)?)?$');
 
 //var BibleReference = function(bookObject, chapter, verseStart, verseEnd){
   var BibleReference = function(vs){
@@ -34,7 +34,7 @@ define(function(){
         matchQuality -= matches[5] === ' ' ? 50 : 0;
 
         var chapter = parseInt(matches[3]);
-        var verseStart = parseInt(matches[7]);
+        var verseStart = matches[7] == 'title' ? 'title' : parseInt(matches[7]);
         var verseEnd = parseInt(matches[9]);
       }
     }
@@ -101,6 +101,24 @@ define(function(){
     return str;
   };
 
+  BibleReference.prototype.toXMLId = function(){
+    if(!this.verseStart){
+      this.verseStart = 1;
+      var str = this.toString();
+      this.verseStart = undefined;
+    }else{
+      if(this.verseEnd){
+        var originalVerseEnd = this.verseEnd;
+        this.verseEnd = undefined;
+        var str = this.toString();
+        this.verseEnd = originalVerseEnd;
+      }else{
+        var str = this.toString();
+      }
+    }
+    return str;
+  };
+
   BibleReference.prototype.toLongString = function(){
     var str = this.book.title;
     if(this.chapter){
@@ -113,6 +131,19 @@ define(function(){
       }
     }
     return str;
+  };
+
+  BibleReference.prototype.toBLBNumeric = function(){
+    var verse = this.verseStart || 1;
+    var chapter = this.chapter;
+    bibleBooks.find(function(book){
+      if(book === this.book){
+        return true;
+      }else{
+        chapter += book.chapters;
+      }
+    }.bind(this));
+    return (chapter + '' + ('000' + verse).slice(-3)) * 1;
   };
 
   BibleReference.prototype.toNumeric = function(){

@@ -47,7 +47,8 @@ module.exports = {
         }
       }
     }).exec().then(function(locations){
-      locations = locations.filter(loc => loc.verses.length >= zoomRequirements[req.query.zoom]);
+      locations = locations.sort((a, b) => b.verses.length - a.verses.length);
+      //locations = locations.filter(loc => loc.verses.length >= zoomRequirements[req.query.zoom]);
       res.json(locations);
     });
     //res.json(viewport);

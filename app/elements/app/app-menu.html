@@ -8,6 +8,8 @@
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="/bower_components/iron-icons/av-icons.html">
 
+<link rel="import" href="../utils/utils-dialogs.html">
+
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <link rel="import" href="../utils/gravatar-icon.html">
@@ -87,7 +89,7 @@
         left: 0px;
         top: -10px;
       }
-      paper-item{
+      paper-icon-item{
         cursor: pointer;
       }
       .user-menu .icon{
@@ -129,6 +131,7 @@
 
     <auth-api user="{{user}}" logged-in="{{loggedIn}}"></auth-api>
     <synced-settings id="settings"></synced-settings>
+    <utils-dialogs id="dialogs"></utils-dialogs>
 
     <paper-scroll-header-panel condenses condensed-header-height="64" scroll-away-topbar keep-condensed-header>
 
@@ -245,10 +248,10 @@
         },
         _doSync: function(ev){
           this.$.settings.sync().then(function(){
-            app.toast('Done syncing')
-          }).catch(function(){
-            app.toast('Could not sync');
-          });
+            this.$.dialogs.toast('Done syncing')
+          }.bind(this)).catch(function(){
+            this.$.dialogs.toast('Could not sync');
+          }.bind(this));
         }
       });
     })();

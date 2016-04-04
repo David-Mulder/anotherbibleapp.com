@@ -71,5 +71,14 @@ module.exports = {
         res.status(401).json('Invalid token');
       }
     }
+  },
+  isAdmin: function (req, res, next){
+    module.exports.isAuthenticated(req, res, function(){
+      if(req.user.admin){
+        next();
+      }else{
+        res.status(401).json('Not an admin');
+      }
+    });
   }
 };

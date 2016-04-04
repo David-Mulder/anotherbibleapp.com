@@ -2,15 +2,31 @@
 <link rel="import" href="/bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../utils/relative-time.html">
 <link rel="import" href="../utils/gravatar-icon.html">
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
+<utils-dialogs id="dialogs"></utils-dialogs>
 
 <dom-module id="page-user">
   <template>
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
+      .flex{
+        flex: 1;
+      }
+      #save-button{
+        z-index:1;
+      }
+      .saving-spinner{
+        --paper-spinner-color: var(--accent-color-200);
+        width: 24px;
+        height: 24px;
+        display: inline-block;
+      }
       .display-name{
         width: 100%;
       }
@@ -66,13 +82,37 @@
       .icon{
         width: 100%;
       }
-      gravatar-icon{
+      .icon-container{
         width: 90px;
         height: 90px;
         margin: 20px auto;
-        border-radius: 100%;
         position: relative;
         bottom: 20px;
+      }
+      .icon-container gravatar-icon{
+        overflow: hidden;
+        border-radius: 100%;
+        width: 90px;
+        height: 90px;
+      }
+      .icon-container .gear{
+        cursor: pointer;
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        z-index: 2;
+        color: var(--primary-color-500);
+        background: rgba(255,255,255,.7);
+        border-radius: 100%;
+        padding: 1px;
+      }
+      .icon-container .gear paper-tooltip{
+        width: 140px;
+      }
+      .icon-container .gear iron-icon{
+        width: 16px;
+        height: 16px;
+        display: block;
       }
       @media all and (max-width: 600px){
         .display-name paper-input {
@@ -100,10 +140,23 @@
     <auth-api id="api" method="get" action="user/:id" param-id="{{userId}}"></auth-api>
     <auth-api id="editSelfApi" method="post" action="user" param-user="{{user}}"></auth-api>
 
+    <utils-dialogs id="dialogs"></utils-dialogs>
+
     <paper-toolbar class="tall">
       <intelligent-title title="Profile" no-title-if-wide></intelligent-title>
+      <span class="flex"></span>
+      <paper-button id="save-button" on-tap="save">
+        <iron-icon icon="save" hidden$="{{_saving}}"></iron-icon>
+        <paper-spinner-lite class="saving-spinner" active hidden$="{{!_saving}}"></paper-spinner-lite>
+      </paper-button>
       <div class="middle icon">
-        <gravatar-icon email="{{user.email}}" default="https://anotherbibleapp.com/images/mm.png"></gravatar-icon>
+        <div class="icon-container">
+          <gravatar-icon email="{{user.email}}" default="https://anotherbibleapp.com/images/mm.png"></gravatar-icon>
+          <div class="gear" hidden$="{{!admin}}" on-tap="_goToGravatar">
+            <iron-icon icon="settings"></iron-icon>
+            <paper-tooltip offset="10">To edit your profile picture visit gravatar.com</paper-tooltip>
+          </div>
+        </div>
       </div>
       <div class="bottom display-name">
         <div>
@@ -158,7 +211,11 @@
         properties: {
           userId: String,
           admin: {
-            reflectToAttribute: true
+            reflectToAttribute: true,
+            value: false
+          },
+          _saving: {
+            value: false
           }
         },
         behaviors: [
@@ -195,16 +252,25 @@
             this.admin = result.me;
           }.bind(this));
         },
+        save: function(){
+          return new Promise(function(resolve, reject){
+            this.$.editSelfApi.execute().then(function(){
+              resolve();
+              this.$.dialogs.toast('Saved')
+            }.bind(this));
+          }.bind(this));
+        },
         _userChanged: function(prop, value){
           if(this._saveChanges){
             if(this.admin && prop == 'name'){
               this.$.api.saveLocalUserProperty('displayName', value);
             }
+            this._saving = true;
             this.debounce('save', function(){
-              this.$.editSelfApi.execute().then(function(){
-                app.toast('Saved')
-              });
-            }, 5000);
+              this.save().then(function(){
+                this._saving = false;
+              }.bind(this));
+            }, 2500);
           }
         },
         _goToQuestion: function(ev){
@@ -213,6 +279,9 @@
         },
         _goToSettings: function(){
           app.navigateTo('/settings');
+        },
+        _goToGravatar: function(){
+          window.open('http://en.gravatar.com/emails/');
         }
       });
     })();

@@ -13,7 +13,7 @@ schema.pre('save', function(next) {
     this.token = uuid.v4();
   }
   if(typeof this.expire === 'undefined'){
-    this.expire = new Date(Date.now()+1000*60*60*24*7);
+    this.expire = new Date(Date.now()+1000*60*60*24*7*31*6);
   }
   next();
 });

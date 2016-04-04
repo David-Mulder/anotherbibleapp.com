@@ -72,7 +72,7 @@
 
         <div class="html side-by-side">
 
-          <div hidden$="{{newVersionOnly}}">
+          <div>
 
             <h2>Old:</h2>
 
@@ -80,7 +80,7 @@
             <bible-markdown markdown="{{old.text}}"></bible-markdown>
             <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
 
-            <div class="time">by {{old.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+            <div class="time">by <a href="/user/{{old.revisionAuthor._id}}">{{old.revisionAuthor.displayName}}</a> <relative-time time="{{old.updatedAt}}"></relative-time></div>
 
           </div>
 
@@ -92,13 +92,7 @@
             <bible-markdown markdown="{{new.text}}"></bible-markdown>
             <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
 
-            <template is="dom-if" if="{{newVersionOnly}}">
-              <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
-            </template>
-
-            <template is="dom-if" if="{{!newVersionOnly}}">
-              <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
-            </template>
+            <div class="time">by <a href="/user/{{new.revisionAuthor._id}}">{{new.revisionAuthor.displayName}}</a> <relative-time time="{{new.updatedAt}}"></relative-time></div>
 
           </div>
 
@@ -110,7 +104,7 @@
 
         <div class="markdown side-by-side">
 
-          <div hidden$="{{newVersionOnly}}">
+          <div>
 
             <h2>Old:</h2>
 
@@ -118,7 +112,7 @@
             <pre class="text">{{old.text}}</pre>
             <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
 
-            <div class="time">by {{old.revisionAuthor.displayName}} <relative-time time="{{old.updatedAt}}"></relative-time></div>
+            <div class="time">by <a href="/user/{{old.revisionAuthor._id}}">{{old.revisionAuthor.displayName}}</a> <relative-time time="{{old.updatedAt}}"></relative-time></div>
 
           </div>
 
@@ -130,13 +124,7 @@
             <pre>{{new.text}}</pre>
             <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
 
-            <template is="dom-if" if="{{newVersionOnly}}">
-              <div class="time">by {{new.originalAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
-            </template>
-
-            <template is="dom-if" if="{{!newVersionOnly}}">
-              <div class="time">by {{new.revisionAuthor.displayName}} <relative-time time="{{new.updatedAt}}"></relative-time></div>
-            </template>
+            <div class="time">by <a href="/user/{{new.revisionAuthor._id}}">{{new.revisionAuthor.displayName}}</a> <relative-time time="{{new.updatedAt}}"></relative-time></div>
 
           </div>
 
@@ -171,11 +159,6 @@
         _newSet: function(){
           if(this.new.verses)
             this.new.verseString = this.new.verses.map(v => new BibleReference(v)).join(', ');
-          if(!this.old){
-            this.newVersionOnly = true;
-          }else{
-            this.newVersionOnly = false;
-          }
         },
         _oldSet: function(){
           if(this.old.verses)

@@ -15,7 +15,7 @@
       }
       #text{
         flex: 1;
-        max-width: 900px;
+        max-width: 800px;
         margin-left: auto;
         margin-right: auto;
       }
@@ -60,10 +60,23 @@
         max-width: 600px;
         margin: auto;
       }
+      #note{
+        position: fixed;
+        top: var(--note-dialog-top);
+        left: var(--note-dialog-left);
+        width: 200px;
+        margin-left: -100px;
+        margin-top: -40px;
+      }
+      #note .content{
+        margin: 0px;
+        padding: 20px;
+      }
       #note ci{
         color: var(--accent-color);
         text-decoration: none;
         cursor: pointer;
+        white-space: nowrap;
       }
     </style>
     <style>
@@ -75,12 +88,27 @@
       }
       :host([internal-mode='read']) #text{
         padding: 10px;
+        max-width: 600px;
       }
       :host([internal-mode='read']) chapter{
         display: block;
       }
       :host([internal-mode='read']) n, :host([internal-mode='read']) pericope{
         display: none;
+      }
+      :host([internal-mode='read'][book-name='ps']) chapter:before{
+        content: attr(chapter-number) ':';
+        display: block;
+        text-align: center;
+        padding-top: 40px;
+      }
+      :host([internal-mode='read'][book-name='ps']) vn[n='title']{
+        display: block;
+        font-size: 1.2em;
+        margin-bottom: 10px;
+      }
+      :host([internal-mode='read'][book-name='ps']) #text{
+        font-style: normal !important;
       }
     </style>
     <style>
@@ -101,7 +129,7 @@
         display: inline-block;
         float: left;
         font-size: 32px;
-        min-width: 40px;
+        min-width: 50px;
         text-align: center;
       }
       /*
@@ -189,11 +217,18 @@
         min-height: 12px;
         transform: scale(0.9) translateY(-20%);
       }
+      /* supplied */
       :host([internal-mode='study']) sd{
-        font-variant: small-caps;
-      }
-      :host([internal-mode='study']) im{
         font-style: italic;
+      }
+      /* idiom */
+      :host([internal-mode='study']) im:before{
+        content: '[';
+        color: rgba(0, 0, 0, 0.4);
+      }
+      :host([internal-mode='study']) im:after{
+        content: ']';
+        color: rgba(0, 0, 0, 0.4);
       }
     </style>
 
@@ -204,7 +239,9 @@
       <div class="content" on-tap="_handleTapOnNote"></div>
     </paper-dialog>
 
-    <div id="text" on-tap="_handleTapOnText">
+    <div on-tap="_handleTapOnText">
+      <div id="text">
+    </div>
 
     </div>
     <p class="license">
@@ -260,6 +297,10 @@
           autoSelectReference: {
             type: Boolean,
             value: true
+          },
+          bookName: {
+            type: String,
+            reflectToAttribute: true
           }
         },
 
@@ -281,24 +322,20 @@
           this.this = this;
           window.addEventListener('resize', function(){
             //this.$.text.fire('iron-resize');
+            this._restorePosition();
           }.bind(this));
         },
 
-        _savePosition: function(){
-          if(this._isBookLoaded){
-            this._savedFirstVerse = this._getFirstVisibleVerse();
-          }
-        },
-
         _restorePosition: function(){
-          if(this._savedFirstVerse){
-            var offsetTop = this._savedFirstVerse.offsetTop;
+          var verse = this.firstVisibleVerse;
+          if(verse){
+            var offsetTop = verse.offsetTop;
             offsetTop = offsetTop < 80 ? 0 : offsetTop;
 
             var interval = setInterval(function(){
-              if(this._savedFirstVerse.offsetTop !== offsetTop){
+              if(verse.offsetTop !== offsetTop){
                 this.scrollTop = offsetTop;
-                offsetTop = this._savedFirstVerse.offsetTop;
+                offsetTop = verse.offsetTop;
                 offsetTop = offsetTop < 80 ? 0 : offsetTop;
               }
             }.bind(this), 500);
@@ -316,7 +353,6 @@
         },
 
         switchMode: function(newMode){
-          this._savePosition();
           this.internalMode = newMode;
           this._restorePosition();
         },
@@ -373,7 +409,6 @@
           }.bind(this));
 
           Promise.all([readingColor, fontSize, lineHeight, printOnlyNotes]).then(function(){
-            this._savePosition();
             this.updateStyles();
             this._restorePosition();
             //this.$.text.fire('iron-resize');
@@ -387,6 +422,7 @@
 
         loadBook: function(){
           console.info('loading book', this.textRef);
+          this.bookName = this.textRef.book.name.toLowerCase();
 
           app.loading('book');
 
@@ -441,9 +477,12 @@
         loadBlocksFromBook: function(book){
           var chapters = [].slice.call(book.querySelectorAll('chapter'));
           chapters.forEach(function(chapter){
-            chapter.setAttribute('chapter-number', (new BibleReference(chapter.id)).chapter)
-            this._setVerseNumberAttributes(chapter);
-            this.$.text.appendChild(chapter);
+            var htmlChapter = document.createElement('chapter');
+            htmlChapter.innerHTML = chapter.innerHTML;
+            htmlChapter.setAttribute('chapter-number', (new BibleReference(chapter.id)).chapter)
+            this._setVerseNumberAttributes(htmlChapter);
+            this.scopeSubtree(htmlChapter, false);
+            this.$.text.appendChild(htmlChapter);
           }.bind(this));
           this.setHighlightClasses();
         },
@@ -490,7 +529,7 @@
         scrollToReference: function() {
 
           if(this.textRef.chapter) {
-            var verse = this.$.text.querySelector('vn[id="'+this.textRef.toString()+'"]');
+            var verse = this.$.text.querySelector('vn[id="'+this.textRef.toXMLId()+'"]');
 
             var offsetTop = verse.offsetTop;
             var interval = setInterval(function(){
@@ -524,6 +563,9 @@
           if(Polymer.dom(ev).path[0].nodeName.toLowerCase() == 'n'){
             var note = ev.path[0].innerHTML;
             this.$.note.querySelector('.content').innerHTML = note;
+            this.customStyle['--note-dialog-top'] = event.detail.y + 'px';
+            this.customStyle['--note-dialog-left'] = event.detail.x + 'px';
+            this.updateStyles();
             this.$.note.opened = true;
           }
 
@@ -548,28 +590,40 @@
           }
           this.fire('verse-selected', verseNumberElement ? verseNumberElement.id : undefined)
         },
-        _getFirstVisibleVerse: function(){
+        _setFirstVisibleVerse: function(){
           var scrollTop = this.scrollTop;
           var verses = [].slice.call(this.$.text.querySelectorAll('vn'));
 
-          var verseIndexOfFirstVisibleVerse = verses.findIndex(function(verse){
-            if(scrollTop < verse.offsetTop){
-              return true;
+          var min = 0;
+          var max = verses.length - 1;
+          var guess;
+          var currentlyCheckingVerse;
+          var offsetTop;
+          while (min <= max) {
+            guess = Math.floor((min + max) / 2);
+            currentlyCheckingVerse = verses[guess];
+            offsetTop = currentlyCheckingVerse.offsetTop;
+
+            if(offsetTop < scrollTop) {
+              min = guess + 1;
+            } else {
+              max = guess - 1;
             }
-          });
-          return verses[Math.max(0, verseIndexOfFirstVisibleVerse - 1)];
+          }
+          this.set('firstVisibleVerse', verses[max]);
         },
         _handleScroll: function(){
           this.debounce('scroll', function(){
 
-            var verse = this._getFirstVisibleVerse();
+            this._setFirstVisibleVerse();
+            var verse = this.firstVisibleVerse;
             if(verse) {
               this.fire('scrolled', {
                   verse:verse.id
               });
             }
 
-          }, 10000);
+          }, 100);
         }
 
       });

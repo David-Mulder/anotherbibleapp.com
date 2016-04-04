@@ -1,7 +1,10 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/paper-tooltip/paper-tooltip.html">
+
 <link rel="import" href="./bible-snippet.html">
 <link rel="import" href="../settings/synced-settings.html">
+<link rel="import" href="../utils/utils-dialogs.html">
 
 <dom-module id="card-verse-actions">
   <template>
@@ -27,18 +30,50 @@
         min-width: 0px;
         margin: 0px;
       }
+      /* hack to fix issue with margins causing scrollbars and there are no
+         mixins applied to these specific divs */
+      paper-toolbar /deep/ #middleBar, paper-toolbar /deep/ #bottomBar{
+        display: none;
+      }
+      paper-item{
+        white-space: nowrap;
+      }
+      paper-tooltip{
+        white-space: nowrap;
+      }
     </style>
 
     <synced-settings id="settings"></synced-settings>
+    <utils-dialogs id="dialogs"></utils-dialogs>
 
     <paper-card hidden$="{{!verse}}">
       <paper-toolbar>
-        <paper-button on-tap="highlight">
+        <paper-button id="highlight" on-tap="highlight">
           <iron-icon icon="star" hidden="{{!isHighlighted}}"></iron-icon>
           <iron-icon icon="star-border" hidden="{{isHighlighted}}"></iron-icon>
         </paper-button>
-        <paper-button on-tap="copyVerse"><iron-icon icon="content-copy"></iron-icon></paper-button>
-        <paper-button on-tap="copyLink"><iron-icon icon="link"></iron-icon></paper-button>
+        <paper-tooltip for="highlight">
+          Highlight this verse.
+        </paper-tooltip>
+        <paper-button id="copy" on-tap="copyVerse"><iron-icon icon="content-copy"></iron-icon></paper-button>
+        <paper-tooltip for="copy">
+          Copy this verse.
+        </paper-tooltip>
+        <paper-button id="link" on-tap="copyLink"><iron-icon icon="link"></iron-icon></paper-button>
+        <paper-tooltip for="link">
+          Copy a link to this verse.
+        </paper-tooltip>
+        <paper-menu-button id="open-with" horizontal-align="right">
+          <paper-icon-button icon="launch" class="dropdown-trigger"></paper-icon-button>
+          <paper-menu class="dropdown-content">
+            <paper-item on-tap="_openWithBLB">Blue Letter Bible (Interlinear)</paper-item>
+            <paper-item on-tap="_openWithLumina">Lumina</paper-item>
+            <paper-item on-tap="_openWithBiblia">Biblia.com</paper-item>
+          </paper-menu>
+        </paper-menu-button>
+        <paper-tooltip for="open-with">
+          Open with...
+        </paper-tooltip>
       </paper-toolbar>
     </paper-card>
   </template>
@@ -87,9 +122,9 @@
         },
         copyLink: function(){
           if(this._copy(this.verse.toLongString()+' <'+location.href+'>')){
-            app.toast('The page URL has been copied to your clipboard.')
+            this.$.dialogs.toast('The page URL has been copied to your clipboard.')
           }else{
-            app.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
+            this.$.dialogs.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
           }
           this.fire('finished-with-information-drawer');
         },
@@ -98,7 +133,7 @@
           bibleSnippet.addEventListener('text-changed', function(){
             var selection = bibleSnippet.text+' (LEB)'; // <'+location.href+'>
             if(this._copy(selection)){
-              app.toast('The verse has been copied to your clipboard.')
+              this.$.dialogs.toast('The verse has been copied to your clipboard.')
             }else{
               var overlay = document.createElement('div');
               overlay.style.backgroundColor = 'rgba(255,255,255,.9)';
@@ -118,17 +153,25 @@
               overlay.addEventListener('click', function(){
                 document.body.removeChild(overlay);
                 if(this._copy(selection)){
-                  app.toast('The verse has been copied to your clipboard.')
+                  this.$.dialogs.toast('The verse has been copied to your clipboard.')
                 }else{
-                  app.msg('Please share the verse manually: ' + selection, 'Automatic copying unsuccessful')
+                  this.$.dialogs.msg('Please share the verse manually: ' + selection, 'Automatic copying unsuccessful')
                 }
                 this.fire('finished-with-information-drawer');
               }.bind(this));
-              //app.msg('Please share the verse manually: ' + bibleSnippet.text, 'Automatic copying unsuccessful')
             }
           }.bind(this));
           bibleSnippet.start = this.verse;
           bibleSnippet.end = this.verse;
+        },
+        _openWithBLB: function(){
+          window.open('https://www.blueletterbible.org/kjv/'+this.verse.book.longName + '/'+this.verse.chapter+'/'+this.verse.verseStart + '/t_conc_'+this.verse.toBLBNumeric());
+        },
+        _openWithLumina: function(){
+          window.open('https://lumina.bible.org/bible/'+this.verse.toString().replace(/ /g, '+'));
+        },
+        _openWithBiblia: function(){
+          window.open('https://biblia.com/books/esv/'+this.verse.toString().replace(/ /g, ''));
         }
       });
     })();

@@ -8,6 +8,8 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="bible-markdown-editor.html">
 
+<link rel="import" href="../utils/utils-dialogs.html">
+
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="page-new-question">
@@ -90,14 +92,17 @@
         padding: 6px;
       }
     </style>
+
+    <auth-api logged-in="{{loggedIn}}"></auth-api>
+    <auth-api id="api" method="PUT" action="question" param-title="{{title}}" param-category="{{category}}" param-text="{{questionText}}" param-verses="{{versesAsNumbers}}"></auth-api>
+
+    <utils-dialogs id="dialogs"></utils-dialogs>
+
     <paper-toolbar>
       <intelligent-title title="Ask a Question" allow-back></intelligent-title>
       <span class="flex"></span>
     </paper-toolbar>
     <div class="new-question-page">
-
-      <auth-api logged-in="{{loggedIn}}"></auth-api>
-      <auth-api id="api" method="PUT" action="question" param-title="{{title}}" param-category="{{category}}" param-text="{{questionText}}" param-verses="{{versesAsNumbers}}"></auth-api>
 
       <div hidden="{{!loggedIn}}">
         <paper-card id="card">
@@ -246,19 +251,19 @@
         submit: function(){
           var valid = true;
           if(!this.agreeReadRules){
-            app.toast('Please read the rules before asking your question');
+            this.$.dialogs.toast('Please read the rules before asking your question');
             valid = false;
           }
           if(this.title.length < 15){
-            app.toast('Please make your title more descriptive');
+            this.$.dialogs.toast('Please make your title more descriptive');
             valid = false;
           }
           if(!this.questionText || this.questionText.length < 30){
-            app.toast('Please describe your question in more terms');
+            this.$.dialogs.toast('Please describe your question in more terms');
             valid = false;
           }
           if(!this.category){
-            app.toast('Please pick one of the categories');
+            this.$.dialogs.toast('Please pick one of the categories');
             valid = false;
           }
           if(valid){

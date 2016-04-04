@@ -6,7 +6,12 @@
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
-
+      .license-notice{
+        text-align: center;
+        color: var(--secondary-text-on-primary-color-50);
+        max-width: 400px;
+        margin: auto;
+      }
     </style>
     <paper-toolbar>
       <intelligent-title title="{{beautifulTitle}}" allow-back></intelligent-title>
@@ -14,6 +19,9 @@
     </paper-toolbar>
     <div class="page-content">
       <topic-card id="card" topic="{{topic}}" class="card"></topic-card>
+      <p class="license-notice">
+        CC BY 4.0 : OpenBible.info. Texts (LEB) from the Lexham English Bible.
+      </p>
     </div>
   </template>
 
@@ -27,6 +35,13 @@
         properties: {
           topicName: {
             type: String
+          },
+          lazyRouterConfig: {
+            value: function(){
+              return {
+                awaitReadyEventOnFirstLoad: true
+              }
+            }
           },
           animationConfig: {
             value: function(){
@@ -65,7 +80,6 @@
           abaBehaviors.page
         ],
         ready: function(){
-
         },
         topicChanged: function(topicName){
           this.beautifulTitle = this._smartCaps(topicName);
@@ -87,6 +101,9 @@
             this.set('topic', {
               title: this.beautifulTitle,
               verses: verses
+            });
+            this.async(function(){
+              this.fire('lazy-ready');
             });
           }.bind(this));
         }

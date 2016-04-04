@@ -12,6 +12,9 @@
       .title{
         margin-left: 15px;
         font-size: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       :host(:not([narrow])) #menu{
         display: none;
@@ -51,7 +54,7 @@
           title: {
             type: String,
             value: 'Another\xa0Bible\xa0App',
-            observer: 'setWindowTitle'
+            observer: 'setWindowTitleAndLogView'
           },
           narrow: {
             type: Boolean,
@@ -80,7 +83,7 @@
           },
           _toolbarTitle: {
             type: String,
-            computed: '_getToolbarTitle(title, toolbarTitle)'
+            computed: '_getToolbarTitle(title, toolbarTitle, narrow)'
           }
         },
         observers: [
@@ -104,18 +107,31 @@
           page.back();
         },
         _getToolbarTitle: function(title, toolbarTitle){
-          return toolbarTitle && toolbarTitle.length > 0 ? toolbarTitle : title;
+          if(toolbarTitle && toolbarTitle.length > 0){
+            return toolbarTitle;
+          }else{
+            if(this.shortTitle && this.narrow){
+              return this.shortTitle;
+            }else{
+              return title;
+            }
+          }
         },
         openDrawer: function(){
           document.getElementById('mainDrawer').openDrawer();
         },
-        setWindowTitle: function(title){
+        setWindowTitleAndLogView: function(title){
           app.title = title; //todo
           if(title.length > 0){
             document.title = title + ' - Another Bible App';
           }else{
             document.title = 'Another Bible App'
           }
+          ga('send', {
+            hitType: 'pageview',
+            page: page.current,
+            title: title
+          });
         }
       });
     })();

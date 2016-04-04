@@ -40,9 +40,10 @@ module.exports = exports = function(schema, options) {
         }
       }
     });
-    console.info('Post modified for new revision:',modified);
 
     if(this._original){
+
+      console.info('Post modified for new revision:',modified);
 
       if(modified) {
 

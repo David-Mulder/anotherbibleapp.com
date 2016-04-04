@@ -34,9 +34,22 @@
               return a.timeline.start - b.timeline.start;
             });
           }else if(category === 'name'){
-            books.sort(function(a, b) {
-              a = a.name.toLowerCase().replace(/[^a-z]/g, '');
-              b = b.name.toLowerCase().replace(/[^a-z]/g, '');
+            books.sort(function(bA, bB) {
+              var a = bA.name.toLowerCase().replace(/[^a-z]/g, '');
+              var b = bB.name.toLowerCase().replace(/[^a-z]/g, '');
+              if(a > b){
+                return 1;
+              }else{
+                if(a === b){
+                  if(bA.name > bB.name){
+                    return 1;
+                  }else{
+                    return -1;
+                  }
+                }else{
+                  return -1;
+                }
+              }
               return a > b ? 1 : (a === b ? 0 : -1);
             });
           }else if(category === 'tradition'){
@@ -51,7 +64,7 @@
             });
           }
 
-          this.set('groupedBooks', []);
+          var groupedBooks = [];
 
           var currentListName = '';
           books.forEach(function(book){
@@ -66,15 +79,16 @@
               label = (book.collection.testament === 'New' ? 'New Testament' : 'Old Testament') + ' - ' + book.collection.subset;
             }
             if(label !== currentListName) {
-              this.push('groupedBooks', {
+              groupedBooks.push({
                 label: label,
                 books: []
               });
               currentListName = label;
             }
-            var index = this.groupedBooks.length-1;
-            this.push('groupedBooks.'+index+'.books', book);
+            var index = groupedBooks.length-1;
+            groupedBooks[index].books.push(book);
           }.bind(this));
+          this.set('groupedBooks', groupedBooks);
         }
 
       });

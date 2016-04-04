@@ -3,9 +3,9 @@
 <link rel="import" href="./bible-markdown.html">
 <link rel="import" href="/bower_components/iron-icons/editor-icons.html">
 <link rel="import" href="/bower_components/iron-icons/social-icons.html">
-
-<!-- todo: lazy load only if needed? -->
 <link rel="import" href="/bower_components/paper-input/paper-input.html">
+
+<utils-dialogs id="dialogs"></utils-dialogs>
 
 <dom-module id="qa-post">
   <template>
@@ -172,6 +172,8 @@
     <auth-api id="addCommentApi" method="PUT" action="comment/:type/:id" param-type="{{type}}" param-id="{{post._id}}" param-text="{{commentText}}"></auth-api>
     <auth-api id="deleteCommentApi" method="DELETE" action="comment/:id" param-id="{{commentId}}"></auth-api>
 
+    <utils-dialogs id="dialogs"></utils-dialogs>
+
     <paper-card id="post" deleted$="{{post.deleted}}">
       <div id="title" class="card-title" hidden$="{{!_equals(type, 'question')}}">
         <h1>{{post.title}}</h1>
@@ -197,8 +199,12 @@
             -->
 
 
-            <div class="author">
+            <div class="author" hidden$="{{post.source}}">
               By <a on-tap="_goToUser">{{post.originalAuthor.displayName}}</a>
+              <relative-time time="{{post.createdAt}}"></relative-time>
+            </div>
+            <div class="author" hidden$="{{!post.source}}">
+              Licensed CC BY-SA 3.0 by <a href="{{post.source.user.link}}" target="_blank">{{post.source.user.displayName}}</a>
               <relative-time time="{{post.createdAt}}"></relative-time>
             </div>
             <!--
@@ -304,10 +310,10 @@
             this.$.upvoteApi.execute().then(function(post){
               this.set('post', post);
             }.bind(this)).catch(function(err){
-              app.toast(err);
-            });
+              this.$.dialogs.toast(err);
+            }.bind(this));
           }else{
-            app.toast('You need to be logged in to vote on posts.');
+            this.$.dialogs.toast('You need to be logged in to vote on posts.');
           }
         },
         downvote: function(){
@@ -315,10 +321,10 @@
             this.$.downvoteApi.execute().then(function(post){
               this.set('post', post);
             }.bind(this)).catch(function(err){
-              app.toast(err);
-            });
+              this.$.dialogs.toast(err);
+            }.bind(this));
           }else{
-            app.toast('You need to be logged in to vote on posts.');
+            this.$.dialogs.toast('You need to be logged in to vote on posts.');
           }
         },
         goToEdit: function(ev){
@@ -341,7 +347,7 @@
         },
         addComment: function(){
           if(this.commentText.length < 10){
-            app.toast('Your comment should be at least 10 characters long.');
+            this.$.dialogs.toast('Your comment should be at least 10 characters long.');
           }else {
             this.$.addCommentApi.execute().then(function (comment) {
               this.push('post.comments', comment);
@@ -361,9 +367,9 @@
           var successful = document.execCommand('copy');
           if(successful){
             document.body.removeChild(el);
-            app.toast('The page URL has been copied to your clipboard.')
+            this.$.dialogs.toast('The page URL has been copied to your clipboard.')
           }else{
-            app.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
+            this.$.dialogs.msg('Please share the link manually: ' + location.href, 'Automatic sharing unsuccessful')
           }
         },
         _goToUser: function(ev){
@@ -387,7 +393,7 @@
             this.set('post', post);
             console.log(arguments, doNotToast);
             if(typeof doNotToast == 'undefined'){
-              app.askToast('The post was deleted', ['Undo']).then(function(){
+              this.$.dialogs.askToast('The post was deleted', ['Undo']).then(function(){
                 this.deletePost(ev, mouseEv, true);
               }.bind(this));
             }

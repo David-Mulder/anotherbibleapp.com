@@ -1,6 +1,8 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/paper-card/paper-card.html">
 
+<link rel="import" href="../utils/utils-dialogs.html">
+
 <dom-module id="card-new-answer">
   <template>
     <style include="shared-styles"></style>
@@ -23,7 +25,9 @@
         }
       }
     </style>
+
     <auth-api id="newAnswerApi" method="put" action="answer" param-question="{{questionId}}" param-text="{{answerText}}"></auth-api>
+    <utils-dialogs id="dialogs"></utils-dialogs>
 
     <paper-card heading="Know the answer?" hidden$="{{answerPosted}}">
       <div class="card-actions markdown">
@@ -52,7 +56,7 @@
           var valid = true;
           if(!this.answerText || this.answerText.length < 15){
             valid = false;
-            app.toast('Please add more detail to your answer.');
+            this.$.dialogs.toast('Please add more detail to your answer.');
           }
           if(valid){
             this.$.newAnswerApi.execute().then(function(){

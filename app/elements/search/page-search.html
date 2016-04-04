@@ -2,6 +2,8 @@
 <link rel="import" href="./bible-search.html">
 <link rel="import" href="./topical-search.html">
 
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+
 <dom-module id="page-search">
   <template>
     <style include="shared-styles"></style>
@@ -72,8 +74,8 @@
         To learn more about search, <a href="/help/search">tap here</a>.
       </div>
       <div hidden$="{{!searchStarted}}">
-        <topical-search search-query="{{searchQuery}}" on-results="_finishedTopicalSearch" on-no-results="triggerBibleSearch"></topical-search>
-        <bible-search id="bibleSearch" search-query="{{searchQuery}}"></bible-search>
+        <topical-search search-query="{{_searchQuery}}" on-results="_finishedTopicalSearch" on-no-results="triggerBibleSearch"></topical-search>
+        <bible-search id="bibleSearch" search-query="{{_searchQuery}}"></bible-search>
       </div>
     </div>
 
@@ -82,6 +84,8 @@
   <script>
     (function() {
       'use strict';
+
+      var BibleReference = require('bible-reference-parser');
 
       Polymer({
         is: 'page-search',
@@ -127,10 +131,18 @@
         },
 
         _setSearchStarted: function(){
-          this.searchStarted = this._operatorLessSearchQuery.length > 0;
-          this.title = this.searchStarted ? this.searchQuery : 'Search'
-          if(this.searchStarted)
-            app.loading('search');
+          var reference = new BibleReference(this.searchQuery);
+          //page.len == 0 is true if directly navigated to the page, e.g. through opensearch
+          if(reference.valid && page.len == 0){
+            page.replace('/book/'+reference.toString());
+          }else {
+            this._searchQuery = this.searchQuery;
+            this.searchStarted = this._operatorLessSearchQuery.length > 0;
+            this.title = this.searchStarted ? this.searchQuery : 'Search'
+            if (this.searchStarted) {
+              app.loading('search');
+            }
+          }
         },
 
         _finishedTopicalSearch: function(){
@@ -139,7 +151,7 @@
 
         _setValueIfEnter: function(ev){
           if(ev.keyCode == 13){
-            app.navigateTo('/search/'+ev.target.value);
+            app.navigateTo('/search/'+encodeURIComponent(ev.target.value));
             ev.target.blur();
             //this.searchQuery = ev.target.value;
           }

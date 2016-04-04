@@ -26,7 +26,8 @@
     });
 
     page('/login', function (data) {
-      app.$.router.loadPage('auth/page-login');
+      app.$.router.loadPage('auth/page-login', app.crossNavigationalData.credentials);
+      app.crossNavigationalData.credentials = {};
     });
 
     page('/user/:id/:title?', function (data) {

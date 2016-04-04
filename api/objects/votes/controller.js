@@ -43,8 +43,6 @@ module.exports = {
             votedArray.push(req.user._id);
           }
 
-          post.score = post.upvotes.length - post.downvotes.length;
-
           post.save(function(err, result){
             if(err){
               reject(err);

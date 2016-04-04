@@ -76,9 +76,36 @@
         color: rgba(0,0,0,.2);
         margin-right: 10px;
       }
+      .card-content{
+        margin-top: -25px;
+        margin-bottom: -10px;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+      }
+      .book-link{
+        display: inline-block;
+        width: 40px;
+        text-align: center;
+        height: 19px;
+        margin: 4px;
+        margin-bottom: 10px;
+        background: var(--accent-color-50);
+        padding: 3px;
+      }
     </style>
     <utils-books grouped-books="{{books}}" sort-category="{{sortCategory}}"></utils-books>
     <template is="dom-repeat" items="{{books}}" as="group">
+      <paper-card heading="{{group.label}}">
+        <div class="card-content">
+          <template is="dom-repeat" items="{{group.books}}" as="book">
+
+              <a class="book-link" on-tap="goToBook" title="{{book.title}}">{{book.name}}</a>
+
+          </template>
+        </div>
+      </paper-card>
+      <!--
       <paper-card heading="{{group.label}}">
         <template is="dom-repeat" items="{{group.books}}" as="book">
           <div class="card-actions">
@@ -86,6 +113,7 @@
           </div>
         </template>
       </paper-card>
+      -->
       <!--
       <div class="block">
         <div class="heading">{{group.label}}</div>
@@ -122,13 +150,16 @@
         behaviors: [
           abaBehaviors.logic
         ],
+        ready: function(){
+
+        },
         _setSelectedBook: function(ref){
           var reference = new BibleReference(ref);
           this._selectedBook = reference.book.name;
         },
         goToBook: function(ev){
           var target = Polymer.dom(ev).path.find(function(el){
-            return el.matches('.card-actions');
+            return el.matches('.book-link');
           });
 
           this.fire('hero-element-set', {
@@ -137,10 +168,6 @@
           });
 
           app.navigateTo('/book/'+ev.model.book.name);
-        },
-        _debug: function(a){
-          console.log(a.length);
-          return 'test';
         }
       });
     })();

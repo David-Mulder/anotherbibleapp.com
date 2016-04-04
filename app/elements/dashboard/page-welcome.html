@@ -36,6 +36,7 @@
         };
         --paper-scroll-header-panel-full-header: {
           background-image: url('/images/top-header.png');
+          background-color: var(--primary-color);
           background-size: cover !important;
           background-position: 0px 0px !important;
         };
@@ -108,9 +109,10 @@
         <div hidden="{{loggedIn}}">
           <paper-card heading="Welcome to Another Bible App">
             <div class="card-content">
-              There are a lot of Bible Apps out there, so thanks for using this one. To use the Q&A parts of the app fully
-              you need to register and log in. If you want to just read go right ahead and pick the book from the left drawer.
-              Use search in the top right even offline to find bible verses.
+              There are a lot of Bible apps out there, so thanks for using this one. What makes this application
+              unique is that the goal is to focus on Bible reading as something that's best done in groups in the
+              full understanding that the Bible is an actual collection of testimonies written by real people
+              about God's revelations.
             </div>
             <div class="card-actions">
               <paper-button on-tap="goToLogin">Log In</paper-button>
@@ -121,17 +123,18 @@
           <paper-card heading="Q&A">
             <div class="card-content">
               An integral part of this bible app is the ability to ask and answer questions about bible texts. You can
-              consider it as a sort of long form collaborative study bible, or a focused collaborative commentary. You
-              can ask questions about specific bible passages or answer questions that other users have asked.
-              <a href="/philosophy">Read more</a>.
+              consider it as a sort of long form collaborative study bible, or a focused collaborative commentary. Feel
+              free to only read questions and answers others have asked, or write your own.
+              <a href="/philosophy">Read more about the philosophy behind this functionality</a>
             </div>
           </paper-card>
           <paper-card heading="Focused reading">
             <div class="card-content">
               The Bible is 'just' a collection of books and letters. Stuff like verses, notes, pericopes (the headers in
-              between paragraphs) and all those things were added later. Naturally these are incredibly useful when deeply
-              studying a specific text, but only distract from the original text as a whole. By default this app will hide
-              all these things, although they are just a tap away if you need them.
+              between paragraphs) and all those things were added later. Naturally these can be incredibly useful when
+              studying a specific text, but often only distract from the original text as a whole. By default this app hides
+              these things presenting only text in it's original form, but you can turn on the 'study tools' anytime you
+              need them.
             </div>
           </paper-card>
 

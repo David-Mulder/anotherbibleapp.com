@@ -116,27 +116,30 @@
           this._checkQueue();
         },
         _checkQueue: function(){
-          console.info('checking queue', this._pageLoadQueue);
-          console.info('currently animating', this._isCurrentlyAnimating);
+
           this.debounce('stuck-animation-bug-hack-fix', function(){
             if(this._isCurrentlyAnimating){
               this._isCurrentlyAnimating = false;
               this._checkQueue();
             }
-          }.bind(this), 3000);
+          }.bind(this), 2000);
+
           if(!this._isCurrentlyAnimating && this._pageLoadQueue.length > 0){
+
             this._isCurrentlyAnimating = true;
             var args = this._pageLoadQueue.shift();
 
-            console.log('starting load of', args[0]);
             app.loading(args[0]);
             this._loadPage(args[0], args[1], args[2]).then(function(element){
-              console.log('finished load of', args[0]);
+
               app.finishedLoading(args[0]);
+
               var awaitFinishedAnimation = function(){
-                console.log('finished animation of', args[0]);
+
                 element.removeEventListener('page-finished-animating', awaitFinishedAnimation);
+
                 this._isCurrentlyAnimating = false;
+
                 setTimeout(function(){
                   this._checkQueue();
                 }.bind(this), 250)
@@ -192,6 +195,8 @@
                 }
 
                 var el = document.createElement(elementName);
+                var config = el.lazyRouterConfig || {};
+
                 el.setAttribute('data-id', this._elIdCounter++);
                 this._paramsMap.set(el, params);
                 console.log('params', params);
@@ -200,7 +205,7 @@
                 });
                 Polymer.dom(this.$$('#pages')).appendChild(el);
                 //Polymer.dom(this.$.dummy).appendChild(el);
-                this.async(function(){
+                var onReadyToRock = function(){
                   this._selectedPage = el.dataset.id;
                   window.dispatchEvent(new Event('resize'));
 
@@ -216,7 +221,14 @@
                       }
                     }
                   }.bind(this), 0);
-                }, 100);
+                }.bind(this);
+                if(config.awaitReadyEventOnFirstLoad){
+                  el.addEventListener('lazy-ready', function(){
+                    onReadyToRock();
+                  });
+                }else {
+                  this.async(onReadyToRock, 100);
+                }
                 console.log(el); //s
               }.bind(this));
             }

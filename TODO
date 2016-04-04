@@ -1,59 +1,56 @@
 High Priority
  - solve toast being too big on mobile
  - ev.code enter does not work on mobile
- - scrolling with arrow keys doesnt work
- - paper-menu-button-icon doesn't work in narrow drawer
- - DONE paper-scroll-header-panel hates neon-animated-pages
- - DONE literal search click doesnt work
+ - DONE paper-menu-button-icon doesn't work in narrow drawer
 
 Normal priority
- - Offline
-   - Installation notification
-   - Hide features when offline
- - password token expiration logic
+ - DONE Offline
+ - Installation notification
+ - Hide features when offline
  - improve error reporting in api to prevent crashes
  - NOTE's showing weird for timo :/
- - validation in edit post forms
- - error in book list
- - register -> login prefill seems not to be working
- - add attribution on map
- - check topical attribution
- - DONE make bible snippets linkable on map
- - DONE check bounds and set center on load on map
- - DONE list locations in related questions card
- - add floating info icon above profile pic with gravatar instructions
- - scrollbar due to actions in drawer
+ - DONE error in book list
+ - save rules read checkbox
+ - stuck loading bar (timeout)
+ - add a contact us page
+ - link bible markdown quotes
+ - handle footnote scrolling
 
 Low Priority
+ - DONE link username on history
+ - DONE psalm chapers
+ - validation in edit post forms
  - change 'recent questions' to 'recent activity'
  - add browsing option of recent activity rather than just top 10
  - Refactor: search for 13 enter and fix to `code` enter (qa-post:264 or page-login)
- - refactor app.toast/ask/etc to a... element or behavior
- - consider reworking bible list to look like BibleGateway on desktop :/
- - invalidate all sessionTokesn after forgotten password
- - add explicit save button to user page
+ - DONE refactor app.toast/ask/etc to a... element or behavior
+ - DONE consider reworking bible list to look like BibleGateway on desktop :/
+ - DONE add explicit save button to user page
  - add to menu continue reading button
- - Google analtyics (http://www.outfox.com/do-not-track-for-google-analytics/)
- - move scrollbar in text to side
- - make logout a page after all
+ - DONE Google analtyics (http://www.outfox.com/do-not-track-for-google-analytics/)
+ - DONE move scrollbar in text to side
+ - make logout a page after all (why?)
  - make editable description for locations
  - make editable detailed polygons for locations (visible on info)
- - fix map links
+ - fix map links (which?)
+ - DONE parse 'psalm 49:title' correctly
+ - DONE opensearch
 
 Very Low Priority
- - add a contact us page
+ - invalidate all sessionTokens after forgotten password
  - hash forgotten password tokens
  - scrollbar not visible on white on black
  - pierce navigation when triggering search from bible book to cause focus
  - bible Snippet with just 'mt' (in markdown)
  - refactor to use private properties and functions everywhere properly (`_` start)
  - on mobile, dashboard 'more menu' touches top border
- - reapply firstIndex better after read -> study modus
+ - DONE reapply firstIndex better after read -> study modus
  - dyslexic font
  - maybe run polylint or something
  - add paper dropdown menu icon item on dashboard where you can config which cards you want to see
 
 Optional
+ - explore topics
  - remove JS logic out of JS-only-elements... including maybe even auth-api
  - add questions to search
  - chat or other discussion forum
@@ -67,6 +64,7 @@ Optional
  - make verse copying a multi selection thing?
  - timeline
  - introduction helper
+ - opensearch suggestions
 
 External Dependency
  - PARTLY-DONE When dashboard fits fully on screen, background is visible under it
@@ -167,3 +165,15 @@ DONE
  - DONE change height of related toolbar in page-questoin as well
  - DONE fix arrow-back on map
  - DONE ignore navigations during page navigation animations
+ - DONE scrolling with arrow keys doesnt work
+ - DONE paper-scroll-header-panel hates neon-animated-pages
+ - DONE literal search click doesnt work
+ - DONE register -> login prefill seems not to be working
+ - DONE add attribution on map
+ - DONE check topical attribution
+ - DONE make bible snippets linkable on map
+ - DONE check bounds and set center on load on map
+ - DONE list locations in related questions card
+ - DONE add floating info icon above profile pic with gravatar instructions
+ - DONE scrollbar due to actions in drawer
+ - DONE password token expiration logic

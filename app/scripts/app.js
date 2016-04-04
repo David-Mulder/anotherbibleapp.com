@@ -15,6 +15,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
 
+  app.crossNavigationalData = {};
+
   app._currentlyLoading = [];
   app.loading = function(name){
     app._currentlyLoading.push(name);
@@ -106,18 +108,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   };
 
   var ctrlDown = false;
+  var ctrlTimeout;
   document.addEventListener('keydown', function(ev){
-    console.log('down', ev.code);
     if(ev.code == 'ControlLeft' || ev.code == 'ControlRight'){
       ctrlDown = true;
-    }else{
-      //alert('he?');
     }
+    ctrlTimeout = setTimeout(function(){
+      ctrlDown = false;
+    }, 5000);
   });
   document.addEventListener('keyup', function(ev){
-    console.log('up', ev.code);
     if(ev.code == 'ControlLeft' || ev.code == 'ControlRight'){
       ctrlDown = false;
+      clearTimeout(ctrlTimeout);
     }
   });
   app.navigateTo = function(name){
@@ -137,97 +140,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   app.isHome = function(){
     return app.route === 'home';
   };
-
-  app.toast = function(msg, duration, affector){
-    var pt = document.createElement('paper-toast');
-    pt.duration = duration || 10000;
-    if(affector){
-      (affector.bind(pt))();
-    }
-    pt.opened = true;
-    pt.text = msg;
-    document.body.appendChild(pt);
-    pt.addEventListener('iron-overlay-closed', function(){
-      document.body.removeChild(pt);
-    });
-    var dismisser = function(){
-      pt.opened = false;
-      document.body.removeEventListener('page-navigation', dismisser);
-    };
-    document.body.addEventListener('page-navigation', dismisser);
-
-    return pt;
-  };
-
-  app.askToast = function(msg, options, affector){
-    return new Promise((resolve, reject) => {
-      var pt = app.toast(msg, 25000, affector);
-
-      options.forEach((option, i) => {
-        var pb = document.createElement('paper-button');
-        pb.textContent = option;
-        pb.style.padding = '5px';
-        pb.style.margin = '-5px 0px';
-        pb.addEventListener('tap', function () {
-          pt.close();
-          resolve(option, i);
-        });
-        pt.appendChild(pb);
-      });
-    });
-  };
-
-  app.msg = function(msg, title){
-    var pd = document.createElement('paper-dialog');
-    pd.entryAnimation = 'scale-up-animation';
-    pd.innerHTML = '<h1></h1><div></div><div class="buttons"></div>';
-    pd.querySelector('div').textContent = msg;
-    pd.querySelector('h1').textContent = title;
-    if(typeof title == 'undefined'){
-      pd.querySelector('h1').style.display = 'none';
-    }
-    pd.withBackdrop = true;
-    document.body.appendChild(pd);
-    pd.opened = true;
-    pd.addEventListener('iron-overlay-closed', function(){
-      document.body.removeChild(pd);
-    });
-    return pd;
-  };
-
-  app.ask = function(msg, title, options){
-    return new Promise((resolve, reject) => {
-
-      var pd = app.msg(msg, title);
-
-      pd.addEventListener('iron-overlay-canceled', () => {
-        reject();
-      });
-
-      options.forEach((option, i) => {
-        var pb = document.createElement('paper-button');
-        pb.textContent = option;
-        pb.addEventListener('tap', function(){
-          pd.close();
-          resolve(option, i);
-        });
-        pd.querySelector('.buttons').appendChild(pb);
-      });
-
-    });
-  };
-
-  var ignoredErrors = ['/books'];
+  
+  var ignoredErrors = [''];
   var reload;
   var errorOverlay = document.querySelector('#error');
+  var errorMessage = errorOverlay.querySelector('#error-message');
 
-  window.onerror = function(err){
+  window.onerror = function(err, file, line){
     if(ignoredErrors.indexOf(page.current) == -1){
+      console.log(arguments);
+      console.dir(err);
+      errorMessage.textContent = err + '\n\n' + file + ':' + line;
       errorOverlay.style.display = 'block';
       if(!reload){
         reload = setTimeout(function(){
           location.reload(true);
-        }, 10000);
+        }, 15000);
       }
     }
   }
@@ -235,6 +163,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     clearTimeout(reload);
     errorOverlay.style.display = 'none';
     reload = 0;
+  });
+  document.getElementById('errorRefreshNow').addEventListener('click', function(){
+    clearTimeout(reload);
+    location.reload(true);
   });
 
 })(document);

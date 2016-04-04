@@ -175,6 +175,8 @@
                       document.body.appendChild(pt);
                       reject(response);
 
+                      page('/logout');
+
                     }else if(this.status === 429){
 
                       var pt = document.createElement('paper-toast');

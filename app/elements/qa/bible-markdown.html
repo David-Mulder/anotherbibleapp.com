@@ -1,14 +1,34 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
-<script src="/bower_components/markdown-js/lib/markdown.js"></script>
+<script src="/bower_components/remarkable/dist/remarkable.js"></script>
 
 <dom-module id="bible-markdown">
   <template>
     <style include="shared-styles"></style>
 
     <style>
-
+      blockquote{
+        background: rgba(0,0,0,.05);
+        margin: 16px 0px;
+        padding: 5px 40px;
+      }
+      blockquote p.source{
+        font-size: smaller;
+        text-align: right;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+      blockquote p.source span{
+        font-size: medium;
+      }
+      abbr{
+        border-bottom: 1px dotted var(--secondary-text-on-card-dialog-color);
+        display: inline-block;
+      }
+      code{
+        white-space: pre-wrap;
+        background: rgba(255, 0, 0, .1);
+      }
     </style>
     <div id="html"></div>
   </template>
@@ -28,6 +48,32 @@
         },
         _render: function(){
 
+          var remarkable = new Remarkable({
+            html:         false,        // Enable HTML tags in source
+            xhtmlOut:     false,        // Use '/' to close single tags (<br />)
+            breaks:       false,        // Convert '\n' in paragraphs into <br>
+            langPrefix:   'language-',  // CSS language prefix for fenced blocks
+            linkify:      true,        // Autoconvert URL-like text to links
+
+            // Enable some language-neutral replacement + quotes beautification
+            typographer:  true,
+
+            // Double + single quotes replacement pairs, when typographer enabled,
+            // and smartquotes on. Set doubles to '«»' for Russian, '„“' for German.
+            quotes: '“”‘’',
+
+            // Highlighter function. Should return escaped HTML,
+            // or '' if the source string is not changed
+            highlight: function (/*str, lang*/) { return ''; }
+          });
+          remarkable.core.ruler.enable([
+            'abbr'
+          ]);
+          remarkable.block.ruler.enable([
+            'footnote',
+            'deflist'
+          ]);
+
           var md = this.markdown;
           console.log(md);
 
@@ -40,24 +86,25 @@
             }
           });
 
-          var tree = markdown.parse(md);
+          var html = remarkable.render(md);
 
-          var html = markdown.renderJsonML( markdown.toHTMLTree( tree ) );
-
-          html = html.replace(/<blockquote><p>(.*?)<\/p><\/blockquote>/g, function(match, capture){
-            console.log('match', arguments);
+          html = html.replace(/<blockquote>\n<p>(.*?)<\/p>\n<\/blockquote>/g, function(match, capture){
+            //console.log('match', arguments);
             var reference = new BibleReference(capture);
-            console.info('ref',reference);
-            if(reference.valid){
+            //console.info('ref',reference);
+            if(reference.valid && reference.chapter){
               return '<blockquote><p><bible-snippet start="'+reference.start.toNumeric()+'" end="'+reference.end.toNumeric()+'"></bible-snippet></p></blockquote>';
             }else{
               return match;
             }
           });
+          console.log(html);
+          html = html.replace(/<blockquote>([\s\S]*?)<\/blockquote>[\r\n]*<p>[sS]ource: (.*?)<\/p>/g, function(match, blockquote, source){
+            return '<blockquote>'+blockquote+'<p class="source">source: <span>'+source+'</span></p></blockquote>';
+          });
+          console.log(html);
 
           this.$.html.innerHTML = html;
-
-          console.log(html);
         },
         ready: function(){
           //console.log(this.markdown);
