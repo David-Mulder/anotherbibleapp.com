@@ -12,10 +12,10 @@
       }
     </style>
 
-    <auth-api id="api" action="questions/list/{{listType}}" param-count="{{count}}" response="{{questions}}"></auth-api>
+    <auth-api id="api" action="questions/list/{{listType}}" param-count="{{count}}" param-page="{{page}}"></auth-api>
 
     <div id="content">
-      <card-list-questions heading="{{heading}}" questions="{{questions}}"></card-list-questions>
+      <card-list-questions heading="{{heading}}" questions="{{questions}}" no-next-page="{{_lastPage}}" no-prev-page="{{_firstPage}}" on-next-page="_goToNextPage" on-prev-page="_goToPrevPage" page-info="{{_pageDescriptor}}"></card-list-questions>
     </div>
 
   </template>
@@ -36,6 +36,10 @@
             type: Number,
             value: 5
           },
+          page: {
+            type: Number,
+            value: 1
+          },
           listType: {
             type: String,
             value: 'recent'
@@ -46,10 +50,19 @@
           }
         },
         observers: [
-          'reload(listType)'
+          'goToFirstPage(listType)',
+          'reload(listType)',
+          '_pageChanged(page)',
+          '_setPageDescriptor(page, _lastPage)',
+          'reload(page)'
         ],
+        goToFirstPage: function(){
+          this.page = 1;
+        },
         reload: function(){
-          this.$.api.execute().then(function(){
+          this.$.api.execute().then(function(result){
+            this.questions = result.results;
+            this._lastPage = result.moreResults == false;
             this.questions.forEach(function(question){
               var verses = question.verses.map(function(verse){
                 return new BibleReference(verse);
@@ -65,6 +78,24 @@
             'top-unanswered': 'Highest Voted Unanswered Questions',
             'recently-active': 'Recently Active Questions'
           }[type];
+        },
+        _pageChanged: function(){
+          if(this.page == 1){
+            this._firstPage = true;
+          }else{
+            this._firstPage = false;
+          }
+        },
+        _setPageDescriptor: function(){
+          var start = (this.page-1)*this.count+1;
+          var end = start + this.questions.length -1;
+          this._pageDescriptor = start + '-' + end;
+        },
+        _goToNextPage: function(){
+          this.page = this.page + 1;
+        },
+        _goToPrevPage: function(){
+          this.page = this.page - 1;
         }
       });
     })();

@@ -1,6 +1,8 @@
 var Question = require('./model');
 var Answer = require('../answers/model');
 
+var paginate = require('../../utils/paginate');
+
 var deletionCheck = function(req, selector){
   if(req.user && req.user.admin){
     return selector;
@@ -136,59 +138,42 @@ module.exports = {
   },
 
   listRecent: function(req, res){
-    Question
+    var questions = Question
       .find(deletionCheck(req, {'downvotes.0': {$exists: false}}))
       .sort('-createdAt')
-      .limit(Math.min(req.query.count, 25))
-      .populate('originalAuthor', 'displayName _id')
-      .exec(function(err, result){
-        if(err){
-          res.status(500).json(err);
-        }else{
-          res.json(result.map(question => question.makePublic()));
-        }
-      });
+      .populate('originalAuthor', 'displayName _id');
+
+    paginate(questions, req, res);
   },
 
   listRecentlyActive: function(req, res){
-    Question
+    var questions = Question
       .find(deletionCheck(req, {}))
       .sort('-updatedAt')
-      .limit(Math.min(req.query.count, 25))
-      .populate('originalAuthor', 'displayName _id')
-      .exec(function(err, result){
-        if(err){
-          res.status(500).json(err);
-        }else{
-          res.json(result.map(question => question.makePublic()));
-        }
-      });
+      .populate('originalAuthor', 'displayName _id');
+
+    paginate(questions, req, res);
   },
 
   listTopUnanswered: function(req, res){
-    Question
+    var questions = Question
       .find(deletionCheck(req, {'numberOfAnswers': 0}))
       .sort('-score')
-      .limit(Math.min(req.query.count, 25))
-      .populate('originalAuthor', 'displayName _id')
-      .exec(function(err, result){
-        if(err){
-          res.status(500).json(err);
-        }else{
-          res.json(result.map(question => question.makePublic()));
-        }
-      });
+      .populate('originalAuthor', 'displayName _id');
+
+    paginate(questions, req, res);
   },
 
   listForVerse: function(req, res){
     Question.find(deletionCheck(req, {
       verses: parseInt(req.params.verse)
-    })).exec(function(err, result){
+    }))
+      .sort('-score')
+      .exec(function(err, result){
       if(err){
         res.status(500).json(err);
       }else{
         result = result.map(question => question.makePublic());
-        result.sort((a,b) => b.score - a.score);
         res.json(result);
       }
     });

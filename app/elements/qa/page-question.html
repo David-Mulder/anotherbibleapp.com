@@ -151,6 +151,13 @@
         is: 'page-question',
 
         properties: {
+          lazyRouterConfig: {
+            value: function(){
+              return {
+                awaitReadyEventOnFirstLoad: true
+              }
+            }
+          },
           animationConfig: {
             value: function() {
               return {
@@ -182,7 +189,7 @@
           }
         },
         listeners: {
-          'page-became-visible': 'retrieveFromApi',
+          'page-loading': 'retrieveFromApi',
           'new-answer-posted': 'retrieveFromApi'
         },
         observers: [
@@ -199,7 +206,9 @@
         retrieveFromApi: function(){
 
           //alert(this.id);
-          this.$.api.execute().catch(function(err){
+          this.$.api.execute().then(function(){
+            this.fire('lazy-ready');
+          }.bind(this)).catch(function(err){
             if(err == 'Not found'){
               page.replace('/404');
             }

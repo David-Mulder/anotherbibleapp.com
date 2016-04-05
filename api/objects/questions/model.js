@@ -28,8 +28,9 @@ var schema = new Schema({
     default: 0
   },
   verses: {
-    type: Array,
-    required: true
+    type: [Number],
+    required: true,
+    index: true
   },
   originalAuthor: {
     type: Schema.Types.ObjectId,

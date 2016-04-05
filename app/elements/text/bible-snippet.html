@@ -14,6 +14,9 @@
         display: block;
         min-height: 30px;
       }
+      :host([linked]){
+        cursor: pointer;
+      }
       #snippet {
         text-align: justify;
       }
@@ -25,7 +28,7 @@
     </style>
     <utils-books id="utils"></utils-books>
     <div id="snippet"></div>
-    <div class="source"><small>from</small> <span>{{startReference.book.title}}</span> <span>{{startReference.chapter}}</span></div>
+    <div class="source"><small>from</small> <span>{{startReference.book.title}}</span> <span>{{startReference.chapter}}</span> <small>(LEB)</small></div>
   </template>
 
   <script>
@@ -54,7 +57,15 @@
             type: String,
             value: '',
             notify: true
+          },
+          linked: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
           }
+        },
+        listeners: {
+          'tap': '_navigateIfLinked'
         },
         observers: [
           'getText(start, end)'
@@ -66,8 +77,8 @@
 
           this.debounce('get-text', function(){
 
-            this.endReference = new BibleReference(end);
             this.startReference = new BibleReference(start);
+            this.endReference = new BibleReference(end);
             var xmlFile = this.resolveUrl('text/'+this.startReference.book.name+'.xml');
             fetch(xmlFile).then(function(response){
               return response.text();
@@ -105,6 +116,7 @@
               snippet = snippet.replace(/<n.*?>.*?<\/n>/g, '');
               //snippet = snippet.replace(/<verse-number.*?>.*?<\/verse-number>/g, '');
               snippet = snippet.replace(/<caption>.*?<\/caption>/g,'');
+              snippet = snippet.replace(/<pericope>.*?<\/pericope>/g,'');
               snippet = snippet.replace(/<.*?>/g,'');
 
               if(this.highlight.length){
@@ -127,6 +139,11 @@
             }.bind(this));
 
           }, 0);
+        },
+        _navigateIfLinked: function(){
+          if(this.linked){
+            app.navigateTo('/book/'+this.startReference.toString());
+          }
         }
       });
     })();

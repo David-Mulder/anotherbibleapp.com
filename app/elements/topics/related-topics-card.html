@@ -19,7 +19,7 @@
         cursor: pointer;
       }
     </style>
-    <paper-card heading="Related Topics" hidden$="{{noTopics}}">
+    <paper-card heading="Explore texts about" hidden$="{{noTopics}}">
       <template is="dom-repeat" items="{{topics}}" as="topic">
         <div class="card-actions topic" on-tap="openTopicPage">{{_smartCaps(topic.title)}}</div>
       </template>

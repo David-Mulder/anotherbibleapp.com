@@ -9,7 +9,11 @@ var schema = new Schema({
     index: '2dsphere'
   },
   title: String,
-  verses: Array
+  verses: {
+    type: [Number],
+    required: true,
+    index: true
+  }
 });
 
 schema.methods.makePublic = function(userId){

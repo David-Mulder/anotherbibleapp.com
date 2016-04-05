@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="page-contact">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Contact" allow-back></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <paper-card heading="Contact">
+        <div class="card-content">
+          In case you have a question or want to contribute, feel free to write to <a href="mailto:info@anotherbibleapp.com">info@anotherbibleapp.com</a>. Let me just warn you though, I have a terrible habit of forgetting reading my mail,
+          so apologies in advance if I reply late or not at all.
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
+      });
+    })();
+  </script>
+
+</dom-module>

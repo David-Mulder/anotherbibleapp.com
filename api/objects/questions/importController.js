@@ -11,7 +11,7 @@ var entities = new Entities();
 module.exports = {
   christianityStackExchange: function(req, res){
     User.findOne({
-      displayName: 'StackExchange'
+      email: 'stackexchange@anotherbibleapp.com'
     }).exec().then(function(user){
       fetch('http://api.stackexchange.com/2.2/questions/'+req.params.id+'?order=desc&sort=activity&site=christianity&filter=!)5J-0UNpoaNd96s*fEXoTq0JhCZU')
         .then(response => response.text())

@@ -138,9 +138,12 @@
       app.$.router.loadPage('documentation/page-philosophy');
     });
 
-
     page('/legal', function (data) {
       app.$.router.loadPage('documentation/page-legal');
+    });
+
+    page('/contact', function (data) {
+      app.$.router.loadPage('documentation/page-contact');
     });
 
     page('/map/:lng?/:lat?', function (data) {

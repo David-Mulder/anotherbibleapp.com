@@ -175,6 +175,7 @@
                 });
               }
               this._selectedPage = samePage.dataset.id;
+              samePage.fire('page-loading');
               samePage.fire('page-became-visible');
               setTimeout(function(){
                 resolve(samePage);
@@ -204,6 +205,7 @@
                   el.set(paramName, params[paramName]);
                 });
                 Polymer.dom(this.$$('#pages')).appendChild(el);
+
                 //Polymer.dom(this.$.dummy).appendChild(el);
                 var onReadyToRock = function(){
                   this._selectedPage = el.dataset.id;
@@ -222,6 +224,7 @@
                     }
                   }.bind(this), 0);
                 }.bind(this);
+
                 if(config.awaitReadyEventOnFirstLoad){
                   el.addEventListener('lazy-ready', function(){
                     onReadyToRock();
@@ -229,7 +232,9 @@
                 }else {
                   this.async(onReadyToRock, 100);
                 }
-                console.log(el); //s
+
+                el.fire('page-loading');
+
               }.bind(this));
             }
           }.bind(this));

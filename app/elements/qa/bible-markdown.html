@@ -29,6 +29,18 @@
         white-space: pre-wrap;
         background: rgba(255, 0, 0, .1);
       }
+      h1{
+        font-size: 1.5em;
+      }
+      h2{
+        font-size: 1.2em;
+      }
+      hr{
+        display: block;
+        height: 1px;
+        background: var(--accent-color);
+        border: 0px;
+      }
     </style>
     <div id="html"></div>
   </template>
@@ -80,7 +92,16 @@
           md = md.replace(/\[(.*?)\](?!\()/g, function(match, capture){
             var reference = new BibleReference(capture);
             if(reference.valid){
-              return '['+capture+'](/book/'+reference.toString()+')';
+              return '['+capture+'](/book/'+reference.toString().replace(/ /g, '')+')';
+            }else{
+              return match;
+            }
+          });
+
+          md = md.replace(/\[(.*?)\]\((.*?)\)/g, function(match, text, link){
+            var reference = new BibleReference(link);
+            if(reference.valid){
+              return '['+text+'](/book/'+reference.toString().replace(/ /g, '')+')';
             }else{
               return match;
             }
@@ -93,7 +114,7 @@
             var reference = new BibleReference(capture);
             //console.info('ref',reference);
             if(reference.valid && reference.chapter){
-              return '<blockquote><p><bible-snippet start="'+reference.start.toNumeric()+'" end="'+reference.end.toNumeric()+'"></bible-snippet></p></blockquote>';
+              return '<blockquote><p><bible-snippet start="'+reference.start.toNumeric()+'" end="'+reference.end.toNumeric()+'" linked></bible-snippet></p></blockquote>';
             }else{
               return match;
             }
