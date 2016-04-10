@@ -2,6 +2,7 @@ var Answer = require('./model');
 var Question = require('../questions/model');
 
 module.exports = {
+
   get: function(req, res){
     var userId;
     if(req.user){
@@ -75,7 +76,6 @@ module.exports = {
   },
 
   delete: function(req, res){
-
     Answer.findOne({
       _id: req.params.id
     })

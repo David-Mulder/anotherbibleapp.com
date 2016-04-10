@@ -1,6 +1,7 @@
 var Location = require('./model');
 
 module.exports = {
+
   get: function(req, res){
     Location.findOne({
       _id: req.params.id
@@ -133,4 +134,5 @@ module.exports = {
         });
       });
   }
+
 };

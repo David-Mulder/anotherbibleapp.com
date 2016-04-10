@@ -1,6 +1,7 @@
 var Token = require('./model');
 
 module.exports = {
+
   cleanup: function(req, res){
     Token.remove({
       expire: {
@@ -10,4 +11,5 @@ module.exports = {
       res.json(tokens);
     });
   }
+
 };

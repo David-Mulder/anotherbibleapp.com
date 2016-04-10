@@ -6,19 +6,6 @@ var nodemailer = require('nodemailer');
 var Question = require('../questions/model');
 var Answer = require('../answers/model');
 
-/*
-
- a = new User({
- displayName:'test',
- email:'test@test.cm',
- password:'hai'
- });
- a.save();
- User.find({}, function(err, users){
- console.log(users);
- });
- */
-
 var deletionCheck = function(req, selector){
   if(req.user && req.user.admin){
     return selector;
@@ -29,6 +16,7 @@ var deletionCheck = function(req, selector){
 };
 
 module.exports = {
+
   get: function(req, res){
     var userPromise = User.findOne({_id: req.params.id}).exec();
     var questionPromise = Question.find(deletionCheck(req, {originalAuthor: req.params.id})).sort('-createdAt').limit(10).exec();
@@ -59,6 +47,7 @@ module.exports = {
       res.json(result);
     });
   },
+
   updateCurrentlyLoggedInUser: function(req, res){
     req.user.info = req.body.user.info;
     req.user.displayName = req.body.user.displayName;
@@ -66,9 +55,11 @@ module.exports = {
       res.json(user.makePublic());
     });
   },
+
   getCurrentlyLoggedInUser: function(req, res){
     res.json(req.user.makePublic());
   },
+
   recovery: function(req, res){
     User.findOne({email: req.body.username}, function(err, user) {
       if (user === null) {
@@ -103,6 +94,7 @@ module.exports = {
       }
     });
   },
+
   resetPassword: function(req, res){
     User.findOne({recoveryToken: req.body.resetToken}).exec().then(function(user){
       if(user.recoveryToken.length > 0){
@@ -116,17 +108,10 @@ module.exports = {
       }
     });
   },
-  register: function(req, res) {
-    /*a = new User({
-      displayName: 'David Mulder',
-      email: 'test@test.com',
-      password: 'hooooi'
-    });
-    a.save();
-    User.find({}, function(err, users){
-      console.log(users);
-    });*/
 
+  register: function(req, res) {
+
+    //todo: move to config
     fetch('https://www.google.com/recaptcha/api/siteverify?secret=6LdkoBYTAAAAAEtRdNyfhuB_lHLLSda38z3Wfjmu&response='+req.body.captchaResponse).then(res => res.json()).then(result => {
       if(result.success){
 
@@ -158,14 +143,14 @@ module.exports = {
         });
       }
     });
-
-    //res.send(req.body);
   },
+
   getAllSettings: function(req, res){
     User.findOne({ _id: req.user._id}).exec().then(function(user){
       res.json(user.settings);
     });
   },
+
   resetSettings: function(req, res){
     User.findOne({ _id: req.user._id}).exec().then(function(user){
       user.settings = {};
@@ -176,6 +161,7 @@ module.exports = {
       });
     });
   },
+
   getSetting: function(req, res){
     User.findOne({ _id: req.user._id}).select('settings').exec().then(function(user){
       if(req.params.setting in user.settings){
@@ -189,6 +175,7 @@ module.exports = {
 
     });
   },
+
   saveSetting: function(req, res){
     if(/^[a-zA-Z\-0-9]+$/.test(req.params.setting)){
       var update = {};
@@ -202,4 +189,5 @@ module.exports = {
       });
     }
   }
+
 };

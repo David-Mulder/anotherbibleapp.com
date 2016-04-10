@@ -3,6 +3,7 @@ var Question = require('../questions/model');
 var Answer = require('../answers/model');
 
 module.exports = {
+
   _getPost: function(type, id){
     if(type == 'question'){
       return Question.findOne({_id: id}).exec();
@@ -12,8 +13,8 @@ module.exports = {
       console.log(type, id);
     }
   },
-  create: function(req, res){
 
+  create: function(req, res){
     var comment = new Comment({
       user: req.user._id,
       text: req.body.text,
@@ -33,10 +34,9 @@ module.exports = {
           });
         });
       });
-
     });
-
   },
+
   delete: function(req, res){
     Comment.findOne({
       _id: req.params.id
@@ -49,4 +49,5 @@ module.exports = {
       }
     });
   }
+
 };

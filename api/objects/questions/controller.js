@@ -13,6 +13,7 @@ var deletionCheck = function(req, selector){
 };
 
 module.exports = {
+
   get: function(req, res){
     var userId;
     if(req.user){
@@ -193,4 +194,5 @@ module.exports = {
         });
     }
   }
+
 };

@@ -2,6 +2,7 @@ var Answer = require('../answers/model');
 var Question = require('../questions/model');
 
 module.exports = {
+
   upvote: function(req, res){
     module.exports.vote('up', req).then(function(post){
       res.json(post);
@@ -9,6 +10,7 @@ module.exports = {
       res.status(500).json(err);
     });
   },
+
   downvote: function(req, res){
     module.exports.vote('down', req).then(function(post){
       res.json(post);
@@ -16,6 +18,7 @@ module.exports = {
       res.status(500).json(err);
     });
   },
+
   vote: function(direction, req){
     return new Promise(function(resolve, reject){
 
@@ -69,4 +72,5 @@ module.exports = {
       }
     });
   }
+
 };
