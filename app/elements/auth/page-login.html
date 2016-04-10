@@ -55,7 +55,7 @@
             <paper-input id="password" type="password" value="{{password}}" on-keyup="_checkForSubmit" label="Password"></paper-input>
             <div class="actions">
               <paper-button class="blue" on-tap="login">Log In</paper-button>
-              <paper-button class="blue" on-tap="goToForgotPassword">Forgot your password</paper-button>
+              <paper-button class="blue" on-tap="_goToForgotPassword">Forgot your password</paper-button>
             </div>
           </div>
         </paper-card>
@@ -98,7 +98,7 @@
           });
         },
         _checkForSubmit: function(ev){
-          if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
+          if(ev.keyCode == 13){
             if(this.password.length == 0){
               this.$.password.focus();
             }else{
@@ -146,11 +146,11 @@
             }
           }.bind(this));
         },
-        goToForgotPassword: function(){
-          app.navigateTo('/forgot-my-password');
+        _goToForgotPassword: function(ev){
+          app.navigateTo('/forgot-my-password', ev);
         },
-        _goToRegister: function(){
-          app.navigateTo('/register');
+        _goToRegister: function(ev){
+          app.navigateTo('/register', ev);
         }
       });
     })();

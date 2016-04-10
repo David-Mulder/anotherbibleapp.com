@@ -191,7 +191,7 @@
               <h1>{{post.title}}</h1>
             </template>
             -->
-            <bible-markdown markdown="{{post.text}}"></bible-markdown>
+            <bible-markdown id="markdown" markdown="{{post.text}}"></bible-markdown>
             <!--
             <marked-element markdown="{{post.text}}">
               <div class="html"></div>
@@ -332,16 +332,16 @@
             element: this.$.post,
             heroName: 'post'
           });
-          app.navigateTo('/' + this.type + '/' + this.post._id + '/' + 'edit');
+          app.navigateTo('/' + this.type + '/' + this.post._id + '/' + 'edit', ev);
         },
-        goToHistory: function(){
-          app.navigateTo('/' + this.type + '/' + this.post._id + '/' + 'history');
+        goToHistory: function(ev){
+          app.navigateTo('/' + this.type + '/' + this.post._id + '/' + 'history', ev);
         },
         toggleComments: function(){
           this.commentsVisible = this.commentsVisible ? false : true;
         },
         _checkForCommentSubmit: function(ev){
-          if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
+          if(ev.keyCode == 13){
             this.addComment();
           }
         },
@@ -373,13 +373,13 @@
           }
         },
         _goToUser: function(ev){
-          app.navigateTo('/user/' + this.post.originalAuthor._id);
+          app.navigateTo('/user/' + this.post.originalAuthor._id, ev);
         },
         _goToCommentUser: function(ev){
-          app.navigateTo('/user/' + ev.model.comment.user._id);
+          app.navigateTo('/user/' + ev.model.comment.user._id, ev);
         },
         _goToLogin: function(ev){
-          app.navigateTo('/login');
+          app.navigateTo('/login', ev);
         },
         _deleteComment: function(ev){
           this.commentId = ev.model.comment._id;

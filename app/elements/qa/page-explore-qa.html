@@ -45,8 +45,10 @@
         ready: function(){
 
         },
-        _fireReloads: function(){
-          if(this.$$('card-explore-questions')) this.$$('card-explore-questions').reload();
+        _fireReloads: function(ev){
+          if(ev.detail.initialLoad === false){
+            this.$$('card-explore-questions').reload();
+          }
         }
       });
     })();

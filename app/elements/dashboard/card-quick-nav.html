@@ -1,5 +1,6 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="../search/field-search.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -17,11 +18,23 @@
         padding-top: 0px;
         margin-top: -20px;
       }
+      field-search{
+        box-shadow: none;
+        border: 0px;
+        background: transparent;
+        margin: 15px 0px 0px 0px;
+        --field-search-input: {
+          border-bottom: 1px solid gray;
+          padding: 0px 0px 5px 0px;
+          font-size: 16px;
+        };
+      }
     </style>
 
     <paper-card id="card" heading="Quick Navigation">
       <div class="card-content">
-        <paper-input error-message="Reference not recognized, format should be like `Mt 1:1` or `Matthew 1:1`" invalid="{{invalid}}" label="Enter a bible reference and hit enter..." on-keyup="checkForEnter"></paper-input>
+        <field-search class="paper-input-input" label="Enter a bible reference, topic or search term and hit enter..." size="small"></field-search>
+        <!--<paper-input error-message="Reference not recognized, format should be like `Mt 1:1` or `Matthew 1:1`" invalid="{{invalid}}" label="Enter a bible reference, topic or search term and hit enter..." on-keyup="checkForEnter"></paper-input>-->
       </div>
     </paper-card>
 
@@ -45,16 +58,17 @@
         checkForEnter: function(ev){
           this.invalid = false;
           if(ev.keyCode == 13){
-            //BibleReferencePromise.then(function(BibleReference){
-            //  alert(BibleReference);
-            var reference = new BibleReference(ev.target.value);
-            if(reference.book){
-              ev.target.blur();
-              app.navigateTo('/book/'+reference.toString());
-            }else{
-              this.invalid = true;
-            }
-            //}.bind(this));
+            ev.target.blur();
+            app.navigateTo('/search/'+encodeURIComponent(ev.target.value), ev);
+            //var reference = new BibleReference(ev.target.value);
+           // if(reference.book){
+           //   ev.target.blur();
+           //   app.navigateTo('/book/'+reference.toString(), ev);
+           // }else{
+           //   app.navigateTo('/search/'+encodeURIComponent(ev.target.value), ev);
+
+              //this.invalid = true;
+            //}
           }
         }
       });

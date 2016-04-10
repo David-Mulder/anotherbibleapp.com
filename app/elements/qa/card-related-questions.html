@@ -70,7 +70,13 @@
 
     <div id="content">
       <div id="noResult" hidden$="{{!noResults}}">
-        No questions have been asked about {{verse}}. Got a question? <a on-tap="newQuestion" hidden$="{{!loggedIn}}">Tap here to ask yours</a><a href="#" on-tap="goToLogin" hidden$="{{loggedIn}}">Log in to ask yours</a>.
+        No questions have been asked about {{verse}}.
+        <span hidden$="{{_selectionMode}}">
+          Got a question? <a on-tap="newQuestion" hidden$="{{!loggedIn}}">Tap here to ask yours</a><a href="#" on-tap="goToLogin" hidden$="{{loggedIn}}">Log in to ask yours</a>.
+        </span>
+        <span hidden$="{{!_selectionMode}}">
+          See the toast at the bottom of the screen to proceed.
+        </span>
       </div>
 
       <paper-card heading="Related Questions" hidden$="{{!relatedQuestions}}">
@@ -120,12 +126,12 @@
         behaviors: [
           abaBehaviors.logic
         ],
-        goToLogin: function(){
-
-          app.navigateTo('/login');
+        goToLogin: function(ev){
+          app.navigateTo('/login', ev);
         },
-        newQuestion: function(){
+        newQuestion: function(ev){
           if(this.loggedIn){
+            this._selectionMode = true;
             this.fire('multi-verse-selection', {
               label: 'Please tap on all the verses that are relevant to your question.',
               finishedSelection: function(verses){
@@ -133,13 +139,14 @@
               }
             });
           }else{
-            app.navigateTo('/login');
+            app.navigateTo('/login', ev);
           }
         },
         //newQuestionSelectionFinished: function(){
         //  app.navigateTo('/questions/ask/'+this.verses.toString());
         //},
         verseChanged: function(){
+          this._selectionMode = false;
           if(this.verse){
             this.verseId = this.verse.toNumeric();
             var questions = this.$.api.execute();
@@ -164,7 +171,7 @@
             element: target,
             heroName: 'question-card'
           });
-          app.navigateTo('/question/'+ev.model.question._id)
+          app.navigateTo('/question/'+ev.model.question._id, ev)
         },
         _gotoLocationPage: function(ev){
           var target = Polymer.dom(ev).path.find(function(el){
@@ -174,7 +181,7 @@
             element: target,
             heroName: 'question-card'
           });
-          app.navigateTo('/map/'+ev.model.location.coordinates[0]+'/'+ev.model.location.coordinates[1]);
+          app.navigateTo('/map/'+ev.model.location._id, ev);
         }
       });
     })();

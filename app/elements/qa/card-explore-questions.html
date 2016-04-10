@@ -51,7 +51,7 @@
         },
         observers: [
           'goToFirstPage(listType)',
-          'reload(listType)',
+          '_load(listType)',
           '_pageChanged(page)',
           '_setPageDescriptor(page, _lastPage)',
           'reload(page)'
@@ -60,7 +60,13 @@
           this.page = 1;
         },
         reload: function(){
+          if(this.listType && this._initialLoad){
+            this._load();
+          }
+        },
+        _load: function(){
           this.$.api.execute().then(function(result){
+            this._initialLoad = true;
             this.questions = result.results;
             this._lastPage = result.moreResults == false;
             this.questions.forEach(function(question){

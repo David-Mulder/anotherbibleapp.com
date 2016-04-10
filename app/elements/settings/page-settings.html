@@ -61,7 +61,7 @@
         <div class="card-actions">
           <div class="item">
             <label>Line Height</label>
-            <paper-radio-group data-setting="lineHeight" data-default="1" on-iron-select="saveSetting">
+            <paper-radio-group data-setting="lineHeight" data-default="1.5" on-iron-select="saveSetting">
               <paper-radio-button name=".9">0.9</paper-radio-button>
               <paper-radio-button name="1">1.0</paper-radio-button>
               <paper-radio-button name="1.5">1.5</paper-radio-button>
@@ -107,7 +107,7 @@
           abaBehaviors.page
         ],
         loadSettings: function(){
-          var settingsToFill = this.shadowRoot.querySelectorAll('[data-setting]');
+          var settingsToFill = Polymer.dom(this.root).querySelectorAll('[data-setting]');
           for(var i=0;i<settingsToFill.length;i++){
             (function(item){
               var settingName = item.dataset.setting;
@@ -122,9 +122,9 @@
           }
         },
         saveSetting: function(ev){
-          var item = ev.path[0];
+          var item = Polymer.dom(ev).path[0];
           var settingName = item.dataset.setting;
-          var value = ev.path[0].selected; //support more types
+          var value = Polymer.dom(ev).path[0].selected; //support more types
           this.$.settings.saveSetting(settingName, value);
         }
       });

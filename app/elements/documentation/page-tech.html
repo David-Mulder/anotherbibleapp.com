@@ -1,0 +1,164 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-icons/editor-icons.html">
+
+<dom-module id="page-tech">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host{
+        display: flex;
+        flex-direction: column;
+      }
+      .white-title{
+        --paper-card-header-color: white;
+      }
+      .right-image{
+        float: right;
+        margin-left: 10px;
+        margin-bottom: 10px;
+      }
+      .page-content paper-card .card-content{
+        padding: 10px 20px 20px 20px;
+      }
+      .page-content paper-card.plain .card-content{
+        padding: 20px;
+      }
+      .page-content{
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        overflow: auto;
+      }
+      .page-content .column{
+        flex: 1;
+        max-width: 700px;
+      }
+      paper-card{
+        display: block;
+        margin: 10px;
+      }
+      @media all and (max-width: 760px) {
+        .page-content{
+          flex-direction: column;
+          justify-content: initial;
+        }
+      }
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Technical Tour" allow-back></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <div class="column">
+        <paper-card heading="Introduction" image="/images/top-header.png" class="white-title">
+          <div class="card-content">
+            <img src="/images/touch/chrome-touch-icon-192x192.png" class="right-image" title="The logo and all graphics on this site have been designed by me.">
+            <p>
+              Besides being a project born out of passion this is also a project that I use as a showcase of (a part of) my skills. On this page I document some of the more interesting technical aspects. The general infrastructure looks as follows:
+            </p>
+            <ul>
+              <li>
+                Frontend:
+                <ul>
+                  <li>Runs on Polymer, a web components and data binding library made by Google. Somewhat similar - but still very different - to Angular 2 </li>
+                  <li>Fully static and fully lazy loaded<ul>
+                    <li>This means all components, content and libraries are loaded only on demand.</li>
+                    <li>HTTP/2 made it possible to do this without any sharding</li>
+                    <li>Two blog posts I wrote about this can be found <a href="http://blog.apriol.com/2016/01/http2.html" target="_blank">here</a> and <a href="http://blog.apriol.com/2016/02/lazy-loading.html" target="_blank">here</a>.</li>
+                  </ul></li>
+                  <li>Served directly by Nginx (or more likely the client service worker cache)</li>
+                </ul>
+              </li>
+              <li>
+                API:
+                <ul>
+                  <li>Runs on Node.js and uses Express.js for routing</li>
+                  <li>REST interface</li>
+                  <li>Data saved in MongoDB using Mongoose</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </paper-card>
+        <paper-card class="plain">
+          <div class="card-content">
+            <p>
+              <strong>Note for those who know nothing about Christianity</strong>: Considering you came to this page you're statistically speaking probably not a Christian, so here's a quick primer. Christians have a collection of works - split in numbered 'chapters' and 'verses' -  written in the past three to six thousand year that we care a lot about as we consider them some of the best witness accounts of God's actions. Whether you agree or not, the important thing to understand is that truly comprehending what their authors wanted to convey can be hard due to historical luggage and this time gap. This application has been designed to help bridge this gap.
+            </p>
+          </div>
+        </paper-card>
+        <paper-card heading="Map" image="/images/tech/map.png">
+          <div class="card-content">
+            This application includes a map of locations used in the Bible. These locations can be viewed in a Google Maps component using custom styling
+            and custom labels. Markers - for the current viewport - are shown intelligently (meaning that more important locations are given priority) based on zoom level and relative proximity to each other. Locations can include polygons to show which area they apply to, for an example of this follow <a href="/map/56f5187cdf64078c16bbfd92">this link</a>. If you register for an account you can also edit this polygon by following the 'edit' link at the end of the information card and opening the cartography tab.
+          </div>
+        </paper-card>
+        <paper-card heading="Q&A section" image="/images/top-header.png" class="white-title">
+          <div class="card-content">
+            The Q&A part of the application is relatively speaking one of the most straightforward parts. Of interest:
+            <ul>
+              <li>A custom markdown editor that will somewhat intelligently wrap and/or insert markup. Compare for example the behavior of the quote button (<iron-icon icon="editor:format-quote"></iron-icon>) when selecting nothing, when selecting some text and when selecting a bible reference.</li>
+              <li>When you scroll down on a question page the headers moves under the toolbar conform the MD spec.</li>
+              <li>On the backend side of things there is a custom revisioning system keeping track of the changes which can be viewed under the history button.</li>
+              <li>Answers are sorted by the lower bound of the Wilson score confidence instead of plain average scores</li>
+            </ul>
+          </div>
+        </paper-card>
+      </div>
+      <div class="column">
+        <paper-card heading="Offline" image="/images/top-header.png" class="white-title">
+          <div class="card-content">
+            Using service workers this web application retains as much functionality as possible whilst offline. This is not limited to passive things like reading any of the books and letters, but also includes more complex interactions like the search engine. Although non-essential on desktops/laptops this does improve loading times (as files are served from the service worker cache if possible) and on mobile devices this results in a fairly native experience.
+          </div>
+        </paper-card>
+        <paper-card heading="Search" image="/images/tech/search.png" class="white-title">
+          <div class="card-content">
+            To allow for offline searching a custom search engine had to be written, which has the following features of note:
+            <ul>
+              <li>Fully executed in webworkers to keep the user experience smooth</li>
+              <li>Full text-search across verse boundaries</li>
+              <li>Intelligent sorting based on match quality and relative usage (the more a verse is referenced, the more likely it is that a user is searching for it)</li>
+              <li>Like all other settings/user data the recent search list is automatically synced between devices and available offline.</li>
+            </ul>
+            Past iterations of this search engine were running on top of IndexedDB, but populating full text search indexes on the client side caused
+            inability issues in Chrome which would randomly cause initial index building to fail.
+          </div>
+        </paper-card>
+        <paper-card heading="Reading" image="/images/top-header.png" class="white-title">
+          <div class="card-content">
+            When opening a Bible book or letter it will open in 'reading mode' without a lot of unnecessary meta content. In the top right there is a toggle that switches to 'study mode', which will properly maintain the scroll position. When a verse is tapped on, it gets selected and a drawer with actions - like highlighting, copying and asking questions - is revealed.
+          </div>
+        </paper-card>
+        <paper-card heading="Adaptive sizing" image="/images/top-header.png" class="white-title">
+          <div class="card-content">
+            Not too special nowadays anymore, but the full application works flawlessly on mobile screen sizes as well. Of note:
+            <ul>
+              <li>
+                When the viewport size is too small the left drawer is closed showing the traditional hamburger icon. If however you're looking at a subpage this will properly show a back icon conform MD/Android guidelines.
+              </li>
+              <li>
+                Various pages hide and show components or change text based on the viewport size to maintain a fluent UX. An example of this is the reveal of the 'quick navigation' card on the dashboard and the text in the welcome card changing once the left menu changes in to a drawer.
+              </li>
+            </ul>
+            Do note that this application is build to work on mobile devices, but unlike previous versions of the application it does not intent to create a fully native feel. Previous version were build using a custom framework which had the singular goal of being lightweight, fast and look 100% native. Polymer on the other hand allows for more flexibility, but this comes at a cost in performance.
+          </div>
+        </paper-card>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        },
+        behaviors: [
+          abaBehaviors.page
+        ]
+      });
+    })();
+  </script>
+
+</dom-module>

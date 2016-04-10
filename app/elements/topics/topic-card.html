@@ -42,8 +42,7 @@
 
         goToVerse: function(ev){
           var snippet = ev.model.snippet;
-          app.navigateTo('/book/'+snippet.start);
-          console.log(snippet);
+          app.navigateTo('/book/'+snippet.start, ev);
         }
       });
     })();

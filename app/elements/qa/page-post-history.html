@@ -60,9 +60,8 @@
         <intelligent-title title="Post history" allow-back></intelligent-title>
         <div class="bottom fit">
           <paper-tabs selected="{{mode}}" attr-for-selected="data-mode" scrollable>
-            <!--<paper-tab data-mode="inline">Inline changes</paper-tab>-->
-            <paper-tab data-mode="html">Side-by-side</paper-tab>
-            <paper-tab data-mode="markdown">Side-by-side markdown</paper-tab>
+            <paper-tab data-mode="inline-html">Inline changes</paper-tab>
+            <paper-tab data-mode="inline-markdown">Inline markdown changes</paper-tab>
           </paper-tabs>
         </div>
       </paper-toolbar>
@@ -72,6 +71,8 @@
         <template is="dom-repeat" items="{{revisions}}" as="revision">
           <card-post-history type="{{postType}}" new="{{revision.new}}" old="{{revision.old}}" mode="{{mode}}"></card-post-history>
         </template>
+
+        <card-post-history type="{{postType}}" new="{{originalPost}}" old="{{originalPost}}" mode="{{mode}}"></card-post-history>
 
       </div>
 
@@ -89,7 +90,7 @@
           revisions: Array,
           mode: {
             type: String,
-            value: 'html'
+            value: 'inline-html'
           }
         },
         observers: [
@@ -99,7 +100,8 @@
           'page-became-visible': 'retrieveFromApi'
         },
         behaviors: [
-          abaBehaviors.page
+          abaBehaviors.page,
+          abaBehaviors.logic
         ],
         retrieveFromApi: function(){
           this.revisions = [];
@@ -141,6 +143,8 @@
               new: post
             });
             */
+            post.revisions[post.revisions.length - 1].revisionAuthor = post.revisions[post.revisions.length - 1].originalAuthor;
+            this.originalPost = post.revisions[post.revisions.length - 1];
             this.push('revisions', {
               old: post.revisions[0],
               new: post

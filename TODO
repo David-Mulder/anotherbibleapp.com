@@ -1,6 +1,6 @@
 High Priority
  - solve toast being too big on mobile
- - ev.code enter does not work on mobile
+ - DONE ev.code enter does not work on mobile
  - DONE paper-menu-button-icon doesn't work in narrow drawer
 
 Normal priority
@@ -8,21 +8,27 @@ Normal priority
  - Installation notification
  - Hide features when offline
  - improve error reporting in api to prevent crashes
- - NOTE's showing weird for timo :/
+ - notes showing weird for timo :/
  - DONE error in book list
- - save rules read checkbox
- - stuck loading bar (timeout)
- - add a contact us page
- - link bible markdown quotes
- - handle footnote scrolling
+ - DONE save rules read checkbox
+ - MAYBE DONE stuck loading bar (timeout)
+ - DONE add a contact us page
+ - DONE link bible markdown quotes
+ - DONE handle footnote scrolling
+ - DONE first edit misses revisionAuthor (history page)
+ - MAYBE DONE stuck loading settings sync sometimes :/
+ - auto save locations, or warn on leaving or something
+ - add option to automatically reopen last read position on load
+ - DONE make search field auto complete
+ - write contributors page
+ - add title to map links
+ - make arrow keys work for auto complete
 
 Low Priority
  - DONE link username on history
  - DONE psalm chapers
  - validation in edit post forms
- - change 'recent questions' to 'recent activity'
- - add browsing option of recent activity rather than just top 10
- - Refactor: search for 13 enter and fix to `code` enter (qa-post:264 or page-login)
+ - DONE add browsing option of recent activity rather than just top 10
  - DONE refactor app.toast/ask/etc to a... element or behavior
  - DONE consider reworking bible list to look like BibleGateway on desktop :/
  - DONE add explicit save button to user page
@@ -32,7 +38,6 @@ Low Priority
  - make logout a page after all (why?)
  - make editable description for locations
  - make editable detailed polygons for locations (visible on info)
- - fix map links (which?)
  - DONE parse 'psalm 49:title' correctly
  - DONE opensearch
 
@@ -40,14 +45,13 @@ Very Low Priority
  - invalidate all sessionTokens after forgotten password
  - hash forgotten password tokens
  - scrollbar not visible on white on black
- - pierce navigation when triggering search from bible book to cause focus
- - bible Snippet with just 'mt' (in markdown)
+ - DONE pierce navigation when triggering search from bible book to cause focus
+ - DONE bible Snippet with just 'mt' (in markdown)
  - refactor to use private properties and functions everywhere properly (`_` start)
  - on mobile, dashboard 'more menu' touches top border
  - DONE reapply firstIndex better after read -> study modus
  - dyslexic font
  - maybe run polylint or something
- - add paper dropdown menu icon item on dashboard where you can config which cards you want to see
 
 Optional
  - explore topics

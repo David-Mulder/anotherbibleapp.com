@@ -109,8 +109,7 @@
     },
     _triggerResizes: function(){
       if(new Date() > this.__noResizeEventsTill) {
-        var root = this.root || this.shadowRoot;
-        var resizables = root.querySelectorAll('paper-tabs, paper-scroll-header-panel, google-recaptcha');
+        var resizables = Polymer.dom(this.root).querySelectorAll('paper-tabs, paper-scroll-header-panel, google-recaptcha');
         for (var i = 0; i < resizables.length; i++) {
           (function (resizable) {
             this.async(function () {

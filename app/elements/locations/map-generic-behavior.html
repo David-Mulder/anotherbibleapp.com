@@ -1,0 +1,90 @@
+<link id="labels" rel="import" href="labels.data.html">
+<link id="map-style" rel="import" href="map.style.html">
+
+<script>
+  (function(){
+    var genericLabels = require('labels');
+    var mapStyle = require('map-style');
+
+    var initMapQueue = [];
+    var mapInited = false;
+    window._genericBehaviorInitMap = function(){
+      mapInited = true;
+      var script = document.createElement('script');
+      script.addEventListener('load', function(){
+        initMapQueue.forEach(function(buildMap){
+          buildMap();
+        });
+      });
+      script.setAttribute('src', 'https://google-maps-utility-library-v3.googlecode.com/svn/trunk/maplabel/src/maplabel.js');
+      document.body.appendChild(script);
+    };
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA0uckToOVLcHixEBd0FWOt5yKBOrNWlhw&callback=_genericBehaviorInitMap');
+    document.body.appendChild(script);
+
+    abaBehaviors.genericMapBehavior = [Polymer.IronResizableBehavior, {
+      listeners: {
+        'iron-resize': '_resized'
+      },
+      ready: function(){
+        this.mapReady = new Promise(function(resolve, reject){
+
+          var buildMap = function(){
+            var map = new google.maps.Map(this.$.map, {
+              center: {lat: 31.777455442549336, lng: 35.23493499999995},
+              zoom: 8,
+              styles: mapStyle,
+              mapTypeId: 'terrain',
+              streetViewControl: false,
+              rotateControl: false,
+              mapTypeControl: false,
+              fullscreenControl: false,
+              scaleControl: true,
+              maxZoom: 14,
+              minZoom: 4
+            });
+
+            google.maps.event.addListenerOnce(map, 'idle', function(){
+              this._drawGenericInfo(map);
+              resolve(map);
+            }.bind(this));
+          }.bind(this);
+
+          if(!mapInited){
+            initMapQueue.push(buildMap);
+          }else{
+            buildMap();
+          }
+
+        }.bind(this));
+      },
+      _resized: function(){
+        this.debounce('resize', function(){
+          //this.$.map.fire('iron-resize');
+          if(typeof google != 'undefined'){
+            try{
+              google.maps.event.trigger(this.map, 'resize')
+            }catch(e){
+              console.warn(e);
+            };
+          }
+          //this._loadData();
+        }, 500);
+      },
+      _drawGenericInfo: function(map){
+        genericLabels.forEach(function(label){
+          var label = JSON.parse(JSON.stringify(label));
+          label.map = map;
+          label.strokeWeight = 2;
+          label.fontColor = 'rgba(0,0,0,.9)';
+          label.strokeColor = 'rgba(255,255,255,.6)';
+          label.fontFamily = 'Roboto';
+          label.position = new google.maps.LatLng(label.position[1], label.position[0]);
+          new MapLabel(label);
+        }.bind(this));
+      }
+    }];
+  })();
+</script>

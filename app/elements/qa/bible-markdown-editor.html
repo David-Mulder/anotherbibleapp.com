@@ -1,6 +1,13 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="/bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="./bible-markdown.html">
+
+<link rel="import" href="/bower_components/imgur-upload/imgur-upload.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="bible-markdown-editor">
   <template>
@@ -20,14 +27,33 @@
       }
       .questionEditor > div{
         flex: 1;
+      }
+      .input-container{
+        padding: 10px;
         @apply(--bible-markdown-input-container);
       }
       #preview{
         word-break: break-word;
-        margin: 10px;
+        margin: 0px 0px 6px 5px;
         background: var(--accent-color-50);
         padding: 0px 10px;
         @apply(--bible-markdown-preview);
+      }
+      paper-toolbar{
+        --paper-toolbar-height: 45px;
+        --paper-toolbar-sm-height: 45px;
+        background: var(--primary-color-300);
+        color: var(--text-on-primary-color-300);
+      }
+      paper-toolbar .space{
+        display: block;
+        width: 30px;
+      }
+      paper-toolbar paper-icon-button{
+
+      }
+      :host([force-mode='vertical']) .questionEditor{
+        flex-direction: column;
       }
       @media all and (min-width: 700px) and (orientation: landscape) {
         .questionEditor{
@@ -35,9 +61,33 @@
         }
       }
     </style>
+
+    <imgur-upload id="imgur" client-id="71bcd7226f71883"></imgur-upload>
+
     <div class="questionEditor">
       <div>
-        <paper-textarea value="{{value}}" label="{{label}}" rows="{{rows}}" always-float-label="{{_labelPresent}}" no-label-float="{{!_labelPresent}}" placeholder="{{placeholder}}"></paper-textarea>
+        <paper-toolbar>
+          <paper-icon-button id="eBold" icon="editor:format-bold" on-tap="makeBold"></paper-icon-button>
+          <paper-tooltip for="eBold">Make Bold</paper-tooltip>
+          <paper-icon-button id="eItalic" icon="editor:format-italic" on-tap="makeItalic"></paper-icon-button>
+          <paper-tooltip for="eItalic">Make Italic</paper-tooltip>
+          <span class="space"></span>
+          <paper-icon-button id="eImage" icon="editor:insert-photo" on-tap="insertImage"></paper-icon-button>
+          <paper-tooltip for="eImage">Insert an image</paper-tooltip>
+          <paper-icon-button id="eQuote" icon="editor:format-quote" on-tap="insertQuote"></paper-icon-button>
+          <paper-tooltip for="eQuote">Insert quote or Bible passage</paper-tooltip>
+          <paper-icon-button id="eLink" icon="editor:insert-link" on-tap="insertLink"></paper-icon-button>
+          <paper-tooltip for="eLink">Link to website or Bible passage</paper-tooltip>
+          <paper-icon-button id="eFootnote" icon="editor:mode-comment" on-tap="insertFootnote"></paper-icon-button>
+          <paper-tooltip for="eFootnote">Add a footnote</paper-tooltip>
+          <span class="space"></span>
+          <paper-icon-button id="eList" icon="editor:format-list-bulleted" on-tap="insertList"></paper-icon-button>
+          <paper-tooltip for="eList">Format as list</paper-tooltip>
+
+        </paper-toolbar>
+        <div class="input-container">
+          <paper-textarea id="textarea" value="{{value}}" label="{{label}}" rows="{{rows}}" always-float-label="{{_labelPresent}}" no-label-float="{{!_labelPresent}}" placeholder="{{placeholder}}"></paper-textarea>
+        </div>
       </div>
       <div id="preview">
         <bible-markdown markdown="{{value}}"></bible-markdown>
@@ -54,6 +104,8 @@
   <script>
     (function() {
       'use strict';
+
+      var BibleReference = require('bible-reference-parser');
 
       Polymer({
         properties: {
@@ -72,6 +124,10 @@
           value: {
             type: String,
             notify: true
+          },
+          forceMode: {
+            type: String,
+            reflectToAttribute: true
           }
         },
         observers: [
@@ -79,6 +135,178 @@
         ],
         labelChanged: function(label){
           this.set('_labelPresent', label.length > 0);
+        },
+        focus: function(){
+          this.$.textarea.focus();
+        },
+        getSelection: function(){
+          var textarea = this.$.textarea._focusableElement;
+          var value = textarea.value;
+          var start = textarea.selectionStart;
+          var end = textarea.selectionEnd;
+          var beforeSelection = value.substring(0, start);
+          var inSelection = value.substring(start, end);
+          var afterSelection = value.substring(end, value.length);
+          if(inSelection.substr(-1) == ' '){
+            inSelection = inSelection.substring(0, inSelection.length - 1);
+            afterSelection = ' ' + afterSelection;
+          }
+          if(inSelection.substr(0,1) == ' '){
+            inSelection = inSelection.substring(1, inSelection.length);
+            beforeSelection += ' ';
+          }
+          return {
+            before: beforeSelection,
+            in: inSelection,
+            after: afterSelection
+          };
+        },
+        setSelection: function(selection){
+          selection.prefix = selection.prefix || '';
+          selection.suffix = selection.suffix || '';
+          var textarea = this.$.textarea._focusableElement;
+          this.value = selection.before + selection.prefix + selection.in + selection.suffix + selection.after;
+          textarea.selectionStart = selection.before.length + selection.prefix.length;
+          textarea.selectionEnd = selection.before.length + selection.prefix.length + selection.in.length;
+        },
+        makeBold: function(){
+          var selection = this.getSelection();
+          if(selection.in.length == 0){
+            selection.in = 'bold text';
+          }
+          selection.prefix = '**';
+          selection.suffix = '**';
+          this.setSelection(selection);
+        },
+        makeItalic: function(){
+          var selection = this.getSelection();
+          if(selection.in.length == 0){
+            selection.in = 'bold text';
+          }
+          selection.prefix = '*';
+          selection.suffix = '*';
+          this.setSelection(selection);
+        },
+        insertQuote: function(){
+          //todo, check if bible reference
+          var selection = this.getSelection();
+
+          var startEnter = selection.before[selection.before.length - 1] == '\n' ? '' : '\n';
+          var endEnter = selection.after[0] == '\n' ? '' : '\n';
+
+          if(selection.in.length == 0){
+            selection.in = 'Blockquote';
+            selection.prefix = startEnter + '\n> ';
+            selection.suffix = '\n\nSource: Your source\n' + endEnter;
+          }else{
+            var reference = new BibleReference(selection.in);
+            if(reference.valid){
+              selection.prefix = startEnter + '\n> ' + reference.toString() + '\n' + endEnter;
+              selection.in = '';
+            }else{
+              var content = selection.in.split('\n').map(function(line){
+                return '> ' + line;
+              }).join('\n');
+
+              selection.prefix = startEnter + '\n' + content + '\n\n' + 'Source: '
+              selection.in = 'Your source';
+              selection.suffix = '\n' + endEnter;
+            }
+          }
+
+          this.setSelection(selection);
+        },
+        insertLink: function(){
+          var selection = this.getSelection();
+          var reference = new BibleReference(selection.in);
+          if(reference.valid){
+            selection.prefix = '[';
+            selection.suffix = ']';
+          }else{
+            if(selection.in.length == 0){
+              selection.prefix = '[link text](';
+            }else{
+              selection.prefix = '['+selection.in+'](';
+            }
+            selection.in = 'http://';
+            selection.suffix = ')';
+          }
+          this.setSelection(selection);
+        },
+        insertFootnote: function(){
+          var selection = this.getSelection();
+
+          var regexForNumericalFootnotes = /\[\^(\d*?)\]/g;
+          var match;
+          var str = selection.before + selection.in + selection.after;
+          var highestFootnoteNumber = 0;
+          while ((match = regexForNumericalFootnotes.exec(str)) !== null) {
+            if(match[1] > highestFootnoteNumber){
+              highestFootnoteNumber = parseInt(match[1]);
+            }
+          }
+
+          var footnote = highestFootnoteNumber+1;
+          var lastLine = selection.after.split('\n').pop();
+          var endExtraEnter = lastLine[0] == '[' && lastLine[1] == '^' ? '' : '\n';
+          selection.before = selection.before + '[^'+footnote+']'+selection.after+endExtraEnter+'\n[^'+footnote+']: ';
+          if(selection.in.length == 0){
+            selection.in = 'Your footnote';
+          }
+          selection.after = '';
+
+          this.setSelection(selection);
+        },
+        insertImage: function(){
+          var selection = this.getSelection();
+
+          var fileUpload = document.createElement('input');
+          fileUpload.type = 'file';
+          fileUpload.addEventListener('change', function(){
+            app.loading('image-upload');
+            this.$.imgur.file = fileUpload.files[0];
+            var uploadSucces = function(ev){
+              app.finishedLoading('image-upload');
+              this.$.imgur.removeEventListener('imgur-upload-success', uploadSucces);
+
+              var startEnter = selection.before[selection.before.length - 1] == '\n' ? '' : '\n';
+              var endEnter = selection.after[0] == '\n' ? '' : '\n';
+              if(selection.in == ''){
+                selection.in = 'enter image description for visually impaired users'
+              }
+              selection.prefix = startEnter + '![';
+              selection.suffix = '](' + ev.detail.link.replace('http', 'https') + ')' + endEnter;
+
+              this.setSelection(selection);
+            }.bind(this);
+            this.$.imgur.addEventListener('imgur-upload-success', uploadSucces);
+            this.$.imgur.upload();
+          }.bind(this));
+          fileUpload.click();
+          //todo: fileupload canceled
+        },
+        insertList: function(){
+          var selection = this.getSelection();
+
+          var startEnter = selection.before.length == 0 || selection.before[selection.before.length - 1] == '\n' ? '' : '\n';
+          var endEnter = selection.after[0] == '\n' ? '' : '\n';
+
+          if(selection.in == ''){
+            selection.prefix = startEnter + '\n - '
+            selection.in = 'First item'
+            selection.suffix = '\n - Second item\n' + endEnter;
+          }else {
+            var lines = selection.in.split('\n');
+            lines = lines.map(function (line) {
+              return ' - ' + line;
+            });
+            selection.prefix = startEnter + '\n' + lines.join('\n');
+            selection.in = '';
+            selection.suffix = '\n' + endEnter;
+          }
+
+
+          this.setSelection(selection);
         }
       });
     })();

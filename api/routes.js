@@ -66,6 +66,8 @@ module.exports = {
 
     app.get('/synonyms/:word', searchController.synonyms);
 
+    app.get('/location/:id', weakLimit, locationController.get);
+    app.post('/location/:id', authenticator.isAuthenticated, weakLimit, locationController.update);
     app.get('/locations/list/viewport', weakLimit, locationController.listForViewport);
     app.get('/locations/list/coordinates', weakLimit, locationController.listForCoordinates);
     app.get('/locations/list/:verse', weakLimit, locationController.listForVerse);

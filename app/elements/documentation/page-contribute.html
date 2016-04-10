@@ -1,0 +1,82 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="page-contribute">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+
+    </style>
+    <paper-toolbar>
+      <intelligent-title title="Contribute" allow-back></intelligent-title>
+    </paper-toolbar>
+    <div class="page-content">
+      <paper-card heading="Welcome!">
+        <div class="card-content">
+          If you ended up on this page you likely know me personally. Hopefully the fact that you're reading this means you think this
+          Bible application has potential. Either way, there is lots of stuff you can help out with, so look below:
+        </div>
+      </paper-card>
+
+      <paper-card heading="As a Theologian">
+        <div class="card-content">
+          <p>
+            A big part of this application is about creating an efficient platform where everybody can ask questions and have those questions answered. As a theologian there are three important things you can do:
+          </p>
+          <ul>
+            <li>Answer questions other people have asked (obviously)</li>
+            <li>Judge answers given by other people by voting on them. Important: If you downvote an answer always leave a comment why you think it's a poor answer. This allows others to downvote the same answer if they agree.</li>
+            <li>Ask the right questions. Unlike on most Q&A platforms and forums it's totally encouraged here to add questions and answering them yourself. The thing to realize is that the goal is to share knowledge in an easily accessible and focused way with people who want to study the Bible. This can often mean that you might add questions that a non-theologian wouldn't even have thought to ask.</li>
+          </ul>
+        </div>
+      </paper-card>
+
+      <paper-card heading="As a Cartographer/Historian">
+        <div class="card-content">
+          <p>
+            Originally the topographical aspects of this application where merely added in to create some content so that the application wouldn't look too empty at launch. By now however it's a fairly solid platform with a lot more potential. The current data however is fairly basic/simplistic and a editing locations could improve this a lot. Locations need:
+          </p>
+          <ul>
+            <li>Polygons. What this means is that locations such as 'Galilee' shouldn't just be a dot on a map, but should instead show which area was considered 'Galilee'. When you for example open the 'Salt Sea' or 'Galilee' right now you will see what I mean. Adding these in for all the important areas would be extremely valuable.</li>
+            <li>The time range when they are applicable (right now the map shows all locations at the same time, once we have proper ranges this will allow us to generate maps for different periods)</li>
+            <li>Simple descriptions and Wikipedia article names (not too important)</li>
+          </ul>
+        </div>
+      </paper-card>
+
+      <paper-card heading="As an average Joe">
+        <div class="card-content">
+          <p>
+            The goal of the Q&A section isn't to answer individual questions of individual people, but instead to create a collection of great questions with great answers. Now, you might not have the knowledge to write great answers, but adding questions when you have them is also a valid way to contribute. And beyond that cleaning up questions and answers by others is an equally important task. Take a good look at the rules and learn how markdown works feel free to clean up questions or answers that look messy, use improper grammar/punctuation or include superflous text.
+          </p>
+        </div>
+      </paper-card>
+
+      <paper-card heading="As an Programmer">
+        <div class="card-content">
+          <p>
+            I will soon be releasing all this on Github, so any bug squashing help is always greatly appreciated. But honestly though, if you want to contribute as a programmer the best thing you can do is simply contact me.
+          </p>
+        </div>
+      </paper-card>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        properties: {
+
+        },
+        behaviors: [
+          abaBehaviors.page
+        ],
+        listeners: {},
+        observers: []
+      });
+    })();
+  </script>
+
+</dom-module>

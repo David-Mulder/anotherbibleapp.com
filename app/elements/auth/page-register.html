@@ -108,15 +108,15 @@
           this.$.displayName.focus();
         },
         _checkForEnter: function(ev){
-          if(ev.code === 'Enter' || ev.code === 'NumpadEnter'){
+          if(ev.keyCode == 13){
             if(ev.target.value.length){
-              this._tabNext(ev.target);
+              this._tabNext(ev.currentTarget);
             }
           }
         },
         _tabNext: function(curElement){
-          var tabbable = [].slice.call(this.shadowRoot.querySelectorAll('[tabindex]'));
-          var next = tabbable[tabbable.indexOf(curElement)+1];
+          var tabable = Polymer.dom(this.root).querySelectorAll('[tabindex]');
+          var next = tabable[tabable.indexOf(curElement)+1];
           if(next.classList.contains('primary')){
             next.fire('tap');
           }else{

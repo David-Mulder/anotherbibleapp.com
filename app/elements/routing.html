@@ -146,13 +146,50 @@
       app.$.router.loadPage('documentation/page-contact');
     });
 
-    page('/map/:lng?/:lat?', function (data) {
+    page('/map/:id', function (data) {
       app.$.router.loadPage('locations/page-map', {
-        lng: data.params.lng,
-        lat: data.params.lat
+        infoId: data.params.id,
+        lat: '',
+        lng: ''
       }, {
         replace: true
       });
+    });
+
+    page('/map/:id/edit', function (data) {
+      app.$.router.loadPage('locations/page-map-edit', {
+        id: data.params.id
+      }, {
+        replace: true
+      });
+    });
+
+    page('/map/:lng/:lat', function (data) {
+      app.$.router.loadPage('locations/page-map', {
+        lng: parseFloat(data.params.lng.replace('-', '.')),
+        lat: parseFloat(data.params.lat.replace('-', '.')),
+        infoId: ''
+      }, {
+        replace: true
+      });
+    });
+
+    page('/map', function (data) {
+      app.$.router.loadPage('locations/page-map', {
+        infoId: '',
+        lat: '',
+        lng: ''
+      }, {
+        replace: true
+      });
+    });
+
+    page('/tech', function (data) {
+      app.$.router.loadPage('documentation/page-tech');
+    });
+
+    page('/contribute', function (data) {
+      app.$.router.loadPage('documentation/page-contribute');
     });
 
     page('*', function(){

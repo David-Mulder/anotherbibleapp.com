@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<link id="topics" rel="import" href="topics.lib.html">
+
 <dom-module id="related-topics-card">
   <template>
     <style include="shared-styles"></style>
@@ -19,6 +21,7 @@
         cursor: pointer;
       }
     </style>
+
     <paper-card heading="Explore texts about" hidden$="{{noTopics}}">
       <template is="dom-repeat" items="{{topics}}" as="topic">
         <div class="card-actions topic" on-tap="openTopicPage">{{_smartCaps(topic.title)}}</div>
@@ -27,11 +30,14 @@
         If you come across a dubious topic, please do contact me.
       </div>
     </paper-card>
+
   </template>
 
   <script>
     (function() {
       'use strict';
+
+      var topics = require('topics');
 
       Polymer({
         is: 'related-topics-card',
@@ -48,18 +54,14 @@
           abaBehaviors.text
         ],
         ready: function(){
-          this.worker = new Worker(this.resolveUrl('./verse-topic-finder.js'));
-          this.worker.addEventListener('message', function(ev){
-            this.noTopics = ev.data.length === 0;
-            this.set('topics', ev.data);
-            //console.log('new topics', ev.data);
-          }.bind(this));
+
         },
         verseChanged: function(){
           if(this.verse){
-            this.worker.postMessage({
-              verseAsNumber: this.verse.toNumeric()
-            });
+            topics.getTopicsByVerse(this.verse.toNumeric()).then(function(topicNames){
+              this.set('topics', topicNames);
+              this.noTopics = topicNames.length === 0;
+            }.bind(this));
           }else{
             this.noTopics = true;
           }
@@ -72,7 +74,7 @@
             element: target,
             heroName: 'topic-card'
           });
-          app.navigateTo('/topic/'+ev.model.topic.title);
+          app.navigateTo('/topic/'+ev.model.topic.title, ev);
           //console.log(ev.model.topic);
         }
       });

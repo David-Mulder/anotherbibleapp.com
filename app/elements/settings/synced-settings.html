@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
 
 <dom-module id="synced-settings">
   <template>
@@ -57,6 +57,8 @@
           return new Promise(function(resolve, reject) {
 
             var localSettings = this._getAllLocalSettings();
+
+            reset();
 
             if (this.$.getAll.loggedIn) {
               this.$.getAll.execute().then(function (cloudSettings) {

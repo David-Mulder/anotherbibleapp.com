@@ -5,10 +5,12 @@
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 
-<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-stepper/paper-stepper.html">
 <link rel="import" href="bible-markdown-editor.html">
 
 <link rel="import" href="../utils/utils-dialogs.html">
+<link rel="import" href="../settings/synced-settings.html">
+<link rel="import" href="../text/bible-snippet.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -23,78 +25,59 @@
         padding: 20px;
         overflow: auto;
       }
-      paper-card{
-        max-width: 1300px;
-        display: block;
-        width: 100%;
+      paper-stepper{
         margin: auto;
+        min-height: 470px;
+        width: 100%;
+        transition: .1s linear max-width;
       }
-
-      .stepper {
+      .step{
+        width: 100%;
+      }
+      #titleStep{
+        padding-left: 34px;
+        padding-right: 34px;
+        padding-bottom: 34px;
+        padding-top: 10px;
+      }
+      #titleStep bible-snippet{
+        margin-top: 20px;
+        background: rgba(0,0,0,.05);
+        padding: 10px;
+      }
+      .centered-step{
+        padding: 34px;
         display: flex;
-        flex-direction: column;
-      }
-      .stepper .step{
-        display: flex;
-        flex-direction: row;
-      }
-      .stepper .step [data-step]{
-        margin: 10px;
-        width: 24px;
-        position: relative;
-        /*
-        34 px
-        17px + 1px + 17px
-        */
-        background: linear-gradient(to right, transparent 12px, rgba(189,189,189, .87) 12px, transparent 13px);
-      }
-      .stepper .step [data-step]::before{
-        content: ' ';
-        position: absolute;
-        background: var(--card-dialog-color);
-        left:0px;
-        top:0px;
-        right:0px;
-        height: 34px;
-      }
-      .stepper .step [data-step]::after{
-        position: absolute;
-        content: attr(data-step);
-        display: block;
-        width: 24px;
-        height: 24px;
-        line-height: 24px;
-        background-color: var(--primary-color);
-        color: var(--text-on-primary-color);
-        border-radius: 12px;
-        text-align: center;
-      }
-
-      .stepper .step .content{
+        align-items: center;
+        justify-content: center;
         flex: 1;
-        margin: 10px;
-        padding-top: 2px;
-        padding-bottom: 10px;
       }
-
+      paper-radio-button .description{
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+      #rulesStep{
+        padding-top: 18px;
+        padding-bottom: 18px;
+      }
+      .centered-step > div{
+        max-width: 700px;
+      }
       #title{
         --paper-input-container-input: {
           font-size: 22px;
         };
       }
-
-      paper-input.no-upper-padding{
-        --paper-input-container: {
-          padding-top: 0px;
-        };
-      }
-      .step paper-radio-button{
-        padding: 6px;
+      bible-markdown-editor{
+        --bible-markdown-preview: {
+          margin-left: 0px;
+        }
       }
     </style>
 
     <auth-api logged-in="{{loggedIn}}"></auth-api>
     <auth-api id="api" method="PUT" action="question" param-title="{{title}}" param-category="{{category}}" param-text="{{questionText}}" param-verses="{{versesAsNumbers}}"></auth-api>
+
+    <synced-settings id="settings"></synced-settings>
 
     <utils-dialogs id="dialogs"></utils-dialogs>
 
@@ -105,77 +88,94 @@
     <div class="new-question-page">
 
       <div hidden="{{!loggedIn}}">
-        <paper-card id="card">
+        <paper-stepper id="card" on-finished="submit" current-step="{{currentStep}}">
 
-          <div class="card-content">
+          <div class="step centered-step" id="titleStep" label="Question Title" valid="{{_titleStepValid}}" error-message="{{_titleStepErrorMessage}}">
+            <div>
 
-            <div class="stepper">
-              <div class="step">
-                <div data-step="1"></div>
-                <div class="content">
-                  <paper-input id="title" label="Your question in one sentence (title)" class="no-upper-padding" value="{{title}}" char-counter maxlength="200" minlength="15"></paper-input>
-                  regarding
-                  <template is="dom-repeat" items="{{verses}}">
-                    {{item}}
-                  </template>
-                </div>
-              </div>
-              <div class="step">
-                <div data-step="2"></div>
-                <div class="content">
-                  This question is about:<br>
-                  <paper-radio-group selected="{{category}}">
-                    <paper-radio-button name="acts">What is happening in the text</paper-radio-button><br>
-                    <paper-radio-button name="author">The contextual meaning of the text for the text's original audience</paper-radio-button><br>
-                    <paper-radio-button name="application">The modern day applications of the text</paper-radio-button>
-                  </paper-radio-group>
-                </div>
-              </div>
-              <div class="step">
-                <div data-step="3"></div>
-                <div class="content">
-                  <paper-checkbox checked="{{agreeReadRules}}">I have read the rules about asking questions and how to format them.</paper-checkbox> If not <a href="/help/how-to-ask" target="_blank">click here</a> to view them.
-                </div>
-              </div>
-              <div class="step">
-                <div data-step="4"></div>
-                <div class="content">
-                  <bible-markdown-editor value="{{questionText}}" label="Your question in detail" rows="7">
-                    <p style="font-size: 14px;opacity: .8">
-                      Note: Your question will always be shown right next to the verses you selected.
-                    </p>
-                  </bible-markdown-editor>
-                </div>
-              </div>
+              <paper-input id="title" label="Your question in one sentence (title)" class="no-upper-padding" value="{{title}}" char-counter maxlength="200" minlength="15" always-float-label></paper-input>
+
+              <p>
+                about
+              </p>
+
+              <paper-input id="verses" label="Verses" class="no-upper-padding" value="{{versesAsString}}" always-float-label></paper-input>
+
+              <template is="dom-repeat" items="{{verses}}">
+                <bible-snippet start="{{item.start}}" end="{{item.end}}"></bible-snippet>
+              </template>
+
             </div>
-
           </div>
 
-          <div class="card-actions">
-            <paper-button on-tap="submit">Ask your Question</paper-button>
+          <div id="categoryStep" class="step centered-step" label="Category" editable valid="{{_categoryStepValid}}" error-message="is not selected">
+            <div>
+              This question is about:<br>
+              <paper-radio-group selected="{{category}}">
+                <paper-radio-button name="acts">
+                  <div class="title">What is happening in the text</div>
+                  <div class="description">
+                    Questions regarding the events described in the text. This applies primarily to texts that describe
+                    historical events and questions will often be about the temporal context.
+                  </div>
+                </paper-radio-button>
+                <paper-radio-button name="author">
+                  <div class="title">The contextual meaning of the text for the text's original audience</div>
+                  <div class="description">
+                    Questions regarding the author, his intentions and his public. Why was the text written as it was written?
+                    How was it understood by it's audience? Why did the author decide to write the text in the first place?
+                  </div>
+                </paper-radio-button>
+                <paper-radio-button name="application">
+                  <div class="title">The modern day applications of the text</div>
+                  <div class="description">
+                    Questions regarding the modern application the text has for the modern reader. These questions should
+                    only be asked once 'all' relevant questions of the previous two types have been asked.
+                  </div>
+                </paper-radio-button>
+              </paper-radio-group>
+            </div>
           </div>
 
-        </paper-card>
+          <div id="rulesStep" class="step centered-step" label="Rules" valid="{{_rulesStepValid}}" error-message="have not been read">
+            <div>
+              <p>
+                When you ask a question on this site the goal isn't just to have your personal question answered, but
+                rather to create a collection of great questions with their answers. Due to this the rules on this
+                site are a bit different from most Q&A sites:
+              </p>
+              <ul>
+                <li>
+                  <strong>Do not include salutations</strong> ('Hi', 'Greetings', etc.), <strong>thanks</strong>
+                  ('Thanks!', 'Thanks in advance', etc.) <strong>or your signature</strong> in the question body. Your name is already right
+                  next to the question and this keeps the question to the point.
+                </li>
+                <li>
+                  Every question should be worded in such a way that there could be <strong>one definite answer</strong>.
+                  Try to write them in such a way that they do not incite discussion, although it's fine that different answers will disagree.
+                </li>
+                <li>
+                  Every question should <strong>only contain one actual question</strong>. Do not combine multiple questions in to one except if the overlap is huge. In most cases splitting them up is better.
+                </li>
+                <li>
+                  Others may edit your posts to improve them, as long as they honor the original authors intent.
+                </li>
+              </ul>
+              <p>
+                <paper-checkbox checked="{{_hasReadRules}}" on-change="_saveRulesReadState">I have read the above rules</paper-checkbox>
+              </p>
+            </div>
+          </div>
+
+          <div class="step" label="Question Text" valid="{{_textStepValid}}" error-message="is too short">
+            <bible-markdown-editor id="editor" value="{{questionText}}" label="Your question in detail" rows="10">
+              <p style="font-size: 14px;opacity: .8">
+                Note: Your question will always be shown right next to the verses you selected.
+              </p>
+            </bible-markdown-editor>
+          </div>
+        </paper-stepper>
       </div>
-      <!--
-      <div hidden="{{!loggedIn}}">
-        <div id="title">
-          <paper-card>
-            <paper-input label="Your question in one sentence (title)"></paper-input>
-          </paper-card>
-        </div>
-        <div class="questionEditor">
-          <paper-card>
-            <paper-textarea value="{{questionText}}" label="Your question in detail" rows="3" always-float-label></paper-textarea>
-          </paper-card>
-          <paper-card>
-            <marked-element markdown="{{questionText}}">
-              <div class="markdown-html"></div>
-            </marked-element>
-          </paper-card>
-        </div>
-      </div>
-      -->
       <div hidden="{{loggedIn}}">
         You need to log in to do this
       </div>
@@ -194,86 +194,114 @@
         properties: {
           versesString: String,
           verses: Array,
-          animationConfig: {
-            value: function() {
-              return {
-                // the incoming page defines the 'entry' animation
-                'exit': [{
-                  name: 'hero-animation',
-                  id: 'question-card',
-                  fromPage: this
-                }, {
-                  name: 'fade-out-animation',
-                  node: this
-                }],
-                'entry': [{
-                  name: 'slide-from-bottom-animation',
-                  node: this
-                }, {
-                  name: 'fade-in-animation',
-                  node: this
-                }]
-              }
-            }
-          },
-          sharedElements: {
-            value: function() {
-              return {
-                'question-card': this.$.card
-              }
-            }
-          }
+          currentStep: Number
         },
         observers: [
-          'parseVerses(versesString)'
+          '_parseVerses(versesString)',
+          '_parseVerseString(versesAsString)',
+
+          '_stepChanged(currentStep)',
+
+          '_isTitleStepValid(title, _invalidVerseFound)',
+          '_isCategoryStepValid(category)',
+          '_isRulesStepValid(_hasReadRules)',
+          '_isTextStepValid(questionText)'
         ],
         listeners: {
-          'page-became-visible': '_checkLoggedInOrRedirect'
+          'page-became-visible': '_checkLoggedInOrRedirect',
+          'page-finished-animating': '_focusFields'
         },
         behaviors: [
           abaBehaviors.page
         ],
+        created: function(){
+          this._finishedAnimating = {};
+          this._finishedAnimating.when = new Promise(function(resolve, reject){
+            this._finishedAnimating.resolve = resolve;
+          }.bind(this))
+        },
         ready: function(){
+          this.$.settings.getSetting('confirmed-read-question-rules', false).then(function(value){
+            this._hasReadRules = value;
+          }.bind(this));
+        },
+        _stepChanged: function(step){
+          if(step == 3){
+            this.$.card.style.maxWidth = '1300px';
+          }else{
+            this.$.card.style.maxWidth = '800px';
+          }
+          if(step == 0){
+            this._finishedAnimating.when.then(function(){
+              this.$.title.focus();
+            }.bind(this));
+          }
+          if(step == 3){
+            this.$.editor.focus();
+          }
+        },
+        _focusFields: function(){
 
-          //this.set('loggedIn', false);
+          this._finishedAnimating.resolve();
+        },
+        _isTitleStepValid: function(title, _invalidVerseFound){
+          this._titleStepValid = title.length > 15 && !_invalidVerseFound;
+          if(title.length <= 15){
+            this.set('_titleStepErrorMessage', 'is too short')
+          }
+          if(_invalidVerseFound){
+            this.set('_titleStepErrorMessage', 'has unrecognized verse');
+          }
+        },
+        _isCategoryStepValid: function(category){
+          this._categoryStepValid = category ? true : false;
+        },
+        _isRulesStepValid: function(_hasReadRules){
+          this._rulesStepValid = _hasReadRules;
+        },
+        _saveRulesReadState: function(ev){
+          this.$.settings.saveSetting('confirmed-read-question-rules', ev.target.checked);
+        },
+        _isTextStepValid: function(text){
+          this._textStepValid = text.length > 30;
         },
         _checkLoggedInOrRedirect: function(){
           if(!this.loggedIn){
-            redirect('/login');
+            app.navigateTo('/login');
           }
         },
-        parseVerses: function(){
+        _parseVerses: function(){
           var verses = this.versesString.split(',');
           verses = verses.map(verse => new BibleReference(verse));
-          this.set('verses', verses);
-          this.set('versesAsNumbers', verses.map(verse => verse.toNumeric()))
+          this.set('verses', BibleReference.combine(verses));
+
+          if(typeof this.versesAsString == 'undefined' || this.versesAsString.length == 0){
+            this.set('versesAsString', this.verses.map(verse => verse.toString()).join(', '));
+          }
+        },
+        _parseVerseString: function(){
+          var verses = this.versesAsString
+              .split(',')
+              .map(v => v.trim())
+              .map(v => new BibleReference(v));
+
+          this.set('verses', BibleReference.combine(verses.filter(v => v.valid && v.chapter > 0)));
+
+          this.versesAsNumbers = this.verses
+              .reduce((prevValue, currentValue) => prevValue.concat(currentValue.split()), [])
+              .map(br => br.toNumeric());
+          this._invalidVerseFound = verses.some(vid => !vid.valid);
+          console.log(this.invalidVerseFound);
         },
         submit: function(){
-          var valid = true;
-          if(!this.agreeReadRules){
-            this.$.dialogs.toast('Please read the rules before asking your question');
-            valid = false;
-          }
-          if(this.title.length < 15){
-            this.$.dialogs.toast('Please make your title more descriptive');
-            valid = false;
-          }
-          if(!this.questionText || this.questionText.length < 30){
-            this.$.dialogs.toast('Please describe your question in more terms');
-            valid = false;
-          }
-          if(!this.category){
-            this.$.dialogs.toast('Please pick one of the categories');
-            valid = false;
-          }
-          if(valid){
-            this.$.api.execute().then(function(id){
-              page.replace('/question/'+id)
-            }).catch(function(errs){
-              alert('Some validation error occurred');
-              console.info('validation', errs);
-            });
-          }
+
+          this.$.api.execute().then(function(id){
+            page.replace('/question/'+id)
+          }).catch(function(errs){
+            alert('Some validation error occurred');
+            console.info('validation', errs);
+          });
+
         }
       });
     })();

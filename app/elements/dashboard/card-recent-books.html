@@ -27,9 +27,16 @@
         background: rgba(0,0,0,.05);
         cursor: pointer;
       }
+      .no-results{
+        padding: 0px 18px 18px 16px;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
     </style>
     <synced-settings id="settings"></synced-settings>
-    <paper-card id="card" heading="Recently read Books & Letters" hidden$="{{noResults}}">
+    <paper-card id="card" heading="Recently read Books & Letters">
+      <div class="no-results" hidden$="{{!noResults}}">
+        Books & Letters you have started reading will appear here.
+      </div>
       <template is="dom-repeat" items="{{books}}" as="book">
         <div class="card-actions book" on-tap="_goToBook">
           {{book.title}}
@@ -105,7 +112,7 @@
           //piercing the router consciously
           window.doSavePosition = true;
 
-          app.navigateTo('/book/'+ev.model.book.reference);
+          app.navigateTo('/book/'+ev.model.book.reference, ev);
         }
 
       });

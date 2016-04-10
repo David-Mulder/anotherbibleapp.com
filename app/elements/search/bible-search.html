@@ -131,7 +131,7 @@
           //console.log(this.$.utils.parseReference(ev.model.item.firstVerse).toString(), ev.model.item._debug.weights, ev.model.item._debug.weights.popularity);
           //return;
           var verse = ev.model.item;
-          app.navigateTo('/book/'+verse.firstVerse);
+          app.navigateTo('/book/'+verse.firstVerse, ev);
         }
       });
     })();

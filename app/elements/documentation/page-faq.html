@@ -1,4 +1,5 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
 
 <dom-module id="page-faq">
   <template>
@@ -6,78 +7,126 @@
     <style include="page-styles"></style>
     <style>
     </style>
-    <paper-toolbar>
+    <paper-toolbar class="medium-tall">
       <intelligent-title title="Frequently Asked Question"></intelligent-title>
+      <paper-tabs selected="{{section}}" class="bottom fit" scrollable attr-for-selected="data-section">
+        <paper-tab data-section="reading">Bible Reading related</paper-tab>
+        <paper-tab data-section="qa">Q&A related</paper-tab>
+      </paper-tabs>
     </paper-toolbar>
     <div class="page-content">
-      <paper-card heading="I don't see any verse or chapter numbers?">
-        <div class="card-content">
-          <p>
-            <strong>Important:</strong> You can alwayse use the toggle in the top right to turn on all the chapter and verse numbers, pericopes and translation notes.
-          </p>
-          <p>
-            The Bible is a compilation of many shorter books written at different times by a variety of authors, and later assembled into the biblical canon. The original manuscripts did not contain the chapter and verse divisions in the numbered form familiar to modern readers. The first English New Testament to use the verse divisions was a 1557 translation by William Whittingham. The goal of these was to allow referencing specific texts, which was super useful, but the necessity for these to be visible whilst reading the text has disappeared.
-          </p>
+      <iron-pages selected="{{section}}" attr-for-selected="data-section">
+        <div data-section="qa">
+          <paper-card heading="Someone else edited my post?">
+            <div class="card-content">
+              <p>
+                Everyone is allowed to improve each others posts. The strict rule is that this may only be used within the
+                boundaries of the original author's intent. So the large majority of edits will only improve spelling,
+                improve formatting or remove superfluous text (like salutations and thanks). If a post was edited in a way
+                that breaks with your intent as an author, then you should feel more than free to revert the changes.
+              </p>
+              <p>
+                One type of edit that might be controversial is edits that attempt to make questions on topic. Questions
+                should be specific (only a single question per question) and focused (they can't mix application and
+                historical context). In those cases the author still holds the right to revert the changes, but this may
+                result in the deletion of the post.
+              </p>
+              <p>
+                In the future if/once this site ever reaches the point where this collaborative nature of becomes an issue,
+                additional requirements - such as a certain number of posts with a certain number of votes - will be introduced
+                before (free) editing of posts is allowed.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="My question was deleted?">
+            <div class="card-content">
+              <p>
+                Administrators hold the right to delete questions they deem off topic. Questions may be considered off topic
+                because they are too broad or <a href="/help/how-to-ask">for various other reasons</a>. For the moment all
+                administrators will be picked  from users who have experience with the StackExchange platform. In principle the deletion/closure rules will be based on that platform, so if your question got deleted/closed and you're confused why it might
+                be a good idea to check out the StackExchange documentation.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="I see people answering their own questions, why?">
+            <div class="card-content">
+              <p>
+                Unlike most other Q&A sites this site is intended to not answer individual questions people <em>had</em>, but
+                rather become a repository of all questions people might <em>have</em>. So answering your own question
+                is just a way to contribute to this library of knowledge.
+              </p>
+            </div>
+          </paper-card>
         </div>
-      </paper-card>
-      <paper-card heading="Someone else edited my post?">
-        <div class="card-content">
-          <p>
-            Everyone is allowed to improve each others posts. The strict rule is that this may only be used within the
-            boundaries of the original author's intent. So the large majority of edits will only improve spelling,
-            improve formatting or remove superfluous text (like salutations and thanks). If a post was edited in a way
-            that breaks with your intent as an author, then you should feel more than free to revert the changes.
-          </p>
-          <p>
-            One type of edit that might be controversial is edits that attempt to make questions on topic. Questions
-            should be specific (only a single question per question) and focused (they can't mix application and
-            historical context). In those cases the author still holds the right to revert the changes, but this may
-            result in the deletion of the post.
-          </p>
-          <p>
-            In the future if this site ever reaches the point where this collaborative nature of the site becomes an issue
-            additional requirements - such a certain number of posts with a certain number of votes - may be introduced
-            before free editing of posts is allowed.
-          </p>
+        <div data-section="reading">
+          <paper-card heading="I don't see any verse or chapter numbers?">
+            <div class="card-content">
+              <p>
+                <strong>Important:</strong> You can alwayse use the toggle in the top right to turn on all the chapter and verse numbers, pericopes and translation notes.
+              </p>
+              <p>
+                The Bible is a compilation of many shorter books written at different times by a variety of authors, and later assembled into the biblical canon. The original manuscripts did not contain the chapter and verse divisions in the numbered form familiar to modern readers. The first English New Testament to use the verse divisions was a 1557 translation by William Whittingham. The goal of these was to allow referencing specific texts, which was super useful, but the necessity for these to be visible whilst reading the text has disappeared.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Books aren't showing up in my recently read list?">
+            <div class="card-content">
+              <p>
+                The recently read books list is only 'active' if you either open a book or letter without specifically
+                referencing a single verse. The reason for this is that if you're for example reading through Genesis from
+                start to end you don't want to lose your position just because you opened Genesis 1 again during a sermon.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="How do you highlight verses?">
+            <div class="card-content">
+              <p>
+                To highlight verses please tap the star icon (<iron-icon icon="star-border"></iron-icon>) in the right drawer.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Will you add other English translations?">
+            <div class="card-content">
+              <p>
+                Incoming controversial statement warning! In 3! 2! 1! I sincerely think that looking for differences between
+                translations is often more distracting from than helping helping with the comprehension of the text. Now, I
+                definitely <stong>do</stong> think there is a place for comparing translations and grabbing an interlinear bible and studying
+                the greek text, but it's a very small minority of texts where this makes an actual difference. In the cases
+                where it does become relevant I hope for the Q&A system to fill in these gaps, rather than all of us who don't
+                have a deep understanding of Greek and Hebrew jumping to conclusions.
+              </p>
+              <p>
+                For those cases that you do need those more traditional tools I have included an 'open with' button
+                (<iron-icon icon="launch"></iron-icon>) in the study tools drawer which allows you to open the verse in various
+                applications. Miss an application that provides unique tooling? Contact me and I will probably add it.
+              </p>
+            </div>
+          </paper-card>
+          <paper-card heading="Will you add non-English translations?">
+            <div class="card-content">
+              <p>
+                I would absolutely love to! There are two big 'but's though, first of all there is the issue that modern
+                Bible translations are nearly always under strict (possibly commercially motivated) copyright restrictions.
+                Despite the fact that a lot of Bible translations are made by non profit Bible organizations they often
+                have strict licensing rules along the lines of a maximum of 100 verses and at most 50% of a single book
+                or letter. Ironically one of the most commercially motivated Bible-related companies in the world:
+                Faithlife Corporation (Logos Bible Software), has invested in the creation of a modern and far more open
+                Bible translation. Point in case: if there are other non-English bible translations like that out there of
+                high quality and under a license that allows non-commercial distribution I will at least seriously consider
+                adding it.
+              </p>
+              <p>
+                As I said before there are two 'but's, the second being more technical. Although a Bible translation may
+                look like a simple text file to you, in reality there is a lot of meta data to convey semantics. Adding
+                more translations in a manageable way would require parsing the new Bible translation and generating the
+                exact same format. Possible? Definitely, but how easy or hard it is will depend entirely on how neatly
+                that meta data is encoded.
+              </p>
+            </div>
+          </paper-card>
         </div>
-      </paper-card>
-      <paper-card heading="My question was deleted?">
-        <div class="card-content">
-          <p>
-            Administrators hold the right to delete questions they deem off topic. Questions may be considered off topic
-            because they are too broad or <a href="/help/how-to-ask">for various other reasons</a>. For the moment all
-            administrators will be picked  from users who have experience with the StackExchange platform. In principle the deletion/closure rules will be based on that platform, so if your question got deleted/closed and you're confused why it might
-            be a good idea to check out the documenation of that platform.
-          </p>
-        </div>
-      </paper-card>
-      <paper-card heading="Books aren't showing up in my recently read list?">
-        <div class="card-content">
-          <p>
-            The recently read books list is only 'active' if you either open a book or letter without specifically
-            referencing a single verse. The reason for this is that if you're for example reading through Genesis from
-            start to end you don't want to lose your position just because you opened Genesis 1 again during a sermon.
-          </p>
-        </div>
-      </paper-card>
-      <paper-card heading="I see people answering their own questions, why?">
-        <div class="card-content">
-          <p>
-            Unlike most other Q&A sites this site is intended to not answer individual questions people <em>had</em>, but
-            rather become a repository of all questions people might <em>have</em>. So answering your own question
-            is just a way to contribute to this library of knowledge.
-          </p>
-        </div>
-      </paper-card>
-      <paper-card heading="I found a mistake in the map data, what to do?">
-        <div class="card-content">
-          <p>
-            In the future I want to make the map publicly editable as well, but at the moment this is not possible yet.
-            If you would like to contribute significantly to improving the map please contact me and I will make the
-            above a higher priority.
-          </p>
-        </div>
-      </paper-card>
+      </iron-pages>
+
     </div>
   </template>
 
@@ -87,7 +136,10 @@
 
       Polymer({
         properties: {
-
+          section: {
+            type: String,
+            value: 'reading'
+          }
         },
         behaviors: [
           abaBehaviors.page

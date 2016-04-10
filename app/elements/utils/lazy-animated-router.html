@@ -25,6 +25,9 @@
         background: var(--primary-color-500);
         overflow: hidden;
       }
+      iron-pages > *{
+        height: 100%;
+      }
     </style>
     <template is="dom-if" if="{{animated}}">
       <neon-animated-pages selected="{{_selectedPage}}" attr-for-selected="data-id" id="pages" on-neon-animation-finish="_pageAnimationFinished">
@@ -112,6 +115,11 @@
           }.bind(this));
         },
         loadPage: function(file, params, opts){
+          app.loading(file);
+          var opts = opts || {};
+          this.debugI = this.debugI || 1;
+          opts.id = this.debugI++;
+          console.log('started loading', opts.id);
           this._pageLoadQueue.push([file, params, opts]);
           this._checkQueue();
         },
@@ -129,16 +137,15 @@
             this._isCurrentlyAnimating = true;
             var args = this._pageLoadQueue.shift();
 
-            app.loading(args[0]);
             this._loadPage(args[0], args[1], args[2]).then(function(element){
-
-              app.finishedLoading(args[0]);
-
+              //console.log('loaded', args[2].id);
               var awaitFinishedAnimation = function(){
-
+                //console.log('finished loading', args[2].id);
                 element.removeEventListener('page-finished-animating', awaitFinishedAnimation);
 
                 this._isCurrentlyAnimating = false;
+
+                app.finishedLoading(args[0]);
 
                 setTimeout(function(){
                   this._checkQueue();
@@ -174,19 +181,24 @@
                   samePage.set(paramName, params[paramName]);
                 });
               }
+              var topPageIsCurrentPage = this._selectedPage == samePage.dataset.id;
               this._selectedPage = samePage.dataset.id;
               samePage.fire('page-loading');
-              samePage.fire('page-became-visible');
+              samePage.fire('page-became-visible', {
+                initialLoad: false
+              });
               setTimeout(function(){
                 resolve(samePage);
 
-                if(!this.animated){
-                  samePage.fire('page-finished-animating');
-                  if(prevPage){
-                    prevPage.fire('page-finished-exiting');
+                setTimeout(function(){
+                  if(!this.animated || topPageIsCurrentPage){
+                    samePage.fire('page-finished-animating');
+                    if(prevPage){
+                      prevPage.fire('page-finished-exiting');
+                    }
                   }
-                }
-              }, 0);
+                }.bind(this), 0);
+              }.bind(this), 0);
             }else{
               this._importDependency(file).then(function(){
                 if(currentPages.length > 3){
@@ -211,7 +223,9 @@
                   this._selectedPage = el.dataset.id;
                   window.dispatchEvent(new Event('resize'));
 
-                  el.fire('page-became-visible');
+                  el.fire('page-became-visible', {
+                    initialLoad: true
+                  });
 
                   resolve(el);
 

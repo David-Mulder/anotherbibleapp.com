@@ -1,0 +1,222 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="../utils/relative-time.html">
+
+<link id="topics" rel="import" href="../topics/topics.lib.html">
+
+<dom-module id="field-search">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        background-color: #fff;
+        border: 1px solid #eee;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        height: 40px;
+        @apply(--layout-flex);
+        @apply(--layout-center);
+        @apply(--layout-horizontal);
+        position: relative;
+      }
+      #search-icon{
+        color: var(--google-grey-700);
+        fill: var(--google-grey-700);
+        margin: 0 15px;
+      }
+      input{
+        font-size: 20px;
+        outline: 0;
+        border: none;
+        flex: 1;
+        width: 100%;
+        background: transparent;
+        @apply(--field-search-input);
+      }
+
+      #suggestions{
+        position: absolute;
+        left: -1px;
+        right: -1px;
+        top: 40px;
+        background: white;
+        z-index: 1;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+        0 1px 5px 0 rgba(0, 0, 0, 0.12),
+        0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+      }
+      #suggestions::before{
+        content:' ';
+        display: block;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: -6px;
+        height: 6px;
+        background: white;
+      }
+      #suggestions .suggestion{
+        color: var(--text-on-card-dialog-color);
+        padding: 15px 20px 15px 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #suggestions .suggestion:hover{
+        cursor: pointer;
+        background: rgba(0,0,0,.05);
+      }
+      #suggestions .suggestion iron-icon{
+        color: var(--secondary-text-on-card-dialog-color);
+        margin: 0px 8px;
+      }
+      #suggestions .suggestion .time{
+        color: var(--secondary-text-on-card-dialog-color);
+        font-size: smaller;
+      }
+      @media all and (max-width: 600px) {
+        :host {
+          height: 36px;
+        }
+        :host([size='small']) #suggestions{
+          top: 36px;
+        }
+      }
+
+      :host([size='small']){
+        height: 32px;
+      }
+      :host([size='small']) #suggestions{
+        top: 32px;
+      }
+      :host([size='small']) #search-icon{
+        display: none;
+      }
+      :host([size='small']) #suggestions .suggestion{
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+      :host([size='small']) #suggestions .suggestion iron-icon[icon='no-icon']{
+        display: none;
+      }
+      :host([size='small']) .suggestion iron-icon{
+        width: 19px;
+        height: 19px;
+      }
+      :host([size='small']) input{
+        font-size: 15px;
+        padding: 0px 10px;
+        @apply(--field-search-input);
+      }
+    </style>
+    <synced-settings id="settings"></synced-settings>
+
+    <iron-icon id="search-icon" icon="search"></iron-icon>
+
+    <input id="searchInput" is="iron-input" value="[[searchQuery]]" on-keyup="_setValueIfEnter" on-focus="_retrieveAndShowSuggestions" on-blur="_hideSuggestions" placeholder$="{{label}}"></input>
+
+    <div id="suggestions" hidden$="{{!_showSuggestions}}">
+      <template is="dom-repeat" items="{{suggestions}}">
+        <div class="suggestion" on-down="_executeSuggestion">
+          <iron-icon icon$="{{item.icon}}"></iron-icon>
+          <span class="label">{{item.query}}</span>
+          <span class="time" hidden$="{{!item.createdAt}}">
+            <relative-time time="{{item.createdAt}}"></relative-time>
+          </span>
+        </div>
+      </template>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var topics = require('topics');
+
+      Polymer({
+        properties: {
+          searchQuery: {
+            type: String,
+            notify: true
+          },
+          numberOfSuggestions: {
+            type: Number,
+            value: 7
+          },
+          size: {
+            type: String,
+            value: 'normal',
+            reflectToAttribute: true
+          }
+        },
+        behaviors: [
+          abaBehaviors.text
+        ],
+        listeners: {},
+        observers: [],
+        ready: function(){
+          this._showSuggestions = false;
+        },
+        focus: function(){
+          this.$.searchInput.focus();
+        },
+        _setValueIfEnter: function(ev){
+          if(ev.keyCode == 13){
+            app.navigateTo('/search/'+encodeURIComponent(ev.target.value), ev);
+            ev.target.blur();
+            //this.searchQuery = ev.target.value;
+          }else{
+            this._loadAutoComplete();
+          }
+        },
+        _setShowSuggestions: function(){
+          this._showSuggestions = this.suggestions.length > 0 && this.$.searchInput == Polymer.dom(this.root).activeElement;
+        },
+        _loadAutoComplete: function(){
+
+          var query = this.$.searchInput.value;
+          console.log('yes?', query);
+          this.debounce('autocomplete', function(){
+            if(query.length > 0) {
+              topics.getTopicsStartingWith(query, this.numberOfSuggestions).then(function (topics) {
+                this.suggestions = [];
+                topics.forEach(function (topic) {
+                  this.push('suggestions', {
+                    query: this._smartCaps(topic),
+                    icon: 'no-icon'
+                  });
+                }.bind(this));
+                this._setShowSuggestions();
+              }.bind(this));
+            }else{
+              this.$.settings.getSetting('savedSearches', []).then(function(savedSearches){
+                this.suggestions = savedSearches.splice(0, this.numberOfSuggestions).map(function(search){
+                  search.icon = 'history';
+                  return search;
+                });
+                this._setShowSuggestions();
+              }.bind(this));
+            }
+
+          }, 500);
+
+        },
+        _retrieveAndShowSuggestions: function(){
+          this._loadAutoComplete();
+        },
+
+        _hideSuggestions: function(){
+          //async to allow the tap to register
+          this._showSuggestions = false;
+        },
+
+        _executeSuggestion: function(ev){
+          this.searchQuery = '';
+          app.navigateTo('/search/'+encodeURIComponent(ev.model.item.query), ev);
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

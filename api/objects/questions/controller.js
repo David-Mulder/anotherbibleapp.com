@@ -27,7 +27,6 @@ module.exports = {
           res.status(500).json(err);
         }else{
           if(req.query.history) {
-            console.log('or here1');
 
             question.history().then(function(history){
               console.log('history', history);
@@ -40,7 +39,6 @@ module.exports = {
             });
 
           }else{
-            console.log('here');
             res.json(question.makePublic(userId));
           }
         }

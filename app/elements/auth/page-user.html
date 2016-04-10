@@ -275,10 +275,10 @@
         },
         _goToQuestion: function(ev){
           var id = ev.model.item.question ? ev.model.item.question._id : ev.model.item._id;
-          app.navigateTo('/question/'+id);
+          app.navigateTo('/question/'+id, ev);
         },
-        _goToSettings: function(){
-          app.navigateTo('/settings');
+        _goToSettings: function(ev){
+          app.navigateTo('/settings', ev);
         },
         _goToGravatar: function(){
           window.open('http://en.gravatar.com/emails/');

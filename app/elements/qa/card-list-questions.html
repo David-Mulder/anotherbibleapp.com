@@ -99,7 +99,8 @@
             <div class="question">
               <span>{{question.title}}</span>
               <div class="info">
-                <span class="verses">by {{question.originalAuthor.displayName}}</span>
+                <span class="verses" hidden$="{{!question.source}}">by {{question.source.user.displayName}} (CC BY-SA 3.0)</span>
+                <span class="verses" hidden$="{{question.source}}">by {{question.originalAuthor.displayName}}</span>
                 <span class="verses">about {{question.verses}}</span>
               </div>
             </div>
@@ -154,7 +155,7 @@
             element: target,
             heroName: 'question-card'
           });
-          app.navigateTo('/question/'+ev.model.question._id)
+          app.navigateTo('/question/'+ev.model.question._id, ev)
         }
       });
     })();

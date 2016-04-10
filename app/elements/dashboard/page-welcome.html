@@ -12,13 +12,18 @@
     <style include="shared-styles"></style>
     <style include="page-styles"></style>
     <style>
-      card-explore-questions, card-welcome-back, card-quick-nav, card-recent-books{
-        max-width: 700px;
-        margin: auto;
+      card-explore-questions, card-welcome-back, card-quick-nav, card-recent-books, .page-content paper-card{
         margin-bottom: 8px;
+
       }
+      @media all and (max-width: 500px) {
+        .page-content{
+          padding: 0px;
+        }
+      }
+
       @media all and (min-width: 500px) {
-        card-explore-questions, card-welcome-back, card-quick-nav, card-recent-books {
+        card-explore-questions, card-welcome-back, card-quick-nav, card-recent-books, .page-content paper-card {
           margin-bottom: 16px;
         }
       }
@@ -62,6 +67,28 @@
       #narrowTitle{
         margin-left: 50px;
       }
+      .columns{
+        display: flex;
+        justify-content: center;
+      }
+      .columns .column{
+        flex: 1;
+        padding: 10px;
+        max-width: 700px;
+
+      }
+      @media all and (max-width: 600px) {
+        .columns{
+          flex-direction: column;
+        }
+        .column.left{
+          padding-bottom: 0px;
+          margin-bottom: -10px;
+        }
+        .column-right{
+          padding-top: 0px;
+        }
+      }
       @media all and (min-width: 600px) {
         #wideTitle{
           display: block;
@@ -99,13 +126,64 @@
 
         <auth-api logged-in="{{loggedIn}}"></auth-api>
 
-        <template is="dom-if" if="{{loggedIn}}">
-          <card-welcome-back narrow="{{narrow}}"></card-welcome-back>
-          <!--<card-quick-nav></card-quick-nav>-->
-          <card-recent-books></card-recent-books>
-          <card-explore-questions></card-explore-questions>
-        </template>
+        <div class="columns">
+          <div class="left column">
 
+            <template is="dom-if" if="{{loggedIn}}">
+              <card-recent-books></card-recent-books>
+              <card-quick-nav hidden$="{{!narrow}}"></card-quick-nav>
+              <card-explore-questions list-type="recent"></card-explore-questions>
+            </template>
+
+            <paper-card heading="Welcome to Another Bible App" hidden="{{loggedIn}}">
+              <div class="card-content">
+                There are a lot of Bible apps out there, so thanks for using this one. What makes this application
+                unique is that the goal is to focus on Bible reading as something that's best done in groups in the
+                full understanding that the Bible is an actual collection of testimonies written by real people
+                about God's revelations.
+              </div>
+              <div class="card-actions">
+                <paper-button on-tap="goToLogin">Log In</paper-button>
+                <paper-button on-tap="goToRegister">Register</paper-button>
+              </div>
+            </paper-card>
+            <template is="dom-if" if="{{!loggedIn}}">
+              <card-quick-nav hidden$="{{!narrow}}"></card-quick-nav>
+            </template>
+            <paper-card heading="Focused reading" hidden="{{loggedIn}}">
+              <div class="card-content">
+                The Bible is 'just' a collection of books and letters. Stuff like verses, notes, pericopes (the headers in
+                between paragraphs) and all those things were added later. Naturally these can be incredibly useful when
+                studying a specific text, but often only distract from the original text as a whole. By default this app hides
+                these things presenting only text in it's original form, but you can turn on the 'study tools' anytime you
+                need them.
+              </div>
+            </paper-card>
+            <paper-card heading="Q&A" hidden="{{loggedIn}}">
+              <div class="card-content">
+                An integral part of this bible app is the ability to ask and answer questions about bible texts. You can
+                consider it as a sort of long form collaborative study bible, or a focused collaborative commentary. Feel
+                free to only read questions and answers others have asked, or write your own.
+                <a href="/philosophy">Read more about the philosophy behind this functionality</a>
+              </div>
+            </paper-card>
+            <paper-card heading="Search & Offline" hidden="{{loggedIn}}">
+              <div class="card-content">
+                Finding that specific verse you're thinking of can often be quite the challenge, especially without an internet connection.
+                Like all other bible search engines this one can do traditional literal searches, but it can also search for topics (including topics that aren't literally mentioned in the Bible such as 'trinity' or 'celebrating halloween') and intelligently sort results even when offline.
+                <a href="/search">Try it out now</a>
+              </div>
+            </paper-card>
+
+          </div>
+          <div class="right column">
+            <template is="dom-if" if="{{!loggedIn}}">
+              <card-recent-books></card-recent-books>
+            </template>
+            <card-explore-questions list-type="recently-active" count="8"></card-explore-questions>
+          </div>
+        </div>
+        <!--
         <div hidden="{{loggedIn}}">
           <paper-card heading="Welcome to Another Bible App">
             <div class="card-content">
@@ -120,6 +198,7 @@
             </div>
           </paper-card>
           <card-recent-books></card-recent-books>
+          <card-explore-questions list-type="recently-active"></card-explore-questions>
           <paper-card heading="Q&A">
             <div class="card-content">
               An integral part of this bible app is the ability to ask and answer questions about bible texts. You can
@@ -139,6 +218,7 @@
           </paper-card>
 
         </div>
+        -->
     </paper-scroll-header-panel>
   </template>
 
@@ -161,9 +241,14 @@
         ready: function(){
 
         },
-        _pageBecameVisible: function(){
-          if(this.$$('card-recent-books')) this.$$('card-recent-books').reload();
-          if(this.$$('card-explore-questions')) this.$$('card-explore-questions').reload();
+        _pageBecameVisible: function(ev){
+          this.$$('card-recent-books').reload();
+          if(ev.detail.initialLoad === false){
+            var qaCards = Polymer.dom(this.root).querySelectorAll('card-explore-questions');
+            qaCards.forEach(function(card){
+              card.reload();
+            });
+          }
         },
         _setTitleMargin: function(ev){
           var marginTop = (128-ev.detail.y)/128*-20;
@@ -171,17 +256,17 @@
           this.$.wideTitle.style.marginTop = marginTop + 'px';
           this.$.wideTitle.style.fontSize = fontSize + 'px';
         },
-        goToSearch: function(){
-          app.navigateTo('/search');
+        goToSearch: function(ev){
+          app.navigateTo('/search', ev);
         },
-        goToLogin: function(){
-          app.navigateTo('/login');
+        goToLogin: function(ev){
+          app.navigateTo('/login', ev);
         },
-        goToLogout: function(){
-          app.navigateTo('/logout');
+        goToLogout: function(ev){
+          app.navigateTo('/logout', ev);
         },
-        goToRegister: function(){
-          app.navigateTo('/register');
+        goToRegister: function(ev){
+          app.navigateTo('/register', ev);
         }
       });
     })();

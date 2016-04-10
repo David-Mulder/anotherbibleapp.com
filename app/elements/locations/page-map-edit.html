@@ -1,0 +1,401 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="map-generic-behavior.html">
+<link rel="import" href="../text/bible-snippet.html">
+
+<link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
+<link id="labels" rel="import" href="labels.data.html">
+<link id="delete-menu" rel="import" href="delete-menu.lib.html">
+
+<dom-module id="page-map-edit">
+  <template>
+    <style include="shared-styles"></style>
+    <style include="page-styles"></style>
+    <style>
+      .page-content{
+        padding: 0px;
+        position: relative;
+        display: flex;
+      }
+      #map{
+        flex: 1;
+      }
+      .edit-layer{
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        z-index: 1;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        background: white;
+        right: 10px;
+        max-width: 400px;
+      }
+      .tab{
+        padding: 20px;
+      }
+      .timespan{
+        display: flex;
+        clear: both;
+      }
+      .revisions-tab{
+        max-height: 400px;
+        overflow: auto;
+      }
+      .revisions-tab .revision{
+        cursor: pointer;
+        padding: 10px;
+        border-bottom: 1px solid rgba(0,0,0,.1);
+      }
+      .revisions-tab .revision .author{
+        font-size: smaller;
+        text-align: right;
+        color: var(--secondary-text-on-card-dialog-color);
+      }
+    </style>
+
+    <auth-api id="api" action="location/:id" param-id="{{id}}" param-history logged-in="{{loggedIn}}"></auth-api>
+    <auth-api id="saveApi" method="post" action="location/:id" param-id="{{id}}" param-location="{{location}}"></auth-api>
+
+    <paper-toolbar>
+      <intelligent-title title="Map" allow-back></intelligent-title>
+      <paper-icon-button icon="save" on-tap="save"></paper-icon-button>
+    </paper-toolbar>
+
+    <div class="page-content">
+      <div class="edit-layer">
+        <paper-tabs selected="{{_tab}}" attr-for-selected="data-tab">
+          <paper-tab data-tab="info">Description</paper-tab>
+          <paper-tab data-tab="map">Carthography</paper-tab>
+          <paper-tab data-tab="history">Change log</paper-tab>
+        </paper-tabs>
+        <iron-pages selected="{{_tab}}" attr-for-selected="data-tab">
+          <div class="tab" data-tab="info">
+            <paper-input label="Location name" value="{{location.title}}"></paper-input>
+            <paper-textarea label="Description" value="{{location.description}}" char-counter maxlength="120"></paper-textarea>
+            <div class="timespan">
+              <paper-input label="Start year" value="{{location.timespan.start}}"></paper-input>
+              <paper-input label="End year" value="{{location.timespan.end}}"></paper-input>
+            </div>
+            <paper-textarea label="Wikipedia article name" placeholder="" value="{{location.wiki}}"></paper-textarea>
+          </div>
+          <div class="tab" data-tab="map">
+            <p>
+              Drag the marker to change the center/point location.
+            </p>
+
+            <paper-checkbox checked="{{_hasPolygon}}" on-change="_addOrRemovePolygon" disabled="{{_disableComplexShapes}}">Enable complex shapes</paper-checkbox>
+          </div>
+          <div class="revisions-tab" data-tab="history">
+            <template is="dom-repeat" items="{{revisions}}">
+              <div class="revision" on-down="_showRevision" on-up="_hideRevision">
+                <ul>
+                <template is="dom-repeat" items="{{item.changes}}">
+                  <li>{{item}}</li>
+                </template>
+                </ul>
+                <div class="author">{{item.author.displayName}}</div>
+              </div>
+            </template>
+          </div>
+        </iron-pages>
+      </div>
+      <div id="map"></div>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var BibleReference = require('bible-reference-parser');
+      var deleteMenuInit = require('delete-menu').init;
+
+      Polymer({
+        properties: {
+          id: {
+            type: String
+          },
+          map: {
+            type: Object
+          },
+          _mapItems: {
+            type: Array,
+            value: function(){
+              return [];
+            }
+          },
+          _tab: {
+            type: String,
+            value: 'info'
+          }
+        },
+        behaviors: [
+          abaBehaviors.page,
+          abaBehaviors.logic,
+          abaBehaviors.genericMapBehavior
+        ],
+        listeners: {
+          'page-became-visible': '_pageBecameVisible'
+        },
+        observers: [
+          '_loadData(id)',
+          '_drawPolygon(_internalPolygonCoordinates, DeleteMenu)',
+          '_tabChanged(_tab)'
+        ],
+        ready: function(){
+          this.mapReady.then(function(map){
+
+            this.map = map;
+            this.DeleteMenu = deleteMenuInit();
+
+            this._markerImage = new google.maps.MarkerImage(
+              '/elements/locations/marker.png',
+              new google.maps.Size(18,18),
+              new google.maps.Point(0,0),
+              new google.maps.Point(9,18)
+            );
+
+            this._markerImageShape = {
+              coord: [13,0,14,1,15,2,16,3,17,4,17,5,17,6,17,7,17,8,17,9,17,10,17,11,17,12,17,13,16,14,15,15,14,16,13,17,4,17,3,16,2,15,1,14,0,13,0,12,0,11,0,10,0,9,0,8,0,7,0,6,0,5,0,4,1,3,2,2,3,1,4,0,13,0],
+              type: 'poly'
+            };
+
+          }.bind(this));
+        },
+        _pageBecameVisible: function(){
+          if(!this.loggedIn){
+            app.navigateTo('/');
+          }
+        },
+        save: function(){
+          this.$.saveApi.execute();
+        },
+        _addOrRemovePolygon: function(){
+
+          if(this._internalPolygonCoordinates && this._internalPolygonCoordinates.length > 0){
+            this.set('_internalPolygonCoordinates', []);
+          }else{
+
+            var center = this.map.getCenter();
+            var size = {
+              14:.01,
+              13:.02,
+              12:.03,
+              11:.06,
+              10:.12,
+              9:.25,
+              8:.5,
+              7:1,
+              6:3,
+              5:5,
+              4:5
+            }[this.map.getZoom()];
+
+            this.set('_internalPolygonCoordinates', [
+              {lat: center.lat() - size, lng: center.lng() - size},
+              {lat: center.lat() + size, lng: center.lng() - size},
+              {lat: center.lat() + size, lng: center.lng() + size},
+              {lat: center.lat() - size, lng: center.lng() + size}
+            ]);
+          }
+        },
+        _setPolygon: function(ev){
+          this.location.polygon = this._polygon.getPath().getArray().map(function(coor){
+            return coor.toJSON();
+          });
+        },
+        _drawPolygon: function(){
+          if(this._polygon){
+            this._polygon.setMap(null);
+          }
+          if(this._internalPolygonCoordinates && this._internalPolygonCoordinates.length > 0) {
+            this._hasPolygon = true;
+            //this._disableComplexShapes = true;
+            this._polygon = new google.maps.Polygon({
+              map: this.map,
+              paths: this._internalPolygonCoordinates,
+              strokeColor: 'rgb(255,110,64)',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: 'rgb(255,110,64)',
+              fillOpacity: 0.35,
+              geodesic: true,
+              editable: this._tab == 'map'
+            });
+
+            this.push('_mapItems', this._polygon);
+
+            var deleteMenu = new this.DeleteMenu();
+
+            google.maps.event.addListener(this._polygon, 'rightclick', function (e) {
+              // Check if click was on a vertex control point
+              if (e.vertex == undefined) {
+                return;
+              }
+              deleteMenu.open(this.map, this._polygon.getPath(), e.vertex);
+            }.bind(this));
+
+            google.maps.event.addListener(this._polygon.getPath(), 'insert_at', this._setPolygon.bind(this));
+            google.maps.event.addListener(this._polygon.getPath(), 'remove_at', this._setPolygon.bind(this));
+            google.maps.event.addListener(this._polygon.getPath(), 'set_at', this._setPolygon.bind(this));
+          }
+
+        },
+        _tabChanged: function(){
+          if(this._polygon){
+            this._polygon.setEditable(this._tab == 'map');
+          }
+          if(this._marker){
+            this._marker.setDraggable(this._tab == 'map');
+          }
+        },
+        _loadData: function(id){
+          this.$.api.execute().then(function(location){
+            this.mapReady.then(function(map){
+
+              this._clearMap();
+
+              this.location = location;
+
+              this._setRevisions();
+
+              this._internalPolygonCoordinates = location.polygon;
+
+              this._marker = new google.maps.Marker({
+                position: {lat: this.location.coordinates[1], lng: this.location.coordinates[0]},
+                map: this.map,
+                icon: this._markerImage,
+                shape: this._markerImageShape,
+                draggable: this._tab == 'map'
+              });
+              this._mapItems.push(this._marker);
+              google.maps.event.addListener(this._marker, 'dragend', this._setMarker.bind(this));
+
+              this._setPosition();
+
+            }.bind(this));
+          }.bind(this));
+        },
+        _setMarker: function(){
+          this.location.coordinates = [this._marker.position.lng(), this._marker.position.lat()];
+        },
+        _clearMap: function(){
+          this._mapItems.forEach(function(marker){
+            marker.setMap(null);
+          });
+          this._mapItems = [];
+        },
+        _setPosition: function(){
+          var bounds = new google.maps.LatLngBounds();
+          if(this.location.polygon && this.location.polygon.length > 0){
+            this._polygon.getPath().getArray().forEach(function(point){
+              bounds.extend(point);
+            });
+          }else{
+            bounds.extend(this._marker.position);
+          }
+          this.map.fitBounds(bounds);
+        },
+        _setRevisions: function(){
+          //revisions are sorted from 0=newest to n=original
+          //so
+          //compare current to 0
+          // 0 to 1
+          // 1 to n
+          var findDifferences = function(a,b){
+            var diff = [];
+            ['title', 'description', 'wiki'].forEach(function(field){
+              if(a[field] !== b[field]){
+                diff.push('The ' + field + ' has been updated to \'' + b[field] + '\'.');
+              }
+            });
+            ['coordinates'].forEach(function(field){
+              if(a[field][0] !== b[field][0] || a[field][1] !== b[field][1]){
+                diff.push('The ' + field + ' have been updated.');
+              }
+            });
+            ['timespan'].forEach(function(field){
+              if(a[field].start != b[field].start){
+                diff.push('The ' + field + ' start has been updated to ' + b[field].start + '.');
+              }
+              if(a[field].end != b[field].end){
+                diff.push('The ' + field + ' end has been updated to ' + b[field].end + '.');
+              }
+            });
+            ['polygon'].forEach(function(field){
+              if(a[field].length == 0 && b[field].length > 0){
+                diff.push('A complex shape has been added.');
+              }else if(JSON.stringify(a[field]) !== JSON.stringify(b[field])){
+                diff.push('The shape has been updated.');
+              }
+            });
+            return diff;
+          };
+
+          this.revisions = [];
+          for(var i=0;i<this.location.revisions.length;i++){
+            if(i == 0){
+              var oldVersion = this.location.revisions[0];
+              var newVersion = this.location;
+            }else{
+              var oldVersion = this.location.revisions[i];
+              var newVersion = this.location.revisions[i - 1];
+            }
+
+            var changes = findDifferences(oldVersion, newVersion);
+            this.push('revisions', {
+              changes: changes,
+              author: newVersion.revisionAuthor,
+              data: newVersion
+            });
+          }
+          this.push('revisions', {
+            changes: ['Original version imported'],
+            author: {
+              displayName: 'OpenBible.info'
+            },
+            data: this.location.revisions[this.location.revisions.length - 1]
+          });
+        },
+        _showRevision: function(ev){
+          var revision = ev.model.item.data;
+          if(revision.polygon && revision.polygon.length > 0) {
+            this._revisionPolygon = new google.maps.Polygon({
+              map: this.map,
+              paths: revision.polygon,
+              strokeColor: 'rgb(255,110,64)',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: 'rgb(255,110,64)',
+              fillOpacity: 0.35,
+              geodesic: true,
+              editable: this._tab == 'map'
+            });
+          }
+          this._revisionMarker = new google.maps.Marker({
+            position: {lat: revision.coordinates[1], lng: revision.coordinates[0]},
+            map: this.map,
+            icon: this._markerImage,
+            shape: this._markerImageShape
+          });
+        },
+        _hideRevision: function(ev){
+          if(this._revisionPolygon) {
+            this._revisionPolygon.setMap(null);
+            delete this._revisionPolygon;
+          }
+          this._revisionMarker.setMap(null);
+          delete this._revisionMarker;
+        }
+      });
+    })();
+  </script>
+
+</dom-module>

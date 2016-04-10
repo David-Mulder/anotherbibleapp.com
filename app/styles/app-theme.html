@@ -22,6 +22,14 @@
     text-transform: none;
   }
 
+  #mainDrawer{
+    --paper-drawer-panel-drawer-container: {
+      z-index: 1;
+    };
+    --paper-drawer-panel-scrim: {
+      z-index: 1;
+    };
+  }
   #mainDrawer [drawer]{
     background: var(--card-dialog-color);
     background: var(--primary-color-50);
@@ -51,6 +59,7 @@
     width: auto;
     --paper-progress-active-color: var(--accent-color);
   }
+
 
   /* Breakpoints */
 

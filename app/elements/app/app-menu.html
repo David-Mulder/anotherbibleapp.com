@@ -9,6 +9,7 @@
 <link rel="import" href="/bower_components/iron-icons/av-icons.html">
 
 <link rel="import" href="../utils/utils-dialogs.html">
+<link rel="import" href="../search/field-search.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
@@ -22,6 +23,9 @@
         display: block;
         height: 100%;
         background: rgb(250,250,250);
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
       }
       paper-toolbar{
         background: transparent;
@@ -42,37 +46,7 @@
         };
       }
 
-      .search-box {
-        background-color: #fff;
-        border: 1px solid #eee;
-        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-        height: 30px;
-      }
-
-      .search-box iron-icon {
-        color: var(--google-grey-700);
-        fill: var(--google-grey-700);
-        margin: 0 8px;
-      }
-
-      .search-box input {
-        font-size: 15px;
-        outline: 0;
-        border: none;
-        margin-left: 10px;
-      }
-
       .content {
-      }
-
-      .search-box {
-        @apply(--layout-flex);
-        @apply(--layout-center);
-        @apply(--layout-horizontal);
-      }
-
-      .search-box input {
-        @apply(--layout-flex);
       }
 
       .top{
@@ -156,9 +130,7 @@
             <div class="name" hidden$="{{loggedIn}}">Guest</div>
           </div>
         </div>
-        <div class="search-box bottom">
-          <input placeholder="Quick navigation (e.g. Mt 1:1)..." on-keyup="_checkForSubmit">
-        </div>
+        <field-search class="bottom" label="Quick navigation (e.g. Mt 1:1)..." size="small" number-of-suggestions="3"></field-search>
       </paper-toolbar>
 
       <div class="content">
@@ -184,9 +156,6 @@
             <iron-icon icon="search" item-icon></iron-icon>
             Search
           </paper-icon-item>
-        </paper-menu>
-
-        <paper-menu on-tap="_goToPageFromMenuEvent">
           <paper-icon-item data-page="questions">
             <iron-icon icon="trending-up" item-icon></iron-icon>
             Explore Questions
@@ -196,12 +165,13 @@
             Explore Map
           </paper-icon-item>
         </paper-menu>
-
         <paper-menu on-tap="_goToPageFromMenuEvent">
           <paper-icon-item data-page="settings">
             <iron-icon icon="settings" item-icon></iron-icon>
             Settings
           </paper-icon-item>
+        </paper-menu>
+        <paper-menu on-tap="_goToPageFromMenuEvent">
           <paper-icon-item data-page="help/faq">
             <iron-icon icon="help" item-icon></iron-icon>
             FAQ
@@ -232,22 +202,10 @@
 
         },
         _goToPageFromMenuEvent: function(ev){
-          var tappedPage = Polymer.dom(ev).localTarget.dataset.page;
+          var localTarget = Polymer.dom(ev).localTarget;
+          var tappedPage = typeof localTarget.dataset.page != 'undefined' ? localTarget.dataset.page : localTarget.parentElement.dataset.page;
           if(typeof tappedPage !== 'undefined'){
-            app.navigateTo('/' + tappedPage);
-          }
-        },
-        _checkForSubmit: function(ev){
-          if(ev.code == 'Enter' || ev.code == 'NumpadEnter'){
-            var value = ev.target.value;
-            var reference = new BibleReference(value);
-            ev.target.blur();
-            ev.target.value = '';
-            if(reference.book){
-              app.navigateTo('/book/'+reference.toString());
-            }else{
-              app.navigateTo('/search/'+encodeURIComponent(value));
-            }
+            app.navigateTo('/' + tappedPage, ev);
           }
         },
         _doSync: function(ev){

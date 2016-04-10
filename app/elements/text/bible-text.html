@@ -22,7 +22,8 @@
     </style>
     <style>
       :host{
-        font-family: Roboto Slab;
+        font-family: 'Roboto Slab', Roboto;
+        font-weight: 400;
       }
       paper-card{
       }
@@ -206,6 +207,7 @@
         font-family: Verdana;
         cursor: pointer;
       }
+      /*
       :host([internal-mode='study']) vn[first]::before{
         content: attr(n);
         display: inline-block;
@@ -216,6 +218,12 @@
         min-width: 12px;
         min-height: 12px;
         transform: scale(0.9) translateY(-20%);
+      }
+      */
+      :host([internal-mode='study']) vn[first]::before{
+        content: ' ' attr(n) ' ';
+        font-size: .8em;
+        opacity: .4;
       }
       /* supplied */
       :host([internal-mode='study']) sd{
@@ -435,6 +443,7 @@
               this._isBookLoaded = true;
               this.scrollToReference();
               app.finishedLoading('book');
+              this.fire('lazy-ready');
               //this.$.text.fire('iron-resize');
             }, 500);
           }.bind(this);
@@ -555,16 +564,16 @@
         _handleTapOnNote: function(ev){
           if(Polymer.dom(ev).path[0].nodeName.toLowerCase() == 'ci'){
             this.$.note.opened = false;
-            var reference = new BibleReference(ev.path[0].getAttribute('ref'));
+            var reference = new BibleReference(Polymer.dom(ev).path[0].getAttribute('ref'));
             page('/book/'+reference);
           }
         },
         _handleTapOnText: function(ev){
           if(Polymer.dom(ev).path[0].nodeName.toLowerCase() == 'n'){
-            var note = ev.path[0].innerHTML;
+            var note = Polymer.dom(ev).path[0].innerHTML;
             this.$.note.querySelector('.content').innerHTML = note;
-            this.customStyle['--note-dialog-top'] = event.detail.y + 'px';
-            this.customStyle['--note-dialog-left'] = event.detail.x + 'px';
+            this.customStyle['--note-dialog-top'] = ev.detail.y + 'px';
+            this.customStyle['--note-dialog-left'] = ev.detail.x + 'px';
             this.updateStyles();
             this.$.note.opened = true;
           }

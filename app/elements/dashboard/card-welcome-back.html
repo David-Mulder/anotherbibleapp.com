@@ -14,11 +14,13 @@
 
     <paper-card id="card" heading="Welcome">
       <div class="card-content">
-        Below you can find recently asked questions and books you have recently started reading. <span hidden$="{{!narrow}}">Swipe from the left (or tap the hamburger button in the top left)</span><span hidden$="{{narrow}}">Check the left drawer</span> to get an overview of all books or if you're looking for a specific text use the search function in the top right.
+        On the dashboard you can find books and letters you have recently started reading or recently active questions to explore. <span hidden$="{{!narrow}}">Swipe from the left (or tap the hamburger button in the top left)</span><span hidden$="{{narrow}}">Check the left drawer</span> to get an overview of all books or if you're looking for a specific text use the search function in the top right.
       </div>
+      <!--
       <div class="card-actions">
         <paper-button on-tap="dismiss">Dismiss</paper-button>
       </div>
+      -->
     </paper-card>
 
   </template>
@@ -38,7 +40,7 @@
         },
         dismiss: function(){
           localStorage['hideWelcomeBackCard'] = true;
-          this.style.display = 'none';
+          //this.style.display = 'none';
         }
       });
     })();

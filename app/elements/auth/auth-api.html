@@ -108,11 +108,11 @@
 
         execute: function(cb){
 
-          app.loading('api.'+this.action);
-
           return new Promise(function(resolve, reject){
 
             this.debounce('api.'+this.action, function(){
+
+              app.loading('api.'+this.action);
 
               if(this.token || this.unauthorized || true){
                 var allSetParams = this._getSetParams();
@@ -146,7 +146,7 @@
                         data[param.name] = param.value;
                       }.bind(this));
                       fetchConfig.body = JSON.stringify(data);
-                      console.info('body set', data);
+                      //console.info('body set', data);
                       fetchConfig.headers.set('Content-Type','application/json');
                     }
                   }
@@ -155,7 +155,7 @@
                     url += '?' + urlParams.map(p => encodeURIComponent(p[0]) + '=' + encodeURIComponent(typeof p[1] === 'string' ? p[1] : JSON.stringify(p[1]))).join('&');
                   }
 
-                  console.info('fetch', url);
+                  //console.info('fetch', url);
 
                   fetch(url, fetchConfig).then(function(response){
 

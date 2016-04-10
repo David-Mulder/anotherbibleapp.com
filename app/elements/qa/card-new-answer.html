@@ -19,9 +19,10 @@
       bible-markdown-editor{
         --bible-markdown-preview: {
           margin: 0px 0px 0px 0px;
+          padding: 0px 20px;
         };
         --bible-markdown-input-container: {
-          padding: 10px;
+          padding: 10px 20px;
         }
       }
     </style>
@@ -31,10 +32,10 @@
 
     <paper-card heading="Know the answer?" hidden$="{{answerPosted}}">
       <div class="card-actions markdown">
-        <bible-markdown-editor value="{{answerText}}" placeholder="Your answer..." rows="7"></bible-markdown-editor>
+        <bible-markdown-editor value="{{answerText}}" placeholder="Your answer..." rows="7" force-mode="vertical"></bible-markdown-editor>
       </div>
       <div class="card-actions">
-        <paper-button on-tap="submitAnswer">Submit your Answer</paper-button>
+        <paper-button on-tap="submitAnswer">Add your Answer</paper-button>
       </div>
     </paper-card>
 

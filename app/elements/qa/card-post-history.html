@@ -2,6 +2,8 @@
 <link rel="import" href="../utils/relative-time.html">
 <link rel="import" href="./bible-markdown.html">
 
+<script src="/bower_components/jsdiff/diff.min.js"></script>
+
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 
 <dom-module id="card-post-history">
@@ -40,7 +42,7 @@
         padding: 10px 20px 0px 20px;
         margin: 0px;
       }
-      .html .verses, .markdown .verses{
+      .html .verses, .markdown .verses, .inline .verses{
         margin: 0px 20px 10px 20px;
         color: var(--secondary-text-on-card-dialog-color);
       }
@@ -57,16 +59,59 @@
         margin-top: 16px;
         margin-bottom: 16px;
         white-space: pre-wrap;
+        word-break: break-word;
       }
-      .html .time, .markdown .time{
+      .html .time, .markdown .time, .inline .time{
         padding: 0px 20px 15px 20px;
         color: var(--secondary-text-on-card-dialog-color);
         font-size: smaller;
         text-align: right;
       }
+      .inline{
+        padding: 20px;
+        flex: 1;
+      }
+      .inline bible-markdown{
+        display: block;
+      }
+      .inline pre{
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      ins{
+        background-color: darkgreen;
+        color: white;
+        text-decoration: none;
+      }
+      del{
+        background-color: red;
+        color: white;
+      }
     </style>
 
     <paper-card>
+
+
+
+      <div class="inline" hidden$="{{!_equals(mode, 'inline-html')}}">
+
+        <bible-markdown markdown="{{_diffMarkdown}}"></bible-markdown>
+        <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{_diffVerses.untouched}} <del>{{_diffVerses.removed}}</del> <ins>{{_diffVerses.added}}</ins></div>
+
+        <div class="time">by <a href="/user/{{new.revisionAuthor._id}}">{{new.revisionAuthor.displayName}}</a> <relative-time time="{{new.updatedAt}}"></relative-time></div>
+
+
+      </div>
+
+      <div class="inline" hidden$="{{!_equals(mode, 'inline-markdown')}}">
+
+        <pre id="diff-markdown"></pre>
+        <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{_diffVerses.untouched}} <del>{{_diffVerses.removed}}</del> <ins>{{_diffVerses.added}}</ins></div>
+
+        <div class="time">by <a href="/user/{{new.revisionAuthor._id}}">{{new.revisionAuthor.displayName}}</a> <relative-time time="{{new.updatedAt}}"></relative-time></div>
+
+
+      </div>
 
       <template is="dom-if" if="{{_equals(mode, 'html')}}">
 
@@ -90,7 +135,7 @@
 
             <h3 hidden$="{{!_equals(type, 'question')}}">{{new.title}}</h3>
             <bible-markdown markdown="{{new.text}}"></bible-markdown>
-            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{old.verseString}}</div>
+            <div class="verses" hidden$="{{!_equals(type, 'question')}}">About {{new.verseString}}</div>
 
             <div class="time">by <a href="/user/{{new.revisionAuthor._id}}">{{new.revisionAuthor.displayName}}</a> <relative-time time="{{new.updatedAt}}"></relative-time></div>
 
@@ -143,7 +188,9 @@
       var BibleReference = require('bible-reference-parser');
       Polymer({
         properties: {
-          type: String,
+          type: {
+            type: String
+          },
           old: Object,
           new: {
             type: Object
@@ -151,7 +198,8 @@
         },
         observers: [
           '_newSet(new)',
-          '_oldSet(old)'
+          '_oldSet(old)',
+          '_compare(new, old, type)'
         ],
         behaviors:[
           abaBehaviors.logic
@@ -163,6 +211,64 @@
         _oldSet: function(){
           if(this.old.verses)
             this.old.verseString = this.old.verses.map(v => new BibleReference(v)).join(', ');
+        },
+        _compare: function(newRevision, oldRevision){
+          //todo, generalize to function
+          this._diffMarkdown = '';
+          this._diffHTML = '';
+          if(this.type == 'question') {
+            var diffs = JsDiff.diffChars(oldRevision.title, newRevision.title);
+            diffs.forEach(function (diff) {
+              if (diff.added) {
+                this._diffMarkdown += '\u2063+[+\u2063' + diff.value + '\u2063+]+\u2063';
+                this._diffHTML += '<ins>' + diff.value + '</ins>';
+              } else if (diff.removed) {
+                this._diffMarkdown += '\u2063~[~\u2063' + diff.value + '\u2063~]~\u2063';
+                this._diffHTML += '<del>' + diff.value + '</del>';
+              } else {
+                this._diffMarkdown += diff.value;
+                this._diffHTML += diff.value;
+              }
+            }.bind(this));
+            this._diffMarkdown += '\n===\n'
+            this._diffHTML = '<h1>'+ this._diffHTML + '</h1>';
+          }
+          diffs = JsDiff.diffWords(oldRevision.text, newRevision.text);
+          diffs.forEach(function(diff){
+            if(diff.added){
+              this._diffMarkdown += '\u2063+[+\u2063' + diff.value + '\u2063+]+\u2063';
+              this._diffHTML += '<ins>' + diff.value.replace(/\n/g, 'A\nB') + '</ins>';
+            }else if(diff.removed){
+              this._diffMarkdown += '\u2063~[~\u2063' + diff.value + '\u2063~]~\u2063';
+              this._diffHTML += '<del>' + diff.value + '</del>';
+            }else{
+              this._diffMarkdown += diff.value;
+              this._diffHTML += diff.value;
+            }
+          }.bind(this));
+
+          this.$['diff-markdown'].innerHTML = this._diffHTML;
+
+          if(this.type == 'question') {
+            var arrayDiff = function(a, b) {
+              return a.filter(function(i) {return b.indexOf(i) < 0;});
+            };
+            var arrayUnion = function(a, b) {
+              return a.filter(function(i) {return b.indexOf(i) > -1;});
+            };
+
+            var removedVerses = arrayDiff(oldRevision.verses, newRevision.verses);
+            var addedVerses = arrayDiff(newRevision.verses, oldRevision.verses);
+            var untouchedVerses = arrayUnion(newRevision.verses, oldRevision.verses);
+
+            this._diffVerses = {};
+            this.set('_diffVerses.removed', BibleReference.combine(removedVerses.map(v => new BibleReference(v))).join(', '));
+            this.set('_diffVerses.added', BibleReference.combine(addedVerses.map(v => new BibleReference(v))).join(', '));
+            this.set('_diffVerses.untouched', BibleReference.combine(untouchedVerses.map(v => new BibleReference(v))).join(', '));
+          }else{
+            this._diffVerses = {};
+          }
+          console.log(this._diffVerses);
         }
       });
     })();

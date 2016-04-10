@@ -1,4 +1,5 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="../text/bible-snippet.html">
 
 <link id="bible-reference-parser" rel="import" href="../utils/bible-reference-parser.html">
 <script src="/bower_components/remarkable/dist/remarkable.js"></script>
@@ -38,8 +39,22 @@
       hr{
         display: block;
         height: 1px;
-        background: var(--accent-color);
+        background: var(--accent-color-100);
         border: 0px;
+      }
+      img{
+        max-width: 100%;
+        padding-right: 10px;
+        box-sizing: border-box;
+      }
+      ins{
+        background-color: darkgreen;
+        color: white;
+        text-decoration: none;
+      }
+      del{
+        background-color: red;
+        color: white;
       }
     </style>
     <div id="html"></div>
@@ -78,6 +93,8 @@
             // or '' if the source string is not changed
             highlight: function (/*str, lang*/) { return ''; }
           });
+          remarkable.inline.ruler.enable([ 'ins' ]);
+
           remarkable.core.ruler.enable([
             'abbr'
           ]);
@@ -87,7 +104,6 @@
           ]);
 
           var md = this.markdown;
-          console.log(md);
 
           md = md.replace(/\[(.*?)\](?!\()/g, function(match, capture){
             var reference = new BibleReference(capture);
@@ -119,13 +135,16 @@
               return match;
             }
           });
-          console.log(html);
+
           html = html.replace(/<blockquote>([\s\S]*?)<\/blockquote>[\r\n]*<p>[sS]ource: (.*?)<\/p>/g, function(match, blockquote, source){
             return '<blockquote>'+blockquote+'<p class="source">source: <span>'+source+'</span></p></blockquote>';
           });
-          console.log(html);
+
+          html = html.replace(/\+\[\+([\s\S]*?)\+\]\+/g, '<ins>$1</ins>');
+          html = html.replace(/\~\[\~([\s\S]*?)\~\]\~/g, '<del>$1</del>');
 
           this.$.html.innerHTML = html;
+          this.scopeSubtree(this.$.html, false);
         },
         ready: function(){
           //console.log(this.markdown);

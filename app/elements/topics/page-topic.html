@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="./topic-card.html">
 
+<link id="topics" rel="import" href="topics.lib.html">
+
 <dom-module id="page-topic">
   <template>
     <style include="shared-styles"></style>
@@ -28,6 +30,8 @@
   <script>
     (function() {
       'use strict';
+
+      var topics = require('topics');
 
       Polymer({
         is: 'page-topic',
@@ -84,20 +88,7 @@
         topicChanged: function(topicName){
           this.beautifulTitle = this._smartCaps(topicName);
 
-          fetch(this.resolveUrl('./data/topical.js')).then(function(response){
-            return response.text();
-          }).then(function(text){
-            text = text.replace('var topics = ', '');
-            text = text.replace(';', '');
-            var topicTexts = JSON.parse(text)[topicName];
-            var verses = topicTexts.map(function(text){
-              var parts = text.split(' ');
-              return {
-                start: parts[0],
-                end: parts[1].length > 0 ? parts[1] : parts[0],
-                votes: parts[2]
-              };
-            });
+          topics.getByName(topicName).then(function(verses){
             this.set('topic', {
               title: this.beautifulTitle,
               verses: verses

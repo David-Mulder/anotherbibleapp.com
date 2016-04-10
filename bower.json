@@ -1,5 +1,5 @@
 {
-  "name": "polymer-starter-kit",
+  "name": "another-bible-app",
   "private": true,
   "dependencies": {
     "polymer": "Polymer/polymer#^1.1.0",
@@ -38,7 +38,10 @@
     "paper-progress": "PolymerElements/paper-progress#^1.0.9",
     "google-map": "GoogleWebComponents/google-map#^1.1.10",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.1.3",
-    "remarkable": "jonschlinkert/remarkable#^1.6.2"
+    "remarkable": "jonschlinkert/remarkable#^1.6.2",
+    "paper-stepper": "David-Mulder/paper-stepper",
+    "imgur-upload": "ianbibby/imgur-upload#master",
+    "jsdiff": "^2.2.2"
   },
   "devDependencies": {
     "web-component-tester": "*",

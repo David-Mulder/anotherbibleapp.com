@@ -55,11 +55,9 @@
         max-width: 1300px;
       }
       #verseContainer{
-        background: var(--accent-color-50);
-        padding: 10px;
+        padding: 30px;
         padding-top: 5px;
-        padding-bottom: 10px;
-        margin-top: 15px;
+        padding-bottom: 15px;
       }
       #title{
         --paper-input-container-input: {
@@ -70,12 +68,20 @@
         background: var(--primary-color-400);
         color: var(--text-on-primary-color-400);
         padding: 25px 30px;
-        margin-bottom: 20px;
+        margin-bottom: 0px;
       }
       .card-title paper-input{
         --paper-input-container-input-color: white;
         --paper-input-container-color: white;
         --paper-input-container-focus-color: var(--accent-color);
+      }
+      bible-markdown-editor{
+        --bible-markdown-input-container: {
+          padding-left: 20px;
+        };
+        --bible-markdown-preview: {
+          margin-left: 0px;
+        }
       }
     </style>
 
@@ -92,8 +98,9 @@
         <div class="card-title">
           <paper-input id="title" label="Question title" value="{{title}}" char-counter maxlength="200" minlength="15"></paper-input>
         </div>
-        <div class="card-content">
-          <bible-markdown-editor label="Question in detail" value="{{text}}" rows="7"></bible-markdown-editor>
+        <div>
+          <bible-markdown-editor label="Question in detail" value="{{text}}" rows="10"></bible-markdown-editor>
+
           <div id="verseContainer">
             <paper-input label="Verses" value="{{verseString}}" error-message="One of the verses can not be parsed" invalid="{{invalidVerseFound}}"></paper-input>
           </div>
@@ -179,7 +186,8 @@
         },
         save: function(){
           this.$.save.execute().then(function(question){
-            app.navigateTo('/question/'+question._id+'/');
+            //app.navigateTo('/question/'+question._id+'/');
+            page.back();
           });
         }
       });

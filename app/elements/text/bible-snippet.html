@@ -25,6 +25,12 @@
         text-align: right;
         color: var(--secondary-text-on-card-dialog-color);
       }
+      mark{
+        background: var(--accent-color-50);
+        font-style: italic;
+        padding: 2px;
+        margin: -2px;
+      }
     </style>
     <utils-books id="utils"></utils-books>
     <div id="snippet"></div>
@@ -62,6 +68,10 @@
             type: Boolean,
             value: false,
             reflectToAttribute: true
+          },
+          title: {
+            type: String,
+            reflectToAttribute: true
           }
         },
         listeners: {
@@ -79,17 +89,17 @@
 
             this.startReference = new BibleReference(start);
             this.endReference = new BibleReference(end);
+
+            this.title = this.startReference.toString() + (this.startReference.toString() != this.endReference.toString() ? (' - ' + this.endReference.toString()) : '');
+
             var xmlFile = this.resolveUrl('text/'+this.startReference.book.name+'.xml');
             fetch(xmlFile).then(function(response){
               return response.text();
             }).then(function(text){
-              console.info(xmlFile, this.startReference.toString());
+
+              //console.info(xmlFile, this.startReference.toString());
               var startIndex = text.indexOf('<vn id="'+this.startReference.toString()+'">');
               if(startIndex === -1){
-                window._debug = text;
-                window._debug2 = xmlFile;
-                window._debug3 = this.startReference;
-                window._debug4 = start;
                 console.warn('not found start point', this.startReference.toString())
                 return;
               }
@@ -126,7 +136,7 @@
                 snippet = snippet.split(/\s/g).map(function(word){
                   var stemmed = smartStemmer(word.toLowerCase().replace(/[^a-z0-9]+/, ''));
                   if(highlights.indexOf(stemmed) > -1){
-                    return '<strong>'+word+'</strong>';
+                    return '<mark>'+word+'</mark>';
                   }else{
                     return word;
                   }
@@ -140,9 +150,9 @@
 
           }, 0);
         },
-        _navigateIfLinked: function(){
+        _navigateIfLinked: function(ev){
           if(this.linked){
-            app.navigateTo('/book/'+this.startReference.toString());
+            app.navigateTo('/book/'+this.startReference.toString(), ev);
           }
         }
       });

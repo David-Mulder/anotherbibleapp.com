@@ -54,9 +54,19 @@
         margin-right: 10px;
       }
       bible-text{
-        opacity: 0;
-        transition: .1s linear opacity;
         flex: 1;
+      }
+      div[main]{
+        position: relative;
+      }
+      #main-container{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        top: 0px;
       }
     </style>
 
@@ -68,24 +78,27 @@
     <paper-drawer-panel id="qaDrawerPanel" right-drawer responsive-width="700px" drawer-width="300px" force-narrow="{{!studyTools}}">
 
       <div main>
+        <div id="main-container">
 
-        <paper-toolbar id="toolbar">
+          <paper-toolbar id="toolbar">
 
-          <intelligent-title title="{{fullRef.book.plainLongTitle}}" short-title="{{fullRef.book.title}}"></intelligent-title>
+            <intelligent-title title="{{fullRef.book.plainLongTitle}}" short-title="{{fullRef.book.title}}"></intelligent-title>
 
-          <paper-toggle-button checked="{{studyTools}}" id="study-tools">Study&nbsp;tools</paper-toggle-button>
+            <paper-toggle-button checked="{{studyTools}}" id="study-tools">Study&nbsp;tools</paper-toggle-button>
 
-          <paper-menu-button horizontal-align="right">
-            <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-            <paper-menu class="dropdown-content">
-              <paper-item on-tap="goToSearch">Search&nbsp;in&nbsp;{{fullRef.book.title}}</paper-item>
-              <paper-item on-tap="goToSettings">Settings</paper-item>
-            </paper-menu>
-          </paper-menu-button>
+            <paper-menu-button horizontal-align="right">
+              <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+              <paper-menu class="dropdown-content">
+                <paper-item on-tap="goToSearch">Search&nbsp;in&nbsp;{{fullRef.book.title}}</paper-item>
+                <paper-item on-tap="goToSettings">Settings</paper-item>
+              </paper-menu>
+            </paper-menu-button>
 
-        </paper-toolbar>
+          </paper-toolbar>
 
-        <bible-text id="text" text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="verseSelected" mode="{{mode}}" on-scrolled="savePosition"></bible-text>
+          <bible-text id="text" text-ref="{{fullRef}}" selected-verses="{{selectedVerses}}" selection-mode="{{verseSelectionMode}}" on-verse-selected="verseSelected" mode="{{mode}}" on-scrolled="savePosition" on-scroll="_handleToolbar"></bible-text>
+
+        </div>
 
       </div>
 
@@ -115,6 +128,9 @@
           disableLocationSaving: {
             type: Boolean,
             value: false
+          },
+          lazyRouterConfig: {
+            awaitReadyEventOnFirstLoad: true
           },
           animationConfig: {
             value: function() {
@@ -162,11 +178,9 @@
         },
 
         _finishedAnimation: function(){
-          this.$.text.style.opacity = 1;
         },
 
         _pageBecameVisible: function(){
-          this.$.text.style.opacity = 0;
           this.$.text.fire('element-became-visible');
           this.setMode();
         },
@@ -242,12 +256,12 @@
           }
         },
 
-        goToSearch: function(){
-          app.navigateTo('/search/in:'+this.fullRef.book.name.replace(/ /g, '')+' ');
+        goToSearch: function(ev){
+          app.navigateTo('/search/in:'+this.fullRef.book.name.replace(/ /g, '')+' ', ev);
         },
 
-        goToSettings: function(){
-          app.navigateTo('/settings');
+        goToSettings: function(ev){
+          app.navigateTo('/settings', ev);
         },
 
         savePosition: function(ev){
@@ -267,6 +281,29 @@
         _closeDrawerAndDeselectVerses: function(){
           this.$.qaDrawerPanel.closeDrawer();
           this.set('selectedVerses', []);
+        },
+
+        _handleToolbar: function(){
+          if(window.innerWidth <= 768 && !this.studyTools) {
+            var scrollTop = this.$.text.scrollTop;
+            this._prevScrollTop = this._prevScrollTop || 0;
+            if (scrollTop < this._prevScrollTop) {
+              this._scrollUpCounter += (this._prevScrollTop - scrollTop);
+              if (this._scrollUpCounter > 100) {
+                this.$['main-container'].style.top = '0px';
+              }
+              this._scrollDownCounter = 0;
+            } else {
+              this._scrollDownCounter = this._scrollDownCounter || 0;
+              this._scrollDownCounter += (scrollTop - this._prevScrollTop);
+              this.$['main-container'].style.top = -1 * Math.min(this._scrollDownCounter * 2, 64) + 'px';
+              this._scrollUpCounter = 0;
+            }
+
+            this._prevScrollTop = scrollTop;
+          }else{
+            this.$['main-container'].style.top = '0px';
+          }
         }
 
       });

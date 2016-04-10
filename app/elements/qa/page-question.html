@@ -67,6 +67,9 @@
         background: rgba(0,0,0,.05);
         cursor: pointer;
       }
+      #relatedToolbar{
+        z-index: 1;
+      }
     </style>
     <style>
       #toolbar{
@@ -101,12 +104,12 @@
         </div>
         <div id="content" class="page-content" on-scroll="_handleToolbarHeight">
 
-          <qa-post id="question" type="question" post="{{qas.question}}"></qa-post>
+          <qa-post id="question" type="question" post="{{qas.question}}" on-tap="_checkForReferenceTap"></qa-post>
 
           <hr class="divider">
 
           <template is="dom-repeat" items="{{qas.answers}}" as="answer">
-            <qa-post type="answer" post="{{answer}}"></qa-post>
+            <qa-post type="answer" post="{{answer}}" on-tap="_checkForReferenceTap"></qa-post>
           </template>
 
           <div id="noAnswers" hidden$="{{anyAnswers}}">
@@ -246,7 +249,19 @@
           this.relatedVerses = verses;
         },
         _goToVerse: function(ev){
-          app.navigateTo('/book/'+ev.model.item.start.toString());
+          app.navigateTo('/book/'+ev.model.item.start.toString(), ev);
+        },
+        _checkForReferenceTap: function(ev){
+          var el = Polymer.dom(ev).path[0];
+          if(el.nodeName.toLowerCase() == 'a' && el.getAttribute('href').substring(0,1) == '#'){
+            ev.preventDefault();
+            var target = ev.target.$.markdown.$.html.querySelector(el.getAttribute('href'));
+            if(target){
+              var currentRect = el.getBoundingClientRect();
+              var targetRect = target.getBoundingClientRect();
+              this.$.content.scrollTop += targetRect.top - currentRect.top;
+            }
+          }
         }
       });
     })();
